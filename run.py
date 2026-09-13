@@ -18,7 +18,7 @@ import pandas as pd
 
 from predictor import backtest as bt
 from predictor import evaluate as ev
-from predictor.data import download_universe
+from predictor.data import download_universe, assert_vintage
 from predictor.features import build_panel, model_cols
 from predictor.model_lgbm import fit_fold, walk_forward
 
@@ -47,6 +47,7 @@ def main() -> None:
         tickers = [t.strip().upper() for t in args.tickers.split(",") if t.strip()]
     print(f"downloading {len(tickers) + 1} symbols from Yahoo...")
     paths = download_universe(tickers, market=args.market)
+    assert_vintage({k: str(v) for k, v in paths.items()})
     price_paths = {k: str(v) for k, v in paths.items()}
     print("building panel...")
     panel = build_panel(price_paths, market=args.market)

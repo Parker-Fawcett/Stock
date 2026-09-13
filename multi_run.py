@@ -16,7 +16,7 @@ import numpy as np
 import pandas as pd
 
 from predictor import evaluate as ev
-from predictor.data import download_universe
+from predictor.data import download_universe, assert_vintage
 
 ASSETS = ["SPY", "IWM", "TLT", "GLD"]
 LOOKBACK = 210  # ~10 trading months
@@ -34,6 +34,7 @@ def main() -> None:
     args = ap.parse_args()
     assets = [a.strip().upper() for a in args.assets.split(",") if a.strip()]
     paths = download_universe(assets, market="SPY")
+    assert_vintage({k: str(v) for k, v in paths.items()})
     px = {}
     for tk, p in paths.items():
         try:

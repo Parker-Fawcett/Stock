@@ -81,3 +81,29 @@ def download_universe(tickers: list[str], market: str = "SPY",
         except Exception as e:  # noqa: BLE001 - free data is flaky, keep going
             print(f"download failed {t}: {e}")
     return paths
+
+
+def assert_vintage(paths: dict[str, Path], max_gap_days: int = 7) -> None:
+    """Fail loudly on mixed-vintage universes (stale cache + fresh mix).
+    Added after Sep-2026 incident: SPY silently stale 9 months while the
+    rest refreshed, dropping it from multi-asset holds with no error."""
+    import pandas as pd
+
+    ends = {}
+    for tk, p in paths.items():
+        try:
+            d = pd.read_csv(p, parse_dates=["Date"])
+            ends[tk] = d["Date"].max()
+        except Exception:  # noqa: BLE001
+            ends[tk] = None
+    valid = {k: v for k, v in ends.items() if v is not None}
+    if not valid:
+        raise RuntimeError("no readable price files")
+    span = (max(valid.values()) - min(valid.values())).days
+    if span > max_gap_days:
+        old = sorted(((str(v.date()), k) for k, v in valid.items()))[:5]
+        raise RuntimeError(
+            f"mixed vintages: {span}d span. Oldest: {old}. "
+            "Re-run with refresh=True.")
+    print(f"vintage ok: {len(valid)} symbols through "
+          f"{max(valid.values()).date()}")

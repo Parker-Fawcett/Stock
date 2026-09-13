@@ -20,11 +20,12 @@ import pandas as pd
 
 from predictor import backtest as bt
 from predictor import evaluate as ev
-from predictor.data import download_universe
+from predictor.data import download_universe, assert_vintage
 
 
 def momentum_panel(tickers: list[str], market: str) -> pd.DataFrame:
     paths = download_universe(tickers, market=market)
+    assert_vintage({k: str(v) for k, v in paths.items()})
     frames = []
     for tk, p in paths.items():
         try:

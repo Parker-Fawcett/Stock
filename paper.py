@@ -25,7 +25,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parent))
 import numpy as np
 import pandas as pd
 
-from predictor.data import download_universe
+from predictor.data import download_universe, assert_vintage
 from predictor.features import HORIZON, build_panel, model_cols
 from predictor.model_lgbm import fit_fold
 
@@ -57,6 +57,7 @@ def cmd_predict(args) -> None:
         tickers = [t.strip().upper() for t in args.tickers.split(",") if t.strip()]
     paths = download_universe(tickers, market=args.market,
                                 refresh=getattr(args, "refresh", False))
+    assert_vintage({k: str(v) for k, v in paths.items()})
     panel = build_panel({k: str(v) for k, v in paths.items()}, market=args.market)
     cols = model_cols(panel)
     train, val, latest, asof = trailing_split(panel)

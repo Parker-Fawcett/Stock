@@ -101,11 +101,19 @@ which strengthens holdout results and weakens tune ones.
     Sharpe 0.33, dead — tighter selection concentrated without paying.
     Budget: 10/20 left.
 18. **Multi-asset trend, quarterly rebalance (Faber's turnover note).**
-    Tune +5.8% (Sharpe 0.58, DD -0.13), holdout +5.8% (Sharpe 0.51,
-    DD -0.27). Identical halves, lower turnover than monthly, same
-    calm profile. Slow ≈ same, cheaper. (Also fixed a slice-CAGR bug
+    Tune +5.8% (Sharpe 0.58, DD -0.13), holdout +6.9% (Sharpe 0.60,
+    DD -0.27). Monthly version: tune +7.3% (0.82), holdout +7.4%
+    (0.62). SPY buy-hold same window +14.5% — strategy trails on
+    return, wins on risk-adjusted calm. (Also fixed a slice-CAGR bug
     that had inflated momentum holdout prints; Sharpe/DD unaffected.)
-19. **International trend sleeve (EFA/EEM/VNQ/GLD, same frozen rule).**
+19. **Data-hygiene incident (Sep 2026).** Found 105 stale large-cap
+    files (Dec 2025) mixed with fresh ones — universe-scoped refreshes
+    never re-requested them, and SPY silently dropped out of
+    multi-asset holds for 9 months with no error (NaN comparisons).
+    Paper-grade numbers stood (fresh IWM benchmark); multi-asset
+    re-ran slightly better with SPY present. Fix: `assert_vintage`
+    guard wired into every runner — mixed vintages now fail loudly.
+20. **International trend sleeve (EFA/EEM/VNQ/GLD, same frozen rule).**
     Tune +2.9% (Sharpe 0.22, DD -0.26), holdout +11.2% (Sharpe 0.88,
     DD -0.16). Both positive, divergent by regime like everything else.
     Holdout Sharpe 0.88 is the best single-half risk-adjusted print in
