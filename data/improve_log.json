@@ -1,5 +1,5 @@
 {
- "spent": 10,
+ "spent": 12,
  "proposals": {
   "P1-vol-only": {
    "status": "dead-artifact",
@@ -121,6 +121,33 @@
     "months": 82
    },
    "note": "Sharpe 0.333 under 0.41 bar. Tighter gate concentrated without paying."
+  },
+  "P11-hold10": {
+   "status": "dead-tune",
+   "pred": "Fresher signal, half exposure, double turnover rate. Sharpe ~0.3.",
+   "tune": {
+    "CAGR": -0.0341,
+    "maxDD": -0.434,
+    "sharpe": -0.216,
+    "months": 82
+   },
+   "note": "Sharpe -0.22. Shorter holds: double turnover, faster staleness. Direction wrong."
+  },
+  "P12-top40": {
+   "status": "promoted",
+   "pred": "Max breadth; dilutes further. Sharpe ~0.3, DD best yet.",
+   "tune": {
+    "CAGR": 0.1082,
+    "maxDD": -0.308,
+    "sharpe": 0.57,
+    "months": 82
+   },
+   "holdout": {
+    "CAGR": 0.0354,
+    "maxDD": -0.408,
+    "sharpe": 0.135,
+    "months": 81
+   }
   }
  },
  "archive": [
@@ -238,6 +265,33 @@
     "CAGR": 0.0431,
     "maxDD": -0.401,
     "sharpe": 0.161,
+    "months": 81
+   }
+  },
+  {
+   "id": "P11-hold10",
+   "tune": {
+    "CAGR": -0.0341,
+    "maxDD": -0.434,
+    "sharpe": -0.216,
+    "months": 82
+   }
+  },
+  {
+   "id": "P12-top40",
+   "tune": {
+    "CAGR": 0.1082,
+    "maxDD": -0.308,
+    "sharpe": 0.57,
+    "months": 82
+   }
+  },
+  {
+   "id": "P12-top40",
+   "holdout": {
+    "CAGR": 0.0354,
+    "maxDD": -0.408,
+    "sharpe": 0.135,
     "months": 81
    }
   }

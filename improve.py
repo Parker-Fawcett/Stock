@@ -351,6 +351,51 @@ def p_gate35(test, proba, px):
     return _risk_book(t, proba, tpx, weight_fn=trailing_vol, thresh=0.35)
 
 
+def p_hold10(test, proba, px):
+    """Monthly decisions, 10-day holds, then cash. Fresher signal, half
+    exposure. Pre-registered: turnover doubles per invested day."""
+    from predictor.backtest import RISK_STOP
+    t = test.copy().reset_index(drop=True)
+    t["proba"] = np.asarray(proba, dtype=float)
+    months = pd.to_datetime(t["Date"]).dt.to_period("M").drop_duplicates().sort_values()
+    tpx = t.set_index(["ticker", "Date"])["Close"].unstack("ticker")
+    rows, prev = [], []
+    for m in months:
+        block = t[pd.to_datetime(t["Date"]).dt.to_period("M") == m]
+        d0 = block["Date"].max()
+        c = block[block["Date"] == d0].sort_values("proba", ascending=False)
+        picks = c[c["proba"] >= 0.25].head(20)["ticker"].tolist()
+        turnover = len(set(picks) ^ set(prev)) / max(1, max(len(picks), len(prev)))
+        cost = turnover * COST / 1e4
+        fut = tpx.loc[tpx.index > d0]
+        rs = []
+        for tk in picks:
+            try:
+                p0 = tpx.loc[d0, tk]
+                r = fut[tk].iloc[:10]
+                if len(r) == 0:
+                    continue
+                hit = r[r / p0 <= RISK_STOP]
+                rs.append(float(np.log(RISK_STOP)) if len(hit)
+                          else float(np.log(r.iloc[-1] / p0)))
+            except Exception:  # noqa: BLE001
+                continue
+        gross = float(np.mean(rs)) if rs else 0.0
+        rows.append({"date": d0, "net": gross - cost})
+        prev = picks
+    out = pd.DataFrame(rows)
+    return out.set_index("date")["net"]
+
+
+def p_top40(test, proba, px):
+    t = test.copy()
+    tpx = t.set_index(["ticker", "Date"])["Close"].unstack("ticker")
+    return _risk_book(t, proba, tpx, weight_fn=trailing_vol, top_n=40)
+    t = test.copy()
+    tpx = t.set_index(["ticker", "Date"])["Close"].unstack("ticker")
+    return _risk_book(t, proba, tpx, weight_fn=trailing_vol, thresh=0.35)
+
+
 PROPOSALS = {
     # id: (fn, predicted effect, pre-registered before any evaluation)
     "P1-vol-only": (p_vol_only, "Cuts turnover drag; DD unchanged. Sharpe ~0.1."),
@@ -363,6 +408,8 @@ PROPOSALS = {
     "P8-volscale": (p_volw, "Smooths single-name blowups; DD toward -0.2. Sharpe ~0.5."),
     "P9-top30": (p_top30, "More breadth, dilutes best ideas; DD improves, CAGR falls. Sharpe ~0.4."),
     "P10-gate35": (p_gate35, "Tighter selection, fewer names; punchier, worse DD. Sharpe ~0.4."),
+    "P11-hold10": (p_hold10, "Fresher signal, half exposure, double turnover rate. Sharpe ~0.3."),
+    "P12-top40": (p_top40, "Max breadth; dilutes further. Sharpe ~0.3, DD best yet."),
 }
 
 

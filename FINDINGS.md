@@ -100,6 +100,14 @@ which strengthens holdout results and weakens tune ones.
     promotion yet, DD breached bar out-of-sample again. P10-gate35:
     Sharpe 0.33, dead — tighter selection concentrated without paying.
     Budget: 10/20 left.
+21. **Self-improvement round four (P11 short holds, P12 max breadth).**
+    P11-hold10: Sharpe -0.22, dead — monthly decisions with 10d holds
+    double turnover and go stale faster; direction was wrong. P12-top40:
+    tune Sharpe 0.57, DD -0.31, breadth verified (81/82 months, avg
+    11.3 qualifiers — cap rarely binds, so near-twin of P8, which
+    corroborates rather than duplicates). Promoted once: holdout
+    **+3.5%, DD -0.41, Sharpe 0.14**. Fourth straight decaying
+    promotion (+12.7 → +6.1 → +4.3 → +3.5). Budget: 8/20 left.
 18. **Multi-asset trend, quarterly rebalance (Faber's turnover note).**
     Tune +5.8% (Sharpe 0.58, DD -0.13), holdout +6.9% (Sharpe 0.60,
     DD -0.27). Monthly version: tune +7.3% (0.82), holdout +7.4%
