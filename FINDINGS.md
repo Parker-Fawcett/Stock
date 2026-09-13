@@ -74,6 +74,13 @@ which strengthens holdout results and weakens tune ones.
     Promoted once to holdout: **CAGR +12.7%, DD -0.35, Sharpe 0.41**
     through COVID, 2022 bear, and recovery at 25bps. First ML config
     with a clean stress-period holdout. Budget: 14/20 left.
+14. **Self-improvement round two (P7 liquidity, P8 vol scaling).**
+    P7: Sharpe 0.56 pass, DD -0.361 — missed the -0.35 bar by 0.011.
+    Dead by the letter of the law, stated openly. P8 (per-name inverse-
+    vol sizing): tune Sharpe 0.63, DD -0.27. Promoted once: holdout
+    **CAGR +6.1%, DD -0.39, Sharpe 0.22**. Positive through stress,
+    shrunk as honest results do (DD breached -0.35 out-of-sample, which
+    is itself a finding about bar-setting). Budget: 12/20 left.
 12. **Value lane, real data (12 mega caps, FMP annuals).** Median
     price/IV 2.77 — mega caps never near Graham value. d0.5: zero trades.
     d0.0: +2.7% vs +8.1% fair benchmark, avg 0.4 names. Free FMP caps

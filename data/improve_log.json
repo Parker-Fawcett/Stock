@@ -1,5 +1,5 @@
 {
- "spent": 6,
+ "spent": 8,
  "proposals": {
   "P1-vol-only": {
    "status": "dead-artifact",
@@ -67,6 +67,33 @@
     "sharpe": -0.107,
     "months": 82
    }
+  },
+  "P7-liqfilter": {
+   "status": "dead-tune",
+   "pred": "Drops illiquid names; cuts hidden impact. Sharpe ~0.5, DD similar.",
+   "tune": {
+    "CAGR": 0.1212,
+    "maxDD": -0.361,
+    "sharpe": 0.561,
+    "months": 82
+   },
+   "note": "Sharpe 0.56 passed but DD -0.361 missed -0.35 bar by 0.011. Bar is bar."
+  },
+  "P8-volscale": {
+   "status": "promoted",
+   "pred": "Smooths single-name blowups; DD toward -0.2. Sharpe ~0.5.",
+   "tune": {
+    "CAGR": 0.1169,
+    "maxDD": -0.266,
+    "sharpe": 0.629,
+    "months": 82
+   },
+   "holdout": {
+    "CAGR": 0.0614,
+    "maxDD": -0.39,
+    "sharpe": 0.215,
+    "months": 81
+   }
   }
  },
  "archive": [
@@ -130,6 +157,33 @@
     "CAGR": 0.1268,
     "maxDD": -0.35,
     "sharpe": 0.406,
+    "months": 81
+   }
+  },
+  {
+   "id": "P7-liqfilter",
+   "tune": {
+    "CAGR": 0.1212,
+    "maxDD": -0.361,
+    "sharpe": 0.561,
+    "months": 82
+   }
+  },
+  {
+   "id": "P8-volscale",
+   "tune": {
+    "CAGR": 0.1169,
+    "maxDD": -0.266,
+    "sharpe": 0.629,
+    "months": 82
+   }
+  },
+  {
+   "id": "P8-volscale",
+   "holdout": {
+    "CAGR": 0.0614,
+    "maxDD": -0.39,
+    "sharpe": 0.215,
     "months": 81
    }
   }

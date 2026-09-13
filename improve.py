@@ -62,6 +62,17 @@ def load_px(tickers: list[str]) -> pd.DataFrame:
             .set_index(["ticker", "Date"])["Close"].unstack("ticker").sort_index())
 
 
+def load_ohlc(tickers: list[str]) -> dict[str, pd.DataFrame]:
+    out = {}
+    for tk in tickers:
+        p = Path("data/raw") / f"{tk}.csv"
+        if not p.exists():
+            continue
+        d = pd.read_csv(p, parse_dates=["Date"]).sort_values("Date")
+        out[tk.upper()] = d.set_index("Date")
+    return out
+
+
 def monthly_loop(px: pd.DataFrame, months, pick_fn, cost_bps: float = COST):
     """Generic monthly book. pick_fn(d0, cands_df) -> list of tickers."""
     rows, prev = [], []
@@ -222,6 +233,111 @@ def p_calm_only(test, proba, px):
     return b.set_index("date")["net"]
 
 
+_OHLC: dict = {}
+
+
+def ohlc(tk: str):
+    tk = tk.upper()
+    if tk not in _OHLC:
+        p = Path("data/raw") / f"{tk}.csv"
+        if not p.exists():
+            return None
+        _OHLC[tk] = pd.read_csv(p, parse_dates=["Date"]).sort_values("Date").set_index("Date")
+    return _OHLC[tk]
+
+
+def trailing_dv(tk: str, d0, n: int = 20) -> float:
+    h = ohlc(tk)
+    if h is None:
+        return 0.0
+    h = h.loc[h.index <= d0].tail(n)
+    if len(h) < n:
+        return 0.0
+    return float((h["Close"] * h["Volume"]).mean())
+
+
+def trailing_vol(tk: str, d0, n: int = 20) -> float:
+    h = ohlc(tk)
+    if h is None:
+        return float("nan")
+    h = h.loc[h.index <= d0].tail(n + 1)
+    if len(h) < n + 1:
+        return float("nan")
+    return float(np.log(h["Close"] / h["Close"].shift(1)).dropna().std() * np.sqrt(252))
+
+
+def _risk_book(test, proba, px, weight_fn=None, dv_min: float = 0.0):
+    """P5 construction (top20/.25/stops/vol-target/DD-brake) plus an
+    optional candidate $volume filter and per-name weighting."""
+    from predictor.backtest import RISK_STOP
+    t = test.copy().reset_index(drop=True)
+    t["proba"] = np.asarray(proba, dtype=float)
+    months = pd.to_datetime(t["Date"]).dt.to_period("M").drop_duplicates().sort_values()
+    uret = np.log(px / px.shift(1)).mean(axis=1).dropna()
+    vol = uret.rolling(60, min_periods=20).std() * np.sqrt(252)
+    rows, prev, eq, peak = [], [], 1.0, 1.0
+    for m in months:
+        block = t[pd.to_datetime(t["Date"]).dt.to_period("M") == m]
+        d0 = block["Date"].max()
+        cands = block[block["Date"] == d0].sort_values("proba", ascending=False)
+        quals = cands[cands["proba"] >= 0.25]
+        if dv_min > 0:
+            quals = quals[quals["ticker"].map(lambda k: trailing_dv(k, d0)) >= dv_min]
+        if len(quals) < 1:
+            picks, w = [], {}
+        else:
+            hist = vol.loc[vol.index <= d0]
+            trailing = float(hist.iloc[-1]) if len(hist) else float("nan")
+            scale = min(1.0, 0.20 / trailing) if trailing > 0 else 1.0
+            if eq / peak - 1.0 < -0.15:
+                scale *= 0.5
+            n = max(0, round(20 * scale))
+            picks = quals.head(n)["ticker"].tolist() if n >= 1 else []
+            if weight_fn is None or not picks:
+                w = {tk: 1 / len(picks) for tk in picks}
+            else:
+                vols = {tk: weight_fn(tk, d0) for tk in picks}
+                inv = {tk: 1 / v if v and v > 0 else 0.0 for tk, v in vols.items()}
+                tot = sum(inv.values()) or 1.0
+                w = {tk: v / tot for tk, v in inv.items()}
+        turnover = len(set(picks) ^ set(prev)) / max(1, max(len(picks), len(prev)))
+        cost = turnover * COST / 1e4
+        gross = 0.0
+        if picks:
+            rs = []
+            for tk in picks:
+                try:
+                    p0 = px.loc[d0, tk]
+                    fut = px[tk].loc[px.index > d0].iloc[: bt.HORIZON]
+                    if len(fut) == 0:
+                        continue
+                    hit = fut[fut / p0 <= RISK_STOP]
+                    r = float(np.log(RISK_STOP)) if len(hit) else float(np.log(fut.iloc[-1] / p0))
+                    rs.append((tk, r))
+                except Exception:  # noqa: BLE001
+                    continue
+            gross = sum(w.get(tk, 0) * r for tk, r in rs) if rs else 0.0
+        net = gross - cost
+        eq *= np.exp(net)
+        peak = max(peak, eq)
+        rows.append({"date": d0, "net": net})
+        prev = picks
+    out = pd.DataFrame(rows)
+    return out.set_index("date")["net"]
+
+
+def p_liq(test, proba, px):
+    t = test.copy()
+    tpx = t.set_index(["ticker", "Date"])["Close"].unstack("ticker")
+    return _risk_book(t, proba, tpx, dv_min=500_000.0)
+
+
+def p_volw(test, proba, px):
+    t = test.copy()
+    tpx = t.set_index(["ticker", "Date"])["Close"].unstack("ticker")
+    return _risk_book(t, proba, tpx, weight_fn=trailing_vol)
+
+
 PROPOSALS = {
     # id: (fn, predicted effect, pre-registered before any evaluation)
     "P1-vol-only": (p_vol_only, "Cuts turnover drag; DD unchanged. Sharpe ~0.1."),
@@ -230,6 +346,8 @@ PROPOSALS = {
     "P4-hold40": (p_hold40, "Halves turnover; staler signal. Net favors costs."),
     "P5-gate25": (p_gate25, "More names, more diversification; weaker selection."),
     "P6-calm-only": (p_calm_only, "Dodges 2020/2022 storms; whipsaw cash drag."),
+    "P7-liqfilter": (p_liq, "Drops illiquid names; cuts hidden impact. Sharpe ~0.5, DD similar."),
+    "P8-volscale": (p_volw, "Smooths single-name blowups; DD toward -0.2. Sharpe ~0.5."),
 }
 
 
