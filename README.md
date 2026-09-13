@@ -1,9 +1,19 @@
-# Stock predictor rebuild — clean-room, from LosingLoonies transcripts
+# The lab that publishes red ink
 
-Better by construction, not by tuning. Every design choice maps to a
-failure he documented over 11 predictor videos + 14 strategy videos
-(full transcripts in `LosingLoonies_transcripts/` and
-`LosingLoonies_other/`).
+Retail quant sells winners. This repo audits losers — with methodology
+intact. Every strategy here runs through monkeys, sealed holdouts,
+costs from day one, and a trial budget; every failure gets a death
+record in FINDINGS.md. Two frozen models trade on paper monthly and get
+graded in public, green or red.
+
+Live scoreboard (see `paper.py grade`, `data/paper/log.csv):
+- `wide-seed0-v1` (ML rank): 30 picks, 37% hit, -2.7% excess vs IWM.
+- `mom12-1-v1` (textbook momentum): logging, backtest says +6–11% halves.
+
+Origin: clean-room rebuild of the LosingLoonies AI predictor from 29
+video transcripts (`LosingLoonies_transcripts/` and
+`LosingLoonies_other/`). Every design choice maps to a failure he
+documented — then we kept score honestly where he stopped.
 
 ## What changed vs his V1
 
