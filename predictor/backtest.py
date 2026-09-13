@@ -1,35 +1,47 @@
 """Backtest: monthly rebalance, cash by default, costs from day one.
 
-Fixes vs his series:
-- His early bot HAD to buy daily (1F0gYkk7YYw). Here cash is default;
-  we hold at most TOP_N names with proba above THRESH, else cash.
-- His live test assumed open-to-close fills he couldn't make with a day
-  job (Lh1vrIcpJN4). Here rebalance is monthly on closes, with COST_BPS
-  + slippage charged on every change.
-- Monkey baseline every run (his best habit): N_MONKEYS random
-  portfolios, same dates/sizing, mean/std bands.
+Ledger design (rewritten Sep 2026 after external review):
+- SIMPLE returns everywhere. Equal weight = mean of simple returns;
+  equity compounds as product of (1+R). Averaging log returns then
+  exponentiating understated dispersion (+100%/-50% across two names
+  is +25%, not 0%).
+- Stops are gap-aware: exit at the FIRST close beyond the stop, at that
+  actual close — never credited at exactly the threshold. Short stops
+  are losses (sign was wrong before; verified).
+- stop_frac is validated to (0, 1). Values above 1 used to credit
+  log(2) monthly on flat prices. Structurally impossible now.
+- Exposure scaling (vol target, drawdown brake) scales WEIGHTS with the
+  remainder in cash — it used to cut names while remaining names kept
+  full capital, which concentrated instead of de-risking.
+- Turnover = half the sum of absolute weight changes, so sizing shifts
+  and stop exits cost. Monkeys use identical accounting.
+- Holds are 20 trading days on a ~21-day monthly grid, so overlap is
+  ~1 day by construction. Fold-end windows truncate; documented.
+
+Monkey baseline every run (his best habit): N_MONKEYS random
+portfolios, same dates/sizing/costs, mean/std bands.
 """
 from __future__ import annotations
 
 import numpy as np
 import pandas as pd
 
-from .features import FEATURE_COLS, HORIZON
+from .features import HORIZON
 
 TOP_N = 10
 # Labels are cross-sectional top-20% (base rate 0.20), so calibrated
 # proba centers near 0.2. Gate at 0.30 = only buy when meaningfully
 # above baseline confidence. His V5 used ~30% the same way.
 THRESH = 0.30
-COST_BPS = 5.0  # one-way
+COST_BPS = 5.0  # one-way, on traded notional
 N_MONKEYS = 200
 REBAL_FREQ = "M"
 
-# Risk defaults: tame the -67% maxDD, not chase return.
+# Risk defaults: tame drawdowns, not chase return.
 RISK_TOP_N = 20
 RISK_VOL_TARGET = 0.20   # annualized vol target on universe regime
 RISK_MIN_NAMES = 10      # breadth requirement: fewer qualifiers -> cash
-RISK_STOP = 0.85         # per-name stop: exit if close falls 15% below entry
+RISK_STOP = 0.85         # per-name stop: exit at first close <= 85% of entry
 RISK_DD_BRAKE = 0.15     # halve exposure while trailing DD worse than this
 
 
@@ -37,259 +49,189 @@ def _month_keys(dates: pd.Series) -> pd.Series:
     return pd.to_datetime(dates).dt.to_period(REBAL_FREQ)
 
 
-def run_backtest(
-    test: pd.DataFrame,
-    proba: np.ndarray,
-    top_n: int = TOP_N,
-    thresh: float = THRESH,
-    cost_bps: float = COST_BPS,
-) -> pd.DataFrame:
-    t = test.copy().reset_index(drop=True)
-    t["proba"] = np.asarray(proba, dtype=float)
-    t["month"] = _month_keys(t["Date"])
-    months = t["month"].drop_duplicates().sort_values()
-    # forward 20d total return per row (close t -> t+20)
-    px = t.set_index(["ticker", "Date"])["Close"].unstack("ticker")
-    fwd = {}
-    for m in months:
-        block = t[t["month"] == m]
-        d0 = block["Date"].max()  # decide on last observed date of month
-        cands = block[block["Date"] == d0].sort_values("proba", ascending=False)
-        picks = cands[cands["proba"] >= thresh].head(top_n)["ticker"].tolist()
-        fwd[m] = (d0, picks)
-    rows = []
-    prev: list[str] = []
-    for m in months:
-        d0, picks = fwd[m]
-        turnover = len(set(picks) ^ set(prev)) / max(1, max(len(picks), len(prev)))
-        cost = turnover * cost_bps / 1e4
-        # realized: equal-weight picks held HORIZON days from d0
-        if picks:
-            rets = []
-            for tk in picks:
-                try:
-                    p0 = px.loc[d0, tk]
-                    future = px[tk].loc[px.index > d0]
-                    p1 = future.iloc[min(HORIZON - 1, len(future) - 1)]
-                    rets.append(float(np.log(p1 / p0)))
-                except Exception:  # noqa: BLE001
-                    continue
-            gross = float(np.mean(rets)) if rets else 0.0
-        else:
-            gross = 0.0  # cash
-        rows.append({"month": str(m), "date": d0, "n": len(picks),
-                     "gross": gross, "cost": cost, "net": gross - cost,
-                     "turnover": turnover})
-        prev = picks
-    out = pd.DataFrame(rows)
-    out["equity"] = np.exp(out["net"].cumsum())
-    return out
+def _check_stop(stop_frac: float | None) -> None:
+    if stop_frac is not None and not (0.0 < stop_frac < 1.0):
+        raise ValueError(f"stop_frac must be in (0,1) or None, got {stop_frac}")
 
 
-def run_monkeys(
-    test: pd.DataFrame,
-    top_n: int = TOP_N,
-    cost_bps: float = COST_BPS,
-    n: int = N_MONKEYS,
-    seed: int = 0,
-) -> pd.DataFrame:
-    rng = np.random.default_rng(seed)
-    t = test.copy().reset_index(drop=True)
-    t["month"] = _month_keys(t["Date"])
-    months = t["month"].drop_duplicates().sort_values()
-    px = t.set_index(["ticker", "Date"])["Close"].unstack("ticker")
-    eq = {}
-    for i in range(n):
-        rets = []
-        for m in months:
-            block = t[t["month"] == m]
-            d0 = block["Date"].max()
-            avail = block[block["Date"] == d0]["ticker"].unique().tolist()
-            k = min(top_n, len(avail))
-            picks = rng.choice(avail, size=k, replace=False).tolist() if k else []
-            if picks:
-                rs = []
-                for tk in picks:
-                    try:
-                        p0 = px.loc[d0, tk]
-                        future = px[tk].loc[px.index > d0]
-                        p1 = future.iloc[min(HORIZON - 1, len(future) - 1)]
-                        rs.append(float(np.log(p1 / p0)))
-                    except Exception:  # noqa: BLE001
-                        continue
-                gross = float(np.mean(rs)) if rs else 0.0
-            else:
-                gross = 0.0
-            cost = 1.0 * cost_bps / 1e4  # full turnover assumption, conservative
-            rets.append(gross - cost)
-        eq[i] = float(np.exp(np.cumsum(rets)[-1])) if rets else 1.0
-    s = pd.Series(eq)
-    return pd.DataFrame([{"monkey_mean": s.mean(), "monkey_std": s.std(),
-                           "monkey_p5": s.quantile(0.05),
-                           "monkey_p95": s.quantile(0.95)}])
-
-
-def run_backtest_risk(
-    test: pd.DataFrame,
-    proba: np.ndarray,
-    top_n: int = RISK_TOP_N,
-    thresh: float = THRESH,
-    cost_bps: float = COST_BPS,
-    vol_target: float = RISK_VOL_TARGET,
-    min_names: int = RISK_MIN_NAMES,
-    stop_frac: float = RISK_STOP,
-    dd_brake: float = RISK_DD_BRAKE,
-) -> pd.DataFrame:
-    """Risk-controlled version. Same signal, breadth + stops, all trailing:
-
-    1. Breadth: fewer than min_names qualifiers -> cash. Concentrated
-       1-2 stock books caused the worst blowups, not the market.
-    2. Per-name stop: close-based stop at stop_frac of entry (stop order).
-    3. Vol target: scale names by vol_target / trailing-60d universe vol.
-    4. Drawdown brake: halve names while running DD < -dd_brake.
-    """
-    t = test.copy().reset_index(drop=True)
-    t["proba"] = np.asarray(proba, dtype=float)
-    t["month"] = _month_keys(t["Date"])
-    months = t["month"].drop_duplicates().sort_values()
-    px = t.set_index(["ticker", "Date"])["Close"].unstack("ticker")
-    # trailing regime vol from universe equal-weight daily returns
-    uret = np.log(px / px.shift(1)).mean(axis=1).dropna()
-    vol = uret.rolling(60, min_periods=20).std() * np.sqrt(252)
-
-    def stopped_ret(tk: str, d0) -> float:
-        p0 = px.loc[d0, tk]
-        future = px[tk].loc[px.index > d0].iloc[:HORIZON]
-        if len(future) == 0:
-            return 0.0
-        hit = future[future / p0 <= stop_frac]
+def leg_simple(px_col, d0, horizon: int, short: bool,
+               stop_frac: float | None) -> float:
+    """Simple return of one position held up to `horizon` trading days.
+    Gap-aware stops: exit at the first close beyond the stop, realized
+    at that actual close."""
+    _check_stop(stop_frac)
+    p0 = float(px_col.loc[d0])
+    fut = px_col.loc[px_col.index > d0].iloc[:horizon]
+    if len(fut) == 0:
+        return 0.0
+    if stop_frac is not None:
+        if short:
+            hit = fut[fut / p0 >= 1 / stop_frac]
+            if len(hit):
+                return float(p0 / hit.iloc[0] - 1)  # stopped: a loss
+            return float(p0 / fut.iloc[-1] - 1)
+        hit = fut[fut / p0 <= stop_frac]
         if len(hit):
-            return float(np.log(stop_frac))  # stopped out, close-based
-        return float(np.log(future.iloc[-1] / p0))
+            return float(hit.iloc[0] / p0 - 1)  # actual close, gaps included
+        return float(fut.iloc[-1] / p0 - 1)
+    if short:
+        return float(p0 / fut.iloc[-1] - 1)
+    return float(fut.iloc[-1] / p0 - 1)
 
+
+def _run_book(test: pd.DataFrame, schedule, cost_bps: float = COST_BPS,
+              borrow_apr: float = 0.0, horizon: int = HORIZON,
+              stop_long: float | None = None,
+              stop_short: float | None = None) -> pd.DataFrame:
+    """Core ledger. schedule(d0, cands, state) -> (longs {tk: w}, shorts {tk: w})
+    with weights as fractions of equity (rest = cash). Stops passed
+    explicitly so no runner can silently disable them."""
+    _check_stop(stop_long)
+    _check_stop(stop_short)
+    t = test.copy().reset_index(drop=True)
+    t["month"] = _month_keys(t["Date"])
+    months = t["month"].drop_duplicates().sort_values()
+    px = t.set_index(["ticker", "Date"])["Close"].unstack("ticker")
     rows = []
-    prev: list[str] = []
-    eq = 1.0
-    peak = 1.0
+    prev_w: dict = {}
+    state = {"equity": 1.0, "peak": 1.0}
     for m in months:
         block = t[t["month"] == m]
         d0 = block["Date"].max()
-        cands = block[block["Date"] == d0].sort_values("proba", ascending=False)
-        quals = cands[cands["proba"] >= thresh]
-        if len(quals) < min_names:
-            picks = []  # no breadth -> cash
-        else:
-            hist = vol.loc[vol.index <= d0]
-            trailing = float(hist.iloc[-1]) if len(hist) else float("nan")
-            scale = min(1.0, vol_target / trailing) if trailing > 0 else 1.0
-            dd = eq / peak - 1.0
-            if dd < -dd_brake:
-                scale *= 0.5
-            n = max(0, round(top_n * scale))
-            picks = (quals.head(n)["ticker"].tolist() if n >= min_names else [])
-        turnover = len(set(picks) ^ set(prev)) / max(1, max(len(picks), len(prev)))
+        cands = block[block["Date"] == d0]
+        longs, shorts = schedule(d0, cands, state)
+        w = {tk: wt for tk, wt in longs.items()}
+        w.update({tk: -wt for tk, wt in shorts.items()})
+        keys = set(w) | set(prev_w)
+        turnover = 0.5 * sum(abs(w.get(k, 0.0) - prev_w.get(k, 0.0)) for k in keys)
         cost = turnover * cost_bps / 1e4
-        if picks:
-            rets = []
-            for tk in picks:
-                try:
-                    rets.append(stopped_ret(tk, d0))
-                except Exception:  # noqa: BLE001
-                    continue
-            gross = float(np.mean(rets)) if rets else 0.0
-        else:
-            gross = 0.0
-        net = gross - cost
-        eq *= np.exp(net)
-        peak = max(peak, eq)
-        rows.append({"month": str(m), "date": d0, "n": len(picks),
-                     "gross": gross, "cost": cost, "net": net,
+        borrow = sum(shorts.values()) * borrow_apr / 12 if shorts else 0.0
+        gross = 0.0
+        for tk, wt in longs.items():
+            try:
+                gross += wt * leg_simple(px[tk], d0, horizon, False, stop_long)
+            except Exception:  # noqa: BLE001
+                continue
+        for tk, wt in shorts.items():
+            try:
+                gross += wt * leg_simple(px[tk], d0, horizon, True, stop_short)
+            except Exception:  # noqa: BLE001
+                continue
+        net = gross - cost - borrow
+        rows.append({"month": str(m), "date": d0,
+                     "n": len(longs) + len(shorts),
+                     "gross": gross, "cost": cost + borrow, "net": net,
                      "turnover": turnover})
-        prev = picks
+        state["equity"] *= 1 + net
+        state["peak"] = max(state["peak"], state["equity"])
+        prev_w = dict(w)
     out = pd.DataFrame(rows)
-    out["equity"] = np.exp(out["net"].cumsum())
+    out["equity"] = (1 + out["net"]).cumprod()
     return out
 
 
-# Long-short defaults. Small-cap borrow is expensive and sometimes
-# unavailable; 5%/yr + full turnover costs is deliberately harsh.
+def _prepared(test: pd.DataFrame, proba: np.ndarray) -> pd.DataFrame:
+    t = test.copy().reset_index(drop=True)
+    if len(t) != len(proba):
+        raise ValueError("proba must have one value per test row")
+    t["proba"] = np.asarray(proba, dtype=float)
+    return t
+
+
+def run_backtest(
+    test: pd.DataFrame, proba: np.ndarray, top_n: int = TOP_N,
+    thresh: float = THRESH, cost_bps: float = COST_BPS,
+) -> pd.DataFrame:
+    """Long-only, equal-weight, monthly model portfolio."""
+    t = _prepared(test, proba)
+
+    def schedule(_d0, cands, _state):
+        picks = (cands[cands["proba"] >= thresh]
+                 .sort_values("proba", ascending=False)
+                 .head(top_n)["ticker"].tolist())
+        w = 1.0 / len(picks) if picks else 0.0
+        return ({tk: w for tk in picks}, {})
+
+    return _run_book(t, schedule, cost_bps=cost_bps)
+
+
+def run_backtest_risk(
+    test: pd.DataFrame, proba: np.ndarray, top_n: int = RISK_TOP_N,
+    thresh: float = THRESH, cost_bps: float = COST_BPS,
+    vol_target: float = RISK_VOL_TARGET, min_names: int = RISK_MIN_NAMES,
+    stop_frac: float | None = RISK_STOP, dd_brake: float = RISK_DD_BRAKE,
+) -> pd.DataFrame:
+    """Long-only ledger with breadth, volatility, and drawdown controls."""
+    _check_stop(stop_frac)
+    t = _prepared(test, proba)
+    px = t.set_index(["ticker", "Date"])["Close"].unstack("ticker")
+    uret = px.pct_change().mean(axis=1).dropna()
+    vol = uret.rolling(60, min_periods=20).std() * np.sqrt(252)
+
+    def schedule(d0, cands, state):
+        quals = (cands[cands["proba"] >= thresh]
+                 .sort_values("proba", ascending=False))
+        if len(quals) < min_names:
+            return {}, {}
+        hist = vol.loc[vol.index <= d0]
+        trailing = float(hist.iloc[-1]) if len(hist) else np.nan
+        exposure = min(1.0, vol_target / trailing) if trailing > 0 else 1.0
+        if state["equity"] / state["peak"] - 1 < -dd_brake:
+            exposure *= 0.5
+        picks = quals.head(top_n)["ticker"].tolist()
+        return ({tk: exposure / len(picks) for tk in picks}, {})
+
+    return _run_book(t, schedule, cost_bps=cost_bps, stop_long=stop_frac)
+
+
 LS_TOP_N = 10
 LS_BOT_N = 10
 LS_BORROW_APR = 0.05
 
 
 def run_backtest_ls(
-    test: pd.DataFrame,
-    proba: np.ndarray,
-    top_n: int = LS_TOP_N,
-    bot_n: int = LS_BOT_N,
-    thresh: float = THRESH,
-    cost_bps: float = COST_BPS,
-    borrow_apr: float = LS_BORROW_APR,
+    test: pd.DataFrame, proba: np.ndarray, top_n: int = LS_TOP_N,
+    bot_n: int = LS_BOT_N, thresh: float = THRESH,
+    cost_bps: float = COST_BPS, borrow_apr: float = LS_BORROW_APR,
+    stop_frac: float | None = RISK_STOP,
 ) -> pd.DataFrame:
-    """Dollar-neutral: long top-N above thresh, short bottom-N below
-    (1 - thresh). Same 20d hold, stops on both legs, borrow accrued
-    monthly on the short book. Cuts market beta; borrow + turnover
-    decide if anything is left."""
-    t = test.copy().reset_index(drop=True)
-    t["proba"] = np.asarray(proba, dtype=float)
-    t["month"] = _month_keys(t["Date"])
-    months = t["month"].drop_duplicates().sort_values()
-    px = t.set_index(["ticker", "Date"])["Close"].unstack("ticker")
+    """Dollar-neutral long/short book with equal 50% long and short sleeves."""
+    _check_stop(stop_frac)
+    t = _prepared(test, proba)
 
-    def leg_ret(tk: str, d0, short: bool) -> float:
-        p0 = px.loc[d0, tk]
-        future = px[tk].loc[px.index > d0].iloc[:HORIZON]
-        if len(future) == 0:
-            return 0.0
-        if short:
-            hit = future[future / p0 >= 1 / RISK_STOP]
-            r = float(np.log(1 / RISK_STOP)) if len(hit) else float(
-                np.log(p0 / future.iloc[-1]))
-        else:
-            hit = future[future / p0 <= RISK_STOP]
-            r = float(np.log(RISK_STOP)) if len(hit) else float(
-                np.log(future.iloc[-1] / p0))
-        return r
-
-    rows = []
-    prev_l: list[str] = []
-    prev_s: list[str] = []
-    for m in months:
-        block = t[t["month"] == m]
-        d0 = block["Date"].max()
-        cands = block[block["Date"] == d0].sort_values("proba", ascending=False)
-        longs = cands[cands["proba"] >= thresh].head(top_n)["ticker"].tolist()
-        shorts = cands[cands["proba"] <= 1 - thresh].tail(bot_n)["ticker"].tolist()
-        longs = [x for x in longs if x not in shorts]
+    def schedule(_d0, cands, _state):
+        ranked = cands.sort_values("proba", ascending=False)
+        longs = ranked[ranked["proba"] >= thresh].head(top_n)["ticker"].tolist()
+        shorts = (ranked[ranked["proba"] <= 1 - thresh]
+                  .tail(bot_n)["ticker"].tolist())
+        longs = [tk for tk in longs if tk not in shorts]
         if not longs or not shorts:
-            longs, shorts = [], []  # no pair trade -> cash
-        tl = len(set(longs) ^ set(prev_l)) / max(1, max(len(longs), len(prev_l)))
-        ts = len(set(shorts) ^ set(prev_s)) / max(1, max(len(shorts), len(prev_s)))
-        cost = (tl + ts) * 0.5 * cost_bps / 1e4
-        borrow = (len(shorts) > 0) * borrow_apr / 12 * 0.5
-        if longs:
-            rl, rs = [], []
-            for tk in longs:
-                try:
-                    rl.append(leg_ret(tk, d0, False))
-                except Exception:  # noqa: BLE001
-                    continue
-            for tk in shorts:
-                try:
-                    rs.append(leg_ret(tk, d0, True))
-                except Exception:  # noqa: BLE001
-                    continue
-            gross = 0.5 * ((float(np.mean(rl)) if rl else 0.0)
-                           + (float(np.mean(rs)) if rs else 0.0))
-        else:
-            gross = 0.0
-        net = gross - cost - borrow
-        rows.append({"month": str(m), "date": d0,
-                     "n": len(longs) + len(shorts),
-                     "gross": gross, "cost": cost + borrow, "net": net,
-                     "turnover": (tl + ts) / 2})
-        prev_l, prev_s = longs, shorts
-    out = pd.DataFrame(rows)
-    out["equity"] = np.exp(out["net"].cumsum())
-    return out
+            return {}, {}
+        return ({tk: 0.5 / len(longs) for tk in longs},
+                {tk: 0.5 / len(shorts) for tk in shorts})
+
+    return _run_book(t, schedule, cost_bps=cost_bps, borrow_apr=borrow_apr,
+                     stop_long=stop_frac, stop_short=stop_frac)
+
+
+def run_monkeys(
+    test: pd.DataFrame, top_n: int = TOP_N, cost_bps: float = COST_BPS,
+    n: int = N_MONKEYS, seed: int = 0,
+) -> pd.DataFrame:
+    """Random long-only portfolios using the same ledger and turnover costs."""
+    rng = np.random.default_rng(seed)
+    endpoints = test.copy()
+    endpoints["month"] = _month_keys(endpoints["Date"])
+    eq = []
+    for _ in range(n):
+        def schedule(_d0, cands, _state):
+            avail = cands["ticker"].drop_duplicates().to_numpy()
+            picks = rng.choice(avail, size=min(top_n, len(avail)), replace=False)
+            w = 1.0 / len(picks) if len(picks) else 0.0
+            return ({tk: w for tk in picks}, {})
+        eq.append(float(_run_book(endpoints, schedule, cost_bps=cost_bps)
+                        ["equity"].iloc[-1]))
+    s = pd.Series(eq)
+    return pd.DataFrame([{"monkey_mean": s.mean(), "monkey_std": s.std(),
+                          "monkey_p5": s.quantile(.05),
+                          "monkey_p95": s.quantile(.95)}])

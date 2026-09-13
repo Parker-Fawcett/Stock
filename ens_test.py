@@ -54,7 +54,11 @@ def mom_monthly_net(px: pd.DataFrame, months, cost_bps: float = 25.0) -> pd.Seri
         for tk in picks:
             try:
                 r = fut[tk].iloc[:21]
-                rets.append(float(np.log(r.iloc[-1] / px.loc[d0, tk])))
+                # simple return, to match run_backtest_risk's "ml" leg below
+                # (the ledger rewrite moved that to simple returns; mixing a
+                # log-return momentum leg with a simple-return ML leg and
+                # then averaging the two would silently mismatch units).
+                rets.append(float(r.iloc[-1] / px.loc[d0, tk] - 1))
             except Exception:  # noqa: BLE001
                 continue
         nets[d0] = float(np.mean(rets)) - cost if rets else 0.0
@@ -97,8 +101,8 @@ def main() -> None:
         all_nets["mom"].append(mom)
         all_nets["ens"].append(ens)
     for name, series in all_nets.items():
-        eq = np.exp(pd.concat(series).sort_index().cumsum())
-        m = pd.concat(series)
+        m = pd.concat(series).sort_index()
+        eq = (1 + m).cumprod()
         sh = float(m.mean() / (m.std() + 1e-12) * np.sqrt(12))
         yrs = len(eq) / 12
         print(f"{name}: CAGR {float(eq.iloc[-1]**(1/yrs)-1):+.4f} "

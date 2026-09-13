@@ -275,7 +275,115 @@ The loop worked (three clean promotions, all documented) and is now
 frozen until genuinely new data or a new game — spending the rest on
 this universe would be the slow version of the sin it guards.
 
+## Second accounting correction: label leak, paper dating, value engine, momentum accounting (Sep 13, 2026)
+
+Follow-up to an external code review (REVIEW.md). Four more real bugs found
+and fixed; **every AUC, holdout CAGR, and paper pick discussed above was
+produced before these fixes and must be treated as historical, not
+validated, until rerun.**
+
+1. **Walk-forward validation leak.** `label_end` was a calendar-day
+   approximation (`Date + 20 calendar days`); `model_lgbm.walk_forward`
+   purged training rows against it but never purged validation rows against
+   the test boundary at all, and silently discarded `embargo_days`
+   (`_ = embargo_days`). Confirmed on cached folds: a validation label could
+   require prices nearly a month past the test start. Since validation
+   labels feed the isotonic calibrator / LightGBM early stopping, every AUC
+   and probability in this file may be inflated by leakage, not just
+   tuned-window numbers. Fixed: `label_end` is now a true trading-day shift
+   (`groupby("ticker")["Date"].shift(-HORIZON)`), and both train-vs-val and
+   val-vs-test are purged against it plus an embargo buffer. Probabilities
+   need regeneration; every AUC/backtest number downstream of them is
+   unvalidated until then.
+2. **Paper log was dating everything ~a month stale.** `paper.py` inferred
+   on the labeled panel's last date, which is always `HORIZON` trading days
+   behind because those rows need a known forward return that doesn't exist
+   yet — confirmed the panel's last date was 2026-08-13 while true latest
+   data was 2026-09-11. The momentum sleeve reused that same stale date
+   under its own tag. Fixed with a new `build_latest()` that computes
+   today's features without requiring today's (unknowable) label. Also
+   fixed: grading matched model identity by (date, ticker) only, so two
+   sleeves picking the same name on the same date silently overwrote each
+   other's attribution (now carries `model` straight from the log row);
+   grading credited the stop at exactly the threshold on a gap and measured
+   the no-stop case from a different entry price than the stop case (now
+   one gap-aware simple-return calc from the logged decision-day close, one
+   round-trip cost, matching the ledger's own convention). Existing
+   `data/paper/log.csv` entries were logged under the old (wrong) dates and
+   should be read as such, not as same-day observations.
+3. **Momentum lookback wasn't one frozen spec.** `mom_run.py` (the source of
+   every momentum number in this file) is frozen at lookback=252/skip=21.
+   `paper.py`'s momentum sleeve and `qc_momentum.py` both used 273/22 — an
+   undocumented, unexplained drift. Both now match mom_run.py exactly.
+4. **Log-return averaging bug, found in three more places.** The ledger
+   rewrite above fixed this in `predictor/backtest.py` but three standalone
+   scripts still averaged log returns then exponentiated — wrong for an
+   equal-weight portfolio (a +100%/-50% pair nets +25%, not 0%). Hit:
+   `mom_run.py` (source of every "textbook momentum" number, items 11/18),
+   `multi_run.py` (multi-asset trend and the intl sleeve, items 18/20), and
+   `ens_test.py` (the ML/momentum ensemble, item 12) — the last of these
+   also mixed a simple-return ML leg (already fixed) with a log-return
+   momentum leg and averaged them, a straight unit mismatch. All three now
+   use simple returns and `(1+net).cumprod()`.
+5. **Value engine gave the first qualifying stock all available cash.**
+   `value/backtest.py`'s buy loop computed each new position's allocation
+   as `(cash + held value) / (holds + 1)` per ticker, one at a time — so
+   the first name to qualify in a given month got the full target and left
+   nothing for the rest. Diversification depended on ticker iteration
+   order, not the equal-weight rule the docstring claims. Fixed: all
+   qualifiers for the month are found first, then sized against the book
+   that results from all of them buying. Added a regression test
+   (`value/test_value.py::test_diversification_ignores_ticker_order`) that
+   fails under the old code (n=1) and passes now (n=2) for two identical
+   equally-undervalued names.
+
+None of these were retuned or re-selected — same rules, same thresholds,
+same universes. This is the correctness-first replay REVIEW.md recommended,
+not new strategy search. Everything numbered above (11, 12, 18, 20, and the
+AUC-dependent items) needs a rerun before its number can be cited again.
+
 ## Dump (everything, unstructured, Sep 2026)
+
+## Accounting correction and QC check (Sep 13, 2026)
+
+The P1 "lottery" result is retracted as evidence. Its vol-only configuration
+used `stop_frac=2.0` to disable stops; the former stop implementation treated
+that as a hit and credited a positive return on flat prices. The backtest ledger
+now uses simple returns, compounds them directly, validates stop fractions,
+records gap-aware exits at the actual close, charges weight-based turnover, and
+keeps unused exposure in cash. Historical P1/vol-only figures must not be used
+until the affected proposals are rerun under this ledger.
+
+### QuantConnect migration record
+
+The cloud project is **Sleepy Orange Bison**. The first submitted version
+failed before processing data with the exact engine error:
+
+`2010-01-04 00:00:00 Runtime Error: Unable to cast object of type
+'QuantConnect.Data.Fundamental.Fundamental' to type 'System.String'. in
+Extensions.cs:line 3362`
+
+Cause: the draft used the old PascalCase coarse-universe pattern and returned
+fundamental records. The selector was changed to QuantConnect's current Python
+fundamental-universe API: `add_universe`, lower-case fundamental attributes,
+and a returned list of `symbol` objects. The corrected selector initialized,
+warmed up, and processed the full requested period.
+
+The completed run covered January 2011 through June 16, 2026 on the Community
+B-MICRO node, using $100,000 starting equity, the Interactive Brokers brokerage
+model, daily resolution, a 200-stock dollar-volume universe, monthly 10:30
+rebalances, 273-day lookback, 12-1 momentum, and a top-decile portfolio.
+QuantConnect reported: total return **+1,647.489%**, end equity **$1,747,488.78**,
+maximum drawdown **59.400%**, Sharpe **0.58**, annualized return **20.319%**,
+and **$5,224.28** in fees across 3,435 orders.
+
+This is not a clean survivorship-effect estimate. The completed run produced
+repeated handled order errors for newly selected securities that had not yet
+received a price bar. The order guard is now saved both in the cloud project
+and `qc_momentum.py`, but that corrected version has not been rerun. The large
+return and 59.4% drawdown therefore document the first cloud diagnostic only;
+they must not be compared directly with the Yahoo momentum results until the
+guarded run completes.
 
 Started from 29 transcripts of a finance YouTuber building an AI stock
 predictor. Rebuilt it clean-room: trees not LSTM, 20-day excess-vs-market

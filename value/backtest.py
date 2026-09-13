@@ -60,7 +60,12 @@ def run_value_backtest(
             if p >= h["iv"] or aged:
                 cash += h["shares"] * p * (1 - cost_bps / 1e4)
                 del holds[tk]
-        # buys
+        # buys: find every qualifier first, then size each one against the
+        # book that results from ALL of them buying, not just itself. The
+        # old per-ticker loop gave the first qualifier every dollar of
+        # cash and left nothing for the rest -- diversification depended
+        # on ticker iteration order instead of the equal-weight rule.
+        qualifiers = []
         for tk in px:
             if tk in holds:
                 continue
@@ -69,10 +74,12 @@ def run_value_backtest(
             if v is None or p is None or v <= 0:
                 continue
             if p <= (1 - discount) * v:
-                # equal weight across resulting book (his rule)
-                n_after = len(holds) + 1
-                alloc = (cash + sum(
-                    px_at(k, d) * h["shares"] for k, h in holds.items())) / n_after
+                qualifiers.append((tk, v, p))
+        if qualifiers:
+            n_after = len(holds) + len(qualifiers)
+            held_value = sum(px_at(k, d) * h["shares"] for k, h in holds.items())
+            alloc = (cash + held_value) / n_after
+            for tk, v, p in qualifiers:
                 spend = min(cash, alloc)
                 if spend > 0:
                     sh = spend * (1 - cost_bps / 1e4) / p

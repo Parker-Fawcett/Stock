@@ -25,8 +25,9 @@ sys.path.insert(0, str(Path(__file__).resolve().parent))
 import numpy as np
 import pandas as pd
 
+from predictor.backtest import COST_BPS
 from predictor.data import download_universe, assert_vintage
-from predictor.features import HORIZON, build_panel, model_cols
+from predictor.features import HORIZON, build_latest, build_panel, model_cols
 from predictor.model_lgbm import fit_fold
 
 MODEL_VERSION = "wide-seed0-v1"  # frozen. Bump only with a dated reason.
@@ -36,16 +37,18 @@ LOG = PAPER_DIR / "log.csv"
 
 
 def trailing_split(panel: pd.DataFrame):
+    """Train/val split on the labeled panel only. Live inference uses
+    build_latest() separately -- panel's own last date is always HORIZON
+    trading days stale (its rows need a known forward return)."""
     dates = np.sort(panel["Date"].unique())
-    t1 = dates[-1] - pd.to_timedelta(HORIZON + 5, unit="D")
-    v1 = t1 - pd.to_timedelta(6 * 30, unit="D")
+    v1 = dates[-1] - pd.to_timedelta(6 * 30, unit="D")
     r1 = v1 - pd.to_timedelta(3 * 365, unit="D")
+    embargo = pd.to_timedelta(HORIZON, unit="D")
     train = panel[(panel["Date"] >= r1) & (panel["Date"] < v1)]
-    train = train[train["Date"] < v1 - pd.to_timedelta(HORIZON, unit="D")]
-    val = panel[(panel["Date"] >= v1) & (panel["Date"] < t1)]
-    val = val[val["Date"] < t1 - pd.to_timedelta(HORIZON, unit="D")]
-    latest = panel[panel["Date"] == dates[-1]].copy()
-    return train, val, latest, pd.Timestamp(dates[-1])
+    # PURGE by the actual trading-day label window, not a calendar guess.
+    train = train[train["label_end"] < v1 - embargo]
+    val = panel[panel["Date"] >= v1]
+    return train, val
 
 
 def cmd_predict(args) -> None:
@@ -58,16 +61,18 @@ def cmd_predict(args) -> None:
     paths = download_universe(tickers, market=args.market,
                                 refresh=getattr(args, "refresh", False))
     assert_vintage({k: str(v) for k, v in paths.items()})
-    panel = build_panel({k: str(v) for k, v in paths.items()}, market=args.market)
+    str_paths = {k: str(v) for k, v in paths.items()}
+    panel = build_panel(str_paths, market=args.market)
+    latest, asof = build_latest(str_paths, market=args.market)
     cols = model_cols(panel)
-    train, val, latest, asof = trailing_split(panel)
+    train, val = trailing_split(panel)
     print(f"asof={asof.date()} train={len(train)} val={len(val)} "
           f"universe={latest['ticker'].nunique()}")
     if len(train) < 500 or len(val) < 100:
         print("not enough trailing history")
         return
     model = fit_fold(train, val, seed=0)
-    latest = latest[latest["ticker"] != args.market.upper()].copy()
+    latest = latest.copy()
     latest["proba"] = model.predict_proba(latest[cols].values)[:, 1]
     cands = latest.sort_values("proba", ascending=False)
     quals = cands[cands["proba"] >= 0.30]
@@ -102,8 +107,10 @@ def cmd_predict(args) -> None:
                 paths[tk], parse_dates=["Date"]).sort_values("Date")
             pxm[tk] = d.set_index("Date")["Close"]
         pxm = pd.DataFrame(pxm).sort_index()
-        if len(pxm) >= 273:
-            mom = pxm.iloc[-22] / pxm.iloc[-273] - 1
+        # Same frozen 12m-1m spec as mom_run.py (lookback=252, skip=21) --
+        # this used to be -273/-22, a different, undocumented window.
+        if len(pxm) >= 252:
+            mom = pxm.iloc[-21] / pxm.iloc[-252] - 1
             mom = mom.dropna().sort_values(ascending=False)
             cut = mom.quantile(0.90)
             picks_m = mom[mom >= cut].index.tolist()
@@ -147,10 +154,19 @@ def cmd_grade(args) -> None:
             m = px_all[args.market].loc[px_all[args.market].index > d0].iloc[:HORIZON]
             if len(s) < HORIZON or len(m) < HORIZON:
                 continue  # not matured
-            hit = s[s / r["ref_close"] <= 0.85]
-            ret = float(np.log(0.85)) if len(hit) else float(np.log(s.iloc[-1] / s.iloc[0]))
-            mret = float(np.log(m.iloc[-1] / m.iloc[0]))
+            entry = float(r["ref_close"])
+            # gap-aware stop, entry consistently at the logged decision-day
+            # close (matches predictor/backtest.py's ledger): the old code
+            # credited exactly the stop threshold even on a worse gap, and
+            # measured the no-stop case from a *different* entry (next
+            # day's close) than the stop case (ref_close) -- two prices for
+            # one trade. Simple returns throughout, one round-trip cost.
+            hit = s[s <= r["stop"]]
+            ret = float(hit.iloc[0] / entry - 1) if len(hit) else float(s.iloc[-1] / entry - 1)
+            ret -= 2 * COST_BPS / 1e4
+            mret = float(m.iloc[-1] / m.iloc[0] - 1)
             recs.append({"date": d0.date().isoformat(), "ticker": tk,
+                         "model": r["model"],
                          "ret": round(ret, 4), "iwm": round(mret, 4),
                          "excess": round(ret - mret, 4)})
         except Exception:  # noqa: BLE001
@@ -159,9 +175,6 @@ def cmd_grade(args) -> None:
         print(f"{len(log)} picks logged, none matured (need {HORIZON} trading days)")
         return
     g = pd.DataFrame(recs)
-    models = {(str(d)[:10], t): m for d, t, m
-              in zip(log["date"].astype(str), log["ticker"], log["model"])}
-    g["model"] = [models.get((d, t), "?") for d, t in zip(g["date"], g["ticker"])]
     for model, gm in g.groupby("model"):
         print(f"[{model}] n={len(gm)} hit={((gm.ret > 0).mean()):.2f} "
               f"mean={gm.ret.mean():.4f} excess={gm.excess.mean():.4f}")

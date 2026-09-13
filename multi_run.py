@@ -65,7 +65,9 @@ def main() -> None:
                 try:
                     # monthly marked-to-market always; stride only gates turnover
                     r = fut[a].iloc[:21]
-                    rs.append(float(np.log(r.iloc[-1] / px.loc[d0, a])))
+                    # simple return (see predictor/backtest.py ledger notes):
+                    # mean of simple returns is the correct equal-weight P&L.
+                    rs.append(float(r.iloc[-1] / px.loc[d0, a] - 1))
                 except Exception:  # noqa: BLE001
                     continue
             gross = float(np.mean(rs)) if rs else 0.0
@@ -75,7 +77,7 @@ def main() -> None:
                      "cost": cost, "net": gross - cost, "turnover": turnover})
         prev = held
     b = pd.DataFrame(rows)
-    b["equity"] = np.exp(b["net"].cumsum())
+    b["equity"] = (1 + b["net"]).cumprod()
     # SPY buy-hold over same window
     spy = px["SPY"].loc[px.index >= b["date"].iloc[0]]
     bh = float(spy.iloc[-1] / spy.iloc[0])
@@ -84,7 +86,7 @@ def main() -> None:
     print(f"months: {len(b)} mean_n: {b.n.mean():.1f}")
     for tag, sl in (("tune", slice(None, mid)), ("hold", slice(mid, None))):
         part = b.iloc[sl].reset_index(drop=True).copy()
-        part["equity"] = np.exp(part["net"].cumsum())  # reset: slices share a running curve
+        part["equity"] = (1 + part["net"]).cumprod()  # reset: slices share a running curve
         s = ev.summarize(part, label=f"maat/{tag}")
         print(tag, {k: s[k] for k in ("CAGR", "maxDD", "Sharpe_m", "exposure")})
     print(f"SPY buy-hold CAGR same window: {bh**(1/yrs)-1:.4f}")

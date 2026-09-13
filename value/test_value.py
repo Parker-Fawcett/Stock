@@ -10,6 +10,7 @@ from __future__ import annotations
 import numpy as np
 import pandas as pd
 
+from .backtest import run_value_backtest
 from .graham import compute_iv_panel, graham_iv, graham_number, growth_rate
 
 QEPS = [round(1.00 * 1.02 ** i, 4) for i in range(13)]
@@ -46,5 +47,23 @@ def test_hand() -> None:
     print(f"hand-check OK: g={G_EXPECT} ttm={TTM_EXPECT} IV={IV_EXPECT} GN={GN_EXPECT}")
 
 
+def test_diversification_ignores_ticker_order() -> None:
+    """Two identical, equally undervalued names must both get bought the
+    month they qualify, split ~evenly. The old buy loop gave the first
+    ticker every dollar of cash and left nothing for the second -- so
+    which name won depended on dict iteration order, not the equal-weight
+    rule the docstring claims."""
+    dates = pd.date_range("2020-01-31", periods=3, freq="ME")
+    prices = {tk: pd.DataFrame({"Date": dates, "Close": [100.0] * len(dates)})
+              for tk in ("AAA", "BBB")}
+    iv = pd.DataFrame({
+        "ticker": ["AAA", "BBB"], "filed_date": [dates[0], dates[0]],
+        "iv": [1000.0, 1000.0],  # far below any discount threshold
+    })
+    eq, _ = run_value_backtest(iv, prices, discount=0.5, cost_bps=0)
+    assert eq.iloc[0]["n"] == 2, eq.iloc[0]["n"]
+
+
 if __name__ == "__main__":
     test_hand()
+    test_diversification_ignores_ticker_order()

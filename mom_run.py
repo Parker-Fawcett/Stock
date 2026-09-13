@@ -65,7 +65,10 @@ def run_momentum(panel: pd.DataFrame, cost_bps: float = 25.0,
         for tk in picks:
             try:
                 r = fut[tk].iloc[:21]
-                rets.append(float(np.log(r.iloc[-1] / px.loc[d0, tk])))
+                # simple return: equal-weight portfolio return is the mean
+                # of simple returns, not the mean of log returns exp'd back
+                # (a +100%/-50% pair is +25%, not 0%).
+                rets.append(float(r.iloc[-1] / px.loc[d0, tk] - 1))
             except Exception:  # noqa: BLE001
                 continue
         gross = float(np.mean(rets)) if rets else 0.0
@@ -73,7 +76,7 @@ def run_momentum(panel: pd.DataFrame, cost_bps: float = 25.0,
                      "cost": cost, "net": gross - cost, "turnover": turnover})
         prev = picks
     out = pd.DataFrame(rows)
-    out["equity"] = np.exp(out["net"].cumsum())
+    out["equity"] = (1 + out["net"]).cumprod()
     return out
 
 
@@ -93,7 +96,7 @@ def main() -> None:
     mid = len(b) // 2
     for tag, sl in (("tune", slice(None, mid)), ("hold", slice(mid, None))):
         part = b.iloc[sl].reset_index(drop=True).copy()
-        part["equity"] = np.exp(part["net"].cumsum())  # reset: slices share a running curve
+        part["equity"] = (1 + part["net"]).cumprod()  # reset: slices share a running curve
         s = ev.summarize(part, label=f"mom/{tag}")
         print(tag, {k: s[k] for k in ("CAGR", "maxDD", "Sharpe_m", "exposure")})
     print("months:", len(b), "mean_n:", round(b.n.mean(), 1))

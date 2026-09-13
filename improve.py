@@ -119,7 +119,7 @@ def p_vol_only(test, proba, px):
     t["proba"] = proba
     b = bt.run_backtest_risk(t, proba, cost_bps=COST, top_n=TOP_N,
                              thresh=THRESH, min_names=1,
-                             stop_frac=2.0,  # stops off
+                             stop_frac=None,  # stops off
                              vol_target=0.20, dd_brake=10.0)  # brake off
     return b.set_index("date")["net"]
 

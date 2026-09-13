@@ -98,7 +98,10 @@ def build_panel(price_paths: dict[str, str], market: str = "SPY") -> pd.DataFram
     mkt_log = np.log(mkt.set_index("Date")["mkt"])
     panel["mkt_fwd"] = panel["Date"].map(mkt_log.shift(-HORIZON) - mkt_log).astype(float)
     panel["excess"] = panel["fwd_ret"] - panel["mkt_fwd"]
-    panel["label_end"] = panel["Date"] + pd.to_timedelta(HORIZON, unit="D")
+    # Trading-day label end (matches the row-shift used for fwd_ret above),
+    # not a calendar-day approximation -- this is what purge/embargo must
+    # compare against, or validation rows can still see test-period outcomes.
+    panel["label_end"] = panel.groupby("ticker")["Date"].shift(-HORIZON)
     # cross-sectional label: top 20% excess per date = 1
     panel["label"] = (
         panel.groupby("Date")["excess"]
@@ -106,3 +109,28 @@ def build_panel(price_paths: dict[str, str], market: str = "SPY") -> pd.DataFram
     )
     panel = panel.dropna(subset=FEATURE_COLS + ["excess"]).reset_index(drop=True)
     return panel
+
+
+def build_latest(price_paths: dict[str, str], market: str = "SPY") -> tuple[pd.DataFrame, pd.Timestamp]:
+    """Most recent trading day's features per ticker, for live inference.
+
+    build_panel() drops the last HORIZON rows of every ticker because their
+    forward return/label isn't known yet -- correct for training, but it
+    means panel["Date"].max() is always HORIZON trading days stale. Live
+    prediction needs today's features without needing today's outcome.
+    """
+    frames = []
+    for ticker, path in price_paths.items():
+        if ticker.upper() == market.upper():
+            continue
+        try:
+            df = add_features(load_ohlc(path))
+        except Exception as e:  # noqa: BLE001
+            print(f"skip {ticker}: {e}")
+            continue
+        df["ticker"] = ticker.upper()
+        frames.append(df[["Date", "ticker", "Close"] + FEATURE_COLS])
+    panel = pd.concat(frames, ignore_index=True)
+    asof = panel["Date"].max()
+    latest = panel[panel["Date"] == asof].dropna(subset=FEATURE_COLS)
+    return latest.reset_index(drop=True), pd.Timestamp(asof)

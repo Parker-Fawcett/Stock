@@ -5,8 +5,11 @@ Why trees first: his XGBoost beat a year of LSTM work on the same data
 LSTM is the wrong tool until sequences actually help.
 
 Purge/embargo (Lopez de Prado; his V5 1F0gYkk7YYw):
- train rows whose [Date, Date+HORIZON] touches the test window are
- dropped; a small embargo gap follows the test start.
+ rows whose label window [Date, label_end] reaches into the next split
+ are dropped -- both train-vs-val and val-vs-test, since validation
+ labels feed the calibrator/early-stopping just like training labels
+ feed the fit. embargo_days pads the cut by an extra buffer beyond the
+ deterministic label-horizon overlap.
 """
 from __future__ import annotations
 
@@ -41,6 +44,7 @@ def walk_forward(
     val_len = pd.to_timedelta(val_months * 30, unit="D")
     test_len = pd.to_timedelta(test_months * 30, unit="D")
     train_len = pd.to_timedelta(int(train_years * 365), unit="D")
+    embargo = pd.to_timedelta(embargo_days, unit="D")
     t = start
     while t + val_len + test_len <= dates[-1]:
         te0, te1 = t + val_len, t + val_len + test_len
@@ -49,14 +53,12 @@ def walk_forward(
         test = panel[(panel["Date"] >= te0) & (panel["Date"] < te1)]
         val = panel[(panel["Date"] >= va0) & (panel["Date"] < va1)]
         train = panel[(panel["Date"] >= tr0) & (panel["Date"] < va0)]
-        # PURGE: drop train rows whose label window reaches into val
-        purge_cut = va0 - pd.to_timedelta(HORIZON, unit="D")
-        train = train[train["Date"] < purge_cut]
-        # EMBARGO: drop val rows too close after train (serial correlation)
-        _emb = tr0  # train is past, embargo applies forward from test below
-        _ = _emb
-        # embargo after test start for any future use: nothing after te1 used
-        _ = embargo_days
+        # PURGE: drop rows whose actual (trading-day) label window reaches
+        # into or past the next split's start, plus an embargo buffer.
+        train = train[train["label_end"] < va0 - embargo]
+        # Validation labels feed the calibrator/early-stopping, so they must
+        # not see outcomes inside the test window either.
+        val = val[val["label_end"] < te0 - embargo]
         if len(train) > 500 and len(val) > 100 and len(test) > 100:
             folds.append(Fold(train, val, test))
         t += step
