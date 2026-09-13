@@ -57,8 +57,12 @@ which strengthens holdout results and weakens tune ones.
     replicates where overfitting cannot reach. P&L +4.2% / -0.44 DD.
     Signal real, harvest weak.
 11. **Textbook 12-1 momentum, no ML.** Small: tune +9.5% (Sharpe 0.41),
-    holdout +16.3% (Sharpe 0.20). Mid: tune +3.3%, holdout +15.1%.
-    Positive every half, both universes. Best result in the project.
+    holdout +6.2% (Sharpe 0.20, DD -0.56). Mid: tune +3.3%, holdout
+    +11.4% (Sharpe 0.35). Positive every half, both universes. Best
+    raw result in the project. (CORRECTION: holdout CAGRs were first
+    misreported higher — shared running equity curve wasn't reset per
+    slice. Caught by reconciliation check, fixed, rerun. Sharpe/DD were
+    always correct.)
 12. **Ensemble (50% ML-wide + 50% momentum, zero new params).** Tune:
     ml -2.2% (Sharpe -0.10), mom +8.7% (+0.40), ens +3.1% (+0.17). Bar
     was Sharpe > 0.41 with DD > -0.31. Failed — averaging dilutes.
@@ -133,8 +137,10 @@ bar where selection was involved.
 
 What survived: a 0.56 AUC rank signal that replicates on untouched data
 but never survives risk; textbook 12-1 momentum, positive in all four
-halves tested across two universes, the best result in the project, with
-fifteen lines and zero ML; a live paper log grading both monthly.
+halves tested across two universes (small hold +6.2%, mid hold +11.4%),
+plus multi-asset trend (+6.3%/+7.3% halves, Sharpe 0.82/0.54, DD under
+-0.24 — best risk-adjusted in the project); a live paper log grading
+both monthly.
 
 What died: everything with a neural net, everything with insider data
 (three formulations), everything with social sentiment (both directions,
@@ -156,4 +162,44 @@ What would reopen the case: paid point-in-time fundamentals on small
 caps, a new data regime (satellite/credit-card class, with budget), or
 months of live log contradicting the backtests. Until one arrives, the
 file is closed and the index fund wins.
+
+## Who does this better (research waves)
+
+**Numerai (the canonical better).** Thousands of staked models,
+market-neutral global equity, $450M AUM, JPMorgan $500M capacity, +25%
+net 2024 at 2.75 Sharpe. Starter code is XGBoost — our tool at 1000x
+breadth. Works through neutrality + diversity + skin in the game, not
+cleverer models.
+
+**Medallion (the ceiling).** 66%/yr 1988–2018, never a down year,
+negative factor loadings. Thousands of short-term long+short bets,
+mid-frequency, capped size, leverage via consistency. Uncopyable
+retail; sets direction (breadth, short holds, neutral).
+
+**Gu-Kelly-Xiu (the academic ceiling).** Trees + shallow nets win, deep
+nets lose; monthly R² 0.3–0.4%; winners are momentum, liquidity,
+volatility — our top features, independently. Gains via long-short
+deciles at scale.
+
+**QuantConnect/LEAN (the infrastructure better).** 21k stars,
+survivorship-free data with delistings, built-in slippage/fees.
+Our weakest links (hand execution realism, survivor universes) fixed
+free — migration candidate.
+
+**The honest minority.** Quantopian: 888 strategies, backtest-live
+Sharpe correlation zero. Stanford 2025: 58% of retail algos die in 3
+months. Quantpedia: every winner carries -50%+ DD with low persistence.
+Our discipline is the documented base rate, not paranoia.
+
+## AI self-improvement (researched, loop built)
+
+Taxonomy: manual prompting (his way — weakest, no stats, single
+lineage); Reflexion/self-refine (wrong for finance — verbal loops
+manufacture overfitting narratives); AutoML/HPO (PBO-as-a-service
+without trial accounting); AIDE (best fit — solution tree + cheap eval,
+needs a holdout gate); AlphaEvolve (right architecture, needs cheap
+correct evals — finance has neither); Darwin Gödel Machine (keep the
+archive idea, not the benchmark faith).
+Built: improve.py — AIDE structure + DGM archive + tune→holdout-once
+gate + 20-trial lifetime budget, me as mutator. Rounds 1–2 done above.
 

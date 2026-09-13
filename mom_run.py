@@ -91,7 +91,9 @@ def main() -> None:
     b = run_momentum(panel, cost_bps=args.cost)
     mid = len(b) // 2
     for tag, sl in (("tune", slice(None, mid)), ("hold", slice(mid, None))):
-        s = ev.summarize(b.iloc[sl].reset_index(drop=True), label=f"mom/{tag}")
+        part = b.iloc[sl].reset_index(drop=True).copy()
+        part["equity"] = np.exp(part["net"].cumsum())  # reset: slices share a running curve
+        s = ev.summarize(part, label=f"mom/{tag}")
         print(tag, {k: s[k] for k in ("CAGR", "maxDD", "Sharpe_m", "exposure")})
     print("months:", len(b), "mean_n:", round(b.n.mean(), 1))
 
