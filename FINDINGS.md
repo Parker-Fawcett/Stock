@@ -156,6 +156,18 @@ Public-data cross-sectional rank predicts weakly (AUC ~0.56) and profits
 textbook momentum with no ML. Same verdict as LosingLoonies, tighter
 bounds, three universes.
 
+## Regime correction (the nessessary uncomfortable table)
+
+Both ML halves were bull markets, not one calm + one stress:
+tune 2013–19 SPY +12.6%/IWM +8.9%; holdout 2019–25 SPY +15.1%/IWM +7.4%
+(crashes inside, V-recoveries after). Consequence: NO long-only config
+in this project beat buy-and-hold SPY on return in either half. P5's
++12.7% trails SPY's +15.1% on the same window. Best case anywhere is a
+tie on risk-adjusted terms (multi-asset Sharpe 0.82 vs SPY ~0.8).
+Momentum's wins are real but relative, not absolute. The file's claim
+is hereby downgraded from 'weak signal, unharvestable risk' to 'weak
+signal that trails the index, with calmer variants'.
+
 ## After everything
 
 Started from 29 of his videos and one question: can his AI stock
