@@ -78,7 +78,7 @@ FFT features, MACD/candlesticks.
 
 ## Open
 
-- Value backtest on FMP mega-caps (quota-gated).
+- Value on small caps (needs paid fundamentals; free sources exhausted).
 - Quality/profitability tilt (live factor, working endpoints).
 - Paper log accumulation (months, no peeking).
 
@@ -88,3 +88,42 @@ Public-data cross-sectional rank predicts weakly (AUC ~0.56) and profits
 ~never after risk. The only strategy positive in every half tested is
 textbook momentum with no ML. Same verdict as LosingLoonies, tighter
 bounds, three universes.
+
+## After everything
+
+Started from 29 of his videos and one question: can his AI stock
+predictor be rebuilt better. Ended with a fuller answer than his.
+
+What was tried, in order: trees-first rebuild, purge/embargo validation,
+monkey baselines, costs from day one, three universes (large/small/mid),
+raw and conviction insider data, risk overlays, long-short, textbook
+momentum, Graham value on real financials, French factor regimes, live
+paper trading. Twelve numbered experiments, each with a pre-committed
+bar where selection was involved.
+
+What survived: a 0.56 AUC rank signal that replicates on untouched data
+but never survives risk; textbook 12-1 momentum, positive in all four
+halves tested across two universes, the best result in the project, with
+fifteen lines and zero ML; a live paper log grading both monthly.
+
+What died: everything with a neural net, everything with insider data
+(three formulations), everything with social sentiment (both directions,
+his newest video agrees), value on mega caps 2021-26 (median price 2.77x
+Graham value; the strategy holds cash and trails), long-short small caps
+(hedge works, alpha doesn't), and every risk overlay tuned by hand.
+
+Why it died is structural, not bad luck: value/size factors ran negative
+for a decade (French HML -1.1%, SMB -2.3%), famous signals are priced in,
+strange signals are sparse where they're free and paywalled where they'd
+matter, and small-cap friction eats paper edges. His channel banner says
+it in net-worth font; this repo says it in 70 folds.
+
+What runs on its own now: monthly paper log (ML + momentum sleeves),
+monthly momentum sleeve, and the value engine waiting on small-cap data
+that costs money everywhere checked.
+
+What would reopen the case: paid point-in-time fundamentals on small
+caps, a new data regime (satellite/credit-card class, with budget), or
+months of live log contradicting the backtests. Until one arrives, the
+file is closed and the index fund wins.
+
