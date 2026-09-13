@@ -25,6 +25,10 @@ LOOKBACK = 210  # ~10 trading months
 def main() -> None:
     ap = argparse.ArgumentParser()
     ap.add_argument("--cost", type=float, default=10.0)
+    ap.add_argument("--stride", type=int, default=1,
+                    help="rebalance every Nth month (pre-committed test: 3)")
+    ap.add_argument("--hold", type=int, default=21,
+                    help="trading days to hold (pre-committed test: 63)")
     args = ap.parse_args()
     paths = download_universe(ASSETS, market="SPY")
     px = {}
@@ -37,6 +41,7 @@ def main() -> None:
     px = pd.DataFrame(px).sort_index().dropna(how="all")
     months = pd.to_datetime(px.index.to_series()).dt.to_period("M").drop_duplicates().sort_values()
     rows, prev = [], []
+    trade_months = set(months[i] for i in range(0, len(months), args.stride))
     for m in months:
         d0 = px.index[pd.to_datetime(px.index.to_series()).dt.to_period("M") == m].max()
         hist = px.loc[px.index <= d0]
@@ -45,6 +50,8 @@ def main() -> None:
         sma = hist.tail(LOOKBACK).mean()
         held = [a for a in ASSETS if a in hist.columns
                 and hist[a].loc[d0] > sma[a]]
+        if m not in trade_months:
+            held = prev  # hold between rebalances, no turnover
         turnover = len(set(held) ^ set(prev)) / max(1, max(len(held), len(prev)))
         cost = turnover * args.cost / 1e4
         fut = px.loc[px.index > d0]
@@ -52,6 +59,7 @@ def main() -> None:
             rs = []
             for a in held:
                 try:
+                    # monthly marked-to-market always; stride only gates turnover
                     r = fut[a].iloc[:21]
                     rs.append(float(np.log(r.iloc[-1] / px.loc[d0, a])))
                 except Exception:  # noqa: BLE001

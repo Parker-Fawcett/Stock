@@ -266,8 +266,9 @@ def trailing_vol(tk: str, d0, n: int = 20) -> float:
     return float(np.log(h["Close"] / h["Close"].shift(1)).dropna().std() * np.sqrt(252))
 
 
-def _risk_book(test, proba, px, weight_fn=None, dv_min: float = 0.0):
-    """P5 construction (top20/.25/stops/vol-target/DD-brake) plus an
+def _risk_book(test, proba, px, weight_fn=None, dv_min: float = 0.0,
+               top_n: int = 20, thresh: float = 0.25):
+    """P5 construction (top-N/thresh/stops/vol-target/DD-brake) plus an
     optional candidate $volume filter and per-name weighting."""
     from predictor.backtest import RISK_STOP
     t = test.copy().reset_index(drop=True)
@@ -280,7 +281,7 @@ def _risk_book(test, proba, px, weight_fn=None, dv_min: float = 0.0):
         block = t[pd.to_datetime(t["Date"]).dt.to_period("M") == m]
         d0 = block["Date"].max()
         cands = block[block["Date"] == d0].sort_values("proba", ascending=False)
-        quals = cands[cands["proba"] >= 0.25]
+        quals = cands[cands["proba"] >= thresh]
         if dv_min > 0:
             quals = quals[quals["ticker"].map(lambda k: trailing_dv(k, d0)) >= dv_min]
         if len(quals) < 1:
@@ -291,7 +292,7 @@ def _risk_book(test, proba, px, weight_fn=None, dv_min: float = 0.0):
             scale = min(1.0, 0.20 / trailing) if trailing > 0 else 1.0
             if eq / peak - 1.0 < -0.15:
                 scale *= 0.5
-            n = max(0, round(20 * scale))
+            n = max(0, round(top_n * scale))
             picks = quals.head(n)["ticker"].tolist() if n >= 1 else []
             if weight_fn is None or not picks:
                 w = {tk: 1 / len(picks) for tk in picks}
@@ -338,6 +339,18 @@ def p_volw(test, proba, px):
     return _risk_book(t, proba, tpx, weight_fn=trailing_vol)
 
 
+def p_top30(test, proba, px):
+    t = test.copy()
+    tpx = t.set_index(["ticker", "Date"])["Close"].unstack("ticker")
+    return _risk_book(t, proba, tpx, weight_fn=trailing_vol, top_n=30)
+
+
+def p_gate35(test, proba, px):
+    t = test.copy()
+    tpx = t.set_index(["ticker", "Date"])["Close"].unstack("ticker")
+    return _risk_book(t, proba, tpx, weight_fn=trailing_vol, thresh=0.35)
+
+
 PROPOSALS = {
     # id: (fn, predicted effect, pre-registered before any evaluation)
     "P1-vol-only": (p_vol_only, "Cuts turnover drag; DD unchanged. Sharpe ~0.1."),
@@ -348,6 +361,8 @@ PROPOSALS = {
     "P6-calm-only": (p_calm_only, "Dodges 2020/2022 storms; whipsaw cash drag."),
     "P7-liqfilter": (p_liq, "Drops illiquid names; cuts hidden impact. Sharpe ~0.5, DD similar."),
     "P8-volscale": (p_volw, "Smooths single-name blowups; DD toward -0.2. Sharpe ~0.5."),
+    "P9-top30": (p_top30, "More breadth, dilutes best ideas; DD improves, CAGR falls. Sharpe ~0.4."),
+    "P10-gate35": (p_gate35, "Tighter selection, fewer names; punchier, worse DD. Sharpe ~0.4."),
 }
 
 

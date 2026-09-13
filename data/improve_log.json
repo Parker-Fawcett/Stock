@@ -1,5 +1,5 @@
 {
- "spent": 8,
+ "spent": 10,
  "proposals": {
   "P1-vol-only": {
    "status": "dead-artifact",
@@ -94,6 +94,33 @@
     "sharpe": 0.215,
     "months": 81
    }
+  },
+  "P9-top30": {
+   "status": "promoted",
+   "pred": "More breadth, dilutes best ideas; DD improves, CAGR falls. Sharpe ~0.4.",
+   "tune": {
+    "CAGR": 0.1118,
+    "maxDD": -0.3,
+    "sharpe": 0.588,
+    "months": 82
+   },
+   "holdout": {
+    "CAGR": 0.0431,
+    "maxDD": -0.401,
+    "sharpe": 0.161,
+    "months": 81
+   }
+  },
+  "P10-gate35": {
+   "status": "dead-tune",
+   "pred": "Tighter selection, fewer names; punchier, worse DD. Sharpe ~0.4.",
+   "tune": {
+    "CAGR": 0.0494,
+    "maxDD": -0.156,
+    "sharpe": 0.333,
+    "months": 82
+   },
+   "note": "Sharpe 0.333 under 0.41 bar. Tighter gate concentrated without paying."
   }
  },
  "archive": [
@@ -184,6 +211,33 @@
     "CAGR": 0.0614,
     "maxDD": -0.39,
     "sharpe": 0.215,
+    "months": 81
+   }
+  },
+  {
+   "id": "P9-top30",
+   "tune": {
+    "CAGR": 0.1118,
+    "maxDD": -0.3,
+    "sharpe": 0.588,
+    "months": 82
+   }
+  },
+  {
+   "id": "P10-gate35",
+   "tune": {
+    "CAGR": 0.0494,
+    "maxDD": -0.156,
+    "sharpe": 0.333,
+    "months": 82
+   }
+  },
+  {
+   "id": "P9-top30",
+   "holdout": {
+    "CAGR": 0.0431,
+    "maxDD": -0.401,
+    "sharpe": 0.161,
     "months": 81
    }
   }
