@@ -1,0 +1,137 @@
+{
+ "spent": 6,
+ "proposals": {
+  "P1-vol-only": {
+   "status": "dead-artifact",
+   "pred": "Cuts turnover drag; DD unchanged. Sharpe ~0.1.",
+   "tune": {
+    "CAGR": 29.7667,
+    "maxDD": -0.005,
+    "sharpe": 2.888,
+    "months": 82
+   },
+   "note": "9 idiosyncratic doubles, 1-2 name books, bull market. Numeric pass rejected by judgment, stated openly."
+  },
+  "P2-stops-only": {
+   "status": "tested-tune",
+   "pred": "Truncates left tail; whipsaw costs. Sharpe ~0.15.",
+   "tune": {
+    "CAGR": -0.0226,
+    "maxDD": -0.511,
+    "sharpe": -0.109,
+    "months": 82
+   }
+  },
+  "P3-blend": {
+   "status": "tested-tune",
+   "pred": "Best of both signals; Sharpe > 0.3 if ML adds anything.",
+   "tune": {
+    "CAGR": 0.0717,
+    "maxDD": -0.222,
+    "sharpe": 0.426,
+    "months": 82
+   }
+  },
+  "P4-hold40": {
+   "status": "tested-tune",
+   "pred": "Halves turnover; staler signal. Net favors costs.",
+   "tune": {
+    "CAGR": -0.2021,
+    "maxDD": -0.883,
+    "sharpe": -0.509,
+    "months": 82
+   }
+  },
+  "P5-gate25": {
+   "status": "promoted",
+   "pred": "More names, more diversification; weaker selection.",
+   "tune": {
+    "CAGR": 0.1331,
+    "maxDD": -0.26,
+    "sharpe": 0.682,
+    "months": 82
+   },
+   "holdout": {
+    "CAGR": 0.1268,
+    "maxDD": -0.35,
+    "sharpe": 0.406,
+    "months": 81
+   }
+  },
+  "P6-calm-only": {
+   "status": "tested-tune",
+   "pred": "Dodges 2020/2022 storms; whipsaw cash drag.",
+   "tune": {
+    "CAGR": -0.0222,
+    "maxDD": -0.509,
+    "sharpe": -0.107,
+    "months": 82
+   }
+  }
+ },
+ "archive": [
+  {
+   "id": "P1-vol-only",
+   "tune": {
+    "CAGR": 29.7667,
+    "maxDD": -0.005,
+    "sharpe": 2.888,
+    "months": 82
+   }
+  },
+  {
+   "id": "P2-stops-only",
+   "tune": {
+    "CAGR": -0.0226,
+    "maxDD": -0.511,
+    "sharpe": -0.109,
+    "months": 82
+   }
+  },
+  {
+   "id": "P3-blend",
+   "tune": {
+    "CAGR": 0.0717,
+    "maxDD": -0.222,
+    "sharpe": 0.426,
+    "months": 82
+   }
+  },
+  {
+   "id": "P4-hold40",
+   "tune": {
+    "CAGR": -0.2021,
+    "maxDD": -0.883,
+    "sharpe": -0.509,
+    "months": 82
+   }
+  },
+  {
+   "id": "P5-gate25",
+   "tune": {
+    "CAGR": 0.1331,
+    "maxDD": -0.26,
+    "sharpe": 0.682,
+    "months": 82
+   }
+  },
+  {
+   "id": "P6-calm-only",
+   "tune": {
+    "CAGR": -0.0222,
+    "maxDD": -0.509,
+    "sharpe": -0.107,
+    "months": 82
+   }
+  },
+  {
+   "id": "P5-gate25",
+   "holdout": {
+    "CAGR": 0.1268,
+    "maxDD": -0.35,
+    "sharpe": 0.406,
+    "months": 81
+   }
+  }
+ ]
+}

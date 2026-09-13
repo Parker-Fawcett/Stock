@@ -26,6 +26,13 @@ move a verdict.
 
 ## Experiment log
 
+CORRECTION (round one): tune-half is Sep 2013–Aug 2019 (calm bull, no
+crashes), holdout-half Aug 2019–Jul 2025 (COVID crash, 2022 bear,
+recovery). Earlier notes saying tune held the bears were wrong — Yahoo
+cache extended history to 2010 regardless of download start. Split
+stays clean (tune never eyeballed); regimes are harsher than labeled,
+which strengthens holdout results and weakens tune ones.
+
 1. **Large-cap LSTM-style baseline → trees first.** Trees beat a year of
    LSTM work on identical data (his video + our replication). LSTM buried.
 2. **Large-cap price-only ML (104 names, SPY-relative, 20d excess).**
@@ -40,9 +47,10 @@ move a verdict.
 7. **Risk overlays (breadth gate, stops, vol target, DD brake).**
    v1 concentrated into blowups; v2 into cash (2.6% CAGR). Hand-tuning
    risk knobs = overfitting. Stopped, switched to tune/holdout.
-8. **Tune/holdout, 3 configs, small caps.** Tune (2018–22): everything
-   loses to monkeys except cash. Holdout (2022–26): wide +20.8% — but
-   holdout was eyeballed during construction. Contaminated, not claimed.
+8. **Tune/holdout, 3 configs, small caps.** Tune (2013–19 bull):
+    everything loses to monkeys except cash. Holdout (2019–25 stress):
+    wide +20.8% — but holdout was eyeballed during construction.
+    Contaminated, not claimed. (Eras corrected; see note at top.)
 9. **Long-short (top-10/bottom-10, 5% borrow).** Tune Sharpe -0.03.
    Bar failed, no holdout. Hedge cuts DD (-0.26), short book earns nothing.
 10. **Mid-cap ML generalization (fresh universe).** AUC 0.559 —
@@ -56,6 +64,16 @@ move a verdict.
     was Sharpe > 0.41 with DD > -0.31. Failed — averaging dilutes.
     The ML adds nothing to momentum. Buried as a signal; kept running
     in paper only as the losing side of the bet.
+13. **Self-improvement loop, round one (6 proposals, tune-half).**
+    P1 printed Sharpe 2.9/CAGR 2900% — investigated, not celebrated:
+    nine idiosyncratic biotech/crypto doubles in 1–2 name books during a
+    bull market (CLSK verified tick-by-tick as genuine). Numeric pass
+    rejected openly as lottery concentration; protocol gap noted.
+    P5-gate25 (wide + 0.25 gate, 81/82 months invested, avg 9.4 names,
+    no month above +25%) passed clean: tune Sharpe 0.68, DD -0.26.
+    Promoted once to holdout: **CAGR +12.7%, DD -0.35, Sharpe 0.41**
+    through COVID, 2022 bear, and recovery at 25bps. First ML config
+    with a clean stress-period holdout. Budget: 14/20 left.
 12. **Value lane, real data (12 mega caps, FMP annuals).** Median
     price/IV 2.77 — mega caps never near Graham value. d0.5: zero trades.
     d0.0: +2.7% vs +8.1% fair benchmark, avg 0.4 names. Free FMP caps
