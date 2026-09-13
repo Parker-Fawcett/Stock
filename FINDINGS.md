@@ -51,9 +51,12 @@ move a verdict.
 11. **Textbook 12-1 momentum, no ML.** Small: tune +9.5% (Sharpe 0.41),
     holdout +16.3% (Sharpe 0.20). Mid: tune +3.3%, holdout +15.1%.
     Positive every half, both universes. Best result in the project.
-12. **Value lane.** Graham engine hand-validated (IV 119.9 vs 120.0),
-    French HML -1.1%/yr headwind quantified. Real-data run pending FMP
-    quota (mega-caps only on free key).
+12. **Value lane, real data (12 mega caps, FMP annuals).** Median
+    price/IV 2.77 — mega caps never near Graham value. d0.5: zero trades.
+    d0.0: +2.7% vs +8.1% fair benchmark, avg 0.4 names. Free FMP caps
+    history at 5 years and covers mega caps only: no crash in window, no
+    small caps, growth from 5 points. Weak test of value generally;
+    decisive for "Graham on mega caps 2021-26": cash, and trails.
 
 ## Live paper log (frozen models)
 
