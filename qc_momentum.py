@@ -18,9 +18,9 @@ class MomentumSleeve(QCAlgorithm):
         self.UniverseSettings.Resolution = Resolution.Daily
         self.AddUniverse(self.CoarseFilter)
         self._picks = []
-        # monthly, first trading day, after open
+        # monthly, first trading day, mid-morning (no symbol dependency)
         self.Schedule.On(self.DateRules.MonthStart(),
-                         self.TimeRules.AfterMarketOpen("SPY", 30),
+                         self.TimeRules.At(10, 30),
                          self.Rebalance)
         self.SetWarmUp(252, Resolution.Daily)
 
@@ -33,8 +33,11 @@ class MomentumSleeve(QCAlgorithm):
     def Rebalance(self):
         if self.IsWarmingUp:
             return
-        hist = self.History(self.Universe.Select(lambda c: c.Symbol),
-                            273, Resolution.Daily)
+        syms = [x.Symbol for x in self.ActiveSecurities.Values
+                if x.Symbol.SecurityType == SecurityType.Equity]
+        if len(syms) < 10:
+            return
+        hist = self.History(syms, 273, Resolution.Daily)
         if hist.empty:
             return
         mom = {}
