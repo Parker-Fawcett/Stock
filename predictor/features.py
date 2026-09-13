@@ -1,6 +1,6 @@
 """Trailing-only features + 20d forward excess labels. No lookahead.
 
-Lessons baked in (LosingLoonies):
+Lessons baked in (from the source project's public build log):
 - V1 leaked via overlapping windows + stock-split (aiFpAl3mgGk). All
   features here use only data <= date t (shifted), labels use t+20.
 - MSE on 1-day log returns learns the mean (kRa3PUxNBTM). We use

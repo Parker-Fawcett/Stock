@@ -10,10 +10,12 @@ Live scoreboard (see `paper.py grade`, `data/paper/log.csv):
 - `wide-seed0-v1` (ML rank): 30 picks, 37% hit, -2.7% excess vs IWM.
 - `mom12-1-v1` (textbook momentum): logging, backtest says +6–11% halves.
 
-Origin: clean-room rebuild of the LosingLoonies AI predictor from 29
-video transcripts (`LosingLoonies_transcripts/` and
-`LosingLoonies_other/`). Every design choice maps to a failure he
-documented — then we kept score honestly where he stopped.
+Origin: independent rebuild of a community-documented AI stock predictor,
+starting from 29 published video transcripts (`sources-channel-predictor/`
+and `sources-channel-strategy/`). Every design choice maps to a failure
+the source project documented across a year of public iteration — then
+we kept score honestly where it stopped. Source channel credited in full;
+all code, tests, and findings here are original work.
 
 ## What changed vs his V1
 

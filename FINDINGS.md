@@ -153,8 +153,8 @@ FFT features, MACD/candlesticks.
 
 Public-data cross-sectional rank predicts weakly (AUC ~0.56) and profits
 ~never after risk. The only strategy positive in every half tested is
-textbook momentum with no ML. Same verdict as LosingLoonies, tighter
-bounds, three universes.
+textbook momentum with no ML. Independent convergence with the source
+project's verdict, tighter bounds, three universes.
 
 ## Regime correction (the nessessary uncomfortable table)
 

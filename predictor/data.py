@@ -1,6 +1,6 @@
 """Free price downloader (Yahoo chart API -> local CSV cache).
 
-Survivorship warning, from LosingLoonies finale (noK0IwZAnyE):
+Survivorship warning, from the source project's finale (noK0IwZAnyE):
  tickers that exist TODAY hide bankrupt losers. Anything run on this
  free data is BIASED upward. Use a point-in-time membership list +
  delisted prices (e.g. Massive/CRSP) before trusting a number.
