@@ -36,6 +36,7 @@ def load_fmp(tickers: list[str], years: int = 12) -> pd.DataFrame:
     if not key:
         raise RuntimeError("set FMP_KEY (free at site financialmodelingprep.com)")
     rows = []
+    import time as _time
     for t in tickers:
         tk = t.upper()
         try:
@@ -44,16 +45,16 @@ def load_fmp(tickers: list[str], years: int = 12) -> pd.DataFrame:
             url = f"https://financialmodelingprep.com/stable/income-statement?{iq}"
             req = urllib.request.Request(url, headers={"User-Agent": "Mozilla/5.0"})
             inc = json.loads(urllib.request.urlopen(req, timeout=30).read())
+            _time.sleep(2.0)  # free-tier rate limit: unhurried wins
             bq = urllib.parse.urlencode({"symbol": tk, "period": "annual",
                                          "limit": years, "apikey": key})
             url = f"https://financialmodelingprep.com/stable/balance-sheet-statement?{bq}"
             req = urllib.request.Request(url, headers={"User-Agent": "Mozilla/5.0"})
             bal = json.loads(urllib.request.urlopen(req, timeout=30).read())
+            _time.sleep(2.0)
         except Exception as e:  # noqa: BLE001
             print(f"FMP failed {tk}: {e}")
             continue
-        import time
-        time.sleep(1.2)  # free-tier rate limit is tight; unhurried wins
         bmap = {r.get("date"): r for r in bal if isinstance(r, dict)}
         for r in inc:
             if not isinstance(r, dict):
