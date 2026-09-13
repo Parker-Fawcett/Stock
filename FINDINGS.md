@@ -249,13 +249,13 @@ Built: improve.py — AIDE structure + DGM archive + tune→holdout-once
 gate + 20-trial lifetime budget, me as mutator. Rounds 1–2 done above.
 
 
-## LEAN migration (roadmap, not started)
+## LEAN migration (started Sep 2026)
 
-QuantConnect/LEAN: US equities back to 1998, survivorship-bias-free
-bulk download (AlgoSeek/QuantQuote), built-in slippage/fees, free tier
-delayed. Fixes our two known lies (survivor universes, hand execution).
-Costs QCC credits for bulk + Docker weight on this machine. Correct
-long-term home for the harness; changes no strategy conclusions.
+Docker Desktop installed + verified (hello-world runs). LEAN engine
+pull in progress. Goal: re-run momentum sleeve on survivorship-free
+US equity data (AlgoSeek/QuantQuote back to 1998, delistings included)
+— the first backtest here without the survivor asterisk. Open question:
+bulk download QCC costs on a free account; sample data first.
 
 ## Decay meta-analysis (loop paused, 10 trials banked)
 
