@@ -228,3 +228,21 @@ archive idea, not the benchmark faith).
 Built: improve.py — AIDE structure + DGM archive + tune→holdout-once
 gate + 20-trial lifetime budget, me as mutator. Rounds 1–2 done above.
 
+
+## LEAN migration (roadmap, not started)
+
+QuantConnect/LEAN: US equities back to 1998, survivorship-bias-free
+bulk download (AlgoSeek/QuantQuote), built-in slippage/fees, free tier
+delayed. Fixes our two known lies (survivor universes, hand execution).
+Costs QCC credits for bulk + Docker weight on this machine. Correct
+long-term home for the harness; changes no strategy conclusions.
+
+## Decay meta-analysis (loop paused, 10 trials banked)
+
+Promoted holdout CAGRs decline in promotion order: P5 +12.7%, P8 +6.1%,
+P9 +4.3%. Tune Sharpes decline too (0.68/0.63/0.59). Every holdout DD
+breached its tune-set bar. Reading: each promotion mines a thinner vein
+and every round is another selection bite the budget only weakly prices.
+The loop worked (three clean promotions, all documented) and is now
+frozen until genuinely new data or a new game — spending the rest on
+this universe would be the slow version of the sin it guards.
