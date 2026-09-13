@@ -105,6 +105,11 @@ which strengthens holdout results and weakens tune ones.
     DD -0.27). Identical halves, lower turnover than monthly, same
     calm profile. Slow ≈ same, cheaper. (Also fixed a slice-CAGR bug
     that had inflated momentum holdout prints; Sharpe/DD unaffected.)
+19. **International trend sleeve (EFA/EEM/VNQ/GLD, same frozen rule).**
+    Tune +2.9% (Sharpe 0.22, DD -0.26), holdout +11.2% (Sharpe 0.88,
+    DD -0.16). Both positive, divergent by regime like everything else.
+    Holdout Sharpe 0.88 is the best single-half risk-adjusted print in
+    the project. No loop budget spent (new sleeve, descriptive).
 12. **Value lane, real data (12 mega caps, FMP annuals).** Median
     price/IV 2.77 — mega caps never near Graham value. d0.5: zero trades.
     d0.0: +2.7% vs +8.1% fair benchmark, avg 0.4 names. Free FMP caps

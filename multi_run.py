@@ -25,12 +25,15 @@ LOOKBACK = 210  # ~10 trading months
 def main() -> None:
     ap = argparse.ArgumentParser()
     ap.add_argument("--cost", type=float, default=10.0)
+    ap.add_argument("--assets", default="SPY,IWM,TLT,GLD",
+                    help="comma-separated ETFs (pre-committed intl test: EFA,EEM,VNQ,GLD)")
     ap.add_argument("--stride", type=int, default=1,
                     help="rebalance every Nth month (pre-committed test: 3)")
     ap.add_argument("--hold", type=int, default=21,
                     help="trading days to hold (pre-committed test: 63)")
     args = ap.parse_args()
-    paths = download_universe(ASSETS, market="SPY")
+    assets = [a.strip().upper() for a in args.assets.split(",") if a.strip()]
+    paths = download_universe(assets, market="SPY")
     px = {}
     for tk, p in paths.items():
         try:
@@ -48,7 +51,7 @@ def main() -> None:
         if len(hist) < LOOKBACK + 5:
             continue
         sma = hist.tail(LOOKBACK).mean()
-        held = [a for a in ASSETS if a in hist.columns
+        held = [a for a in assets if a in hist.columns
                 and hist[a].loc[d0] > sma[a]]
         if m not in trade_months:
             held = prev  # hold between rebalances, no turnover
