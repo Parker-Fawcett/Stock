@@ -266,3 +266,61 @@ and every round is another selection bite the budget only weakly prices.
 The loop worked (three clean promotions, all documented) and is now
 frozen until genuinely new data or a new game — spending the rest on
 this universe would be the slow version of the sin it guards.
+
+## Dump (everything, unstructured, Sep 2026)
+
+Started from 29 transcripts of a finance YouTuber building an AI stock
+predictor. Rebuilt it clean-room: trees not LSTM, 20-day excess-vs-market
+cross-sectional labels, walk-forward purge/embargo, monkey baselines,
+costs day one, calibration. Then spent months trying to make it work.
+
+ML results: large-cap AUC 0.53 mostly cash. Small-cap AUC 0.55, beats
+monkeys 5/8 folds, fold CAGRs -75% to +123% — signal with disqualifying
+variance. Mid-cap AUC 0.559 on untouched data — replicates, P&L +4.2%/-0.44.
+Insider raw counts hurt twice (0.530->0.524, 0.550->0.533). Conviction
+insider (C-suite >$50k first-buy, 458 months) 0.5554 vs 0.5587 — buried.
+Long-short Sharpe -0.03 — hedge cuts DD, short book earns nothing.
+Ensemble ML+momentum dilutes (0.17 vs 0.40) — ML adds nothing.
+
+Improve loop (budget 20, 10 left): P5-gate25 promoted (+12.7%/-0.35/0.41
+holdout through COVID+2022). P8-volscale promoted (+6.1%/-0.39/0.22).
+P9-top30 promoted (+4.3%/-0.40/0.16). P1 lottery artifact rejected openly
+(Sharpe 2.9 from 9 biotech/crypto doubles in 1-2 name books — real prices,
+verified CLSK tick by tick, meaningless stats). P7 died by 0.011 on the DD
+bar. P10, P2-P4, P6 dead on tune. Vol-monkeys +3%/0.22: sizing is a third
+of P8, selection the rest.
+
+Momentum (no ML): small tune +9.5%/0.41/-0.31, hold +6.2%/0.20/-0.56. Mid
+tune +3.3%/0.15, hold +11.4%/0.35/-0.37. Positive every half both universes.
+Multi-asset Faber-style: monthly tune +7.3%/0.82/-0.13 hold +7.4%/0.62/-0.24;
+quarterly +5.8/+5.8. Intl sleeve tune +2.9%/0.22 hold +11.2%/0.88/-0.16.
+Quality sleeve illustrative +12.7 vs SPY +10.2 (4 decisions). Value on mega
+caps: price 2.77x Graham IV, zero trades at 50%, +2.7 vs +8.1 at 0%.
+
+Regime correction: both ML halves were bulls (tune SPY +12.6, holdout
++15.1). Nothing beat buy-hold on return anywhere. Best case is ties on
+risk-adjusted. Downgraded bottom line accordingly.
+
+Incidents: slice-CAGR bug inflated momentum holdouts (fixed, rerun);
+mixed-vintage data silently dropped SPY 9 months (assert_vintage guard
+added everywhere); FMP free key covers mega-cap annuals only, limit<=5,
+~10 calls/min, 250/day; SEC EDGAR blocked from here; Stooq bot-blocks;
+tune/holdout era labels were wrong for weeks (corrected).
+
+Research: Numerai (+25% 2024, 2.75 Sharpe, JPM $500M — breadth+neutral+
+staking); Medallion 66%/yr never down (thousands of short bets, capped
+size); GKX trees win R2 0.3-0.4% signals=momentum/liquidity/vol (ours
+match); Quantopian 888 strats live correlation ZERO; Stanford 58% die in
+3mo; Faber GTAA replicated by us; TSMOM alpha is mostly vol scaling
+(indicts P8 partially); value+momentum negatively correlated (our
+ensemble failed on two correlated legs); AlphaEvolve/AIDE/DGM taxonomy
+built our loop; 4chan sentiment dead both directions (his newest video).
+
+Live: wide-seed0-v1 30 picks -2.7% excess; mom12-1-v1 logging from Sep 30
+month-end. QC cloud algorithm written (qc_momentum.py, UNTESTED) for
+survivor-free validation — paste into free QuantConnect account, compare
+overlap first. LEAN local bulk costs thousands; Docker ready if ever needed.
+
+Open: paper accumulation, value on paid small-cap data, quality expansion,
+LEAN/QC migration results, 10 loop trials banked. File stays open, loop
+frozen, index fund winning.
