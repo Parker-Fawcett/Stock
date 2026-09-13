@@ -1,0 +1,79 @@
+Kind: captions Language: en Last month, I built an AI that tried to predict tomorrow's stock prices using machine learning.
+It kind of worked.
+If by worked, you mean random guesses with extra steps.
+But then you guys left some insanely smart comments.
+&gt;&gt; I trying many model, but I am so sad.
+&gt;&gt; So, today I rebuilt the model using your suggestions to see if it can actually get smarter.
+Okay, quick recap.
+The last model used an LSTM or long short-term memory network trained on historical data, insider training, and sentiment scores to predict if a stock would go up the next day.
+I'm not certain what the issue is.
+Well, I mean probably that the stock market is very difficult to predict &gt;&gt; is determined by so many variables and then we have to compete with institutional investors.
+So while we might seek to find patterns in news and sentiment to gauge whether or not a stock will increase the next day, realistically there probably already thousands of people doing exactly this.
+So the opportunity in the market has been filled.
+So what should we do next?
+If we were to place ourselves on a Dunning Krueger curve, we'd probably be right here, right at the start.
+We know nothing.
+We are nothing.
+Everything about the code we've written could probably be found in countless places on YouTube.
+Or maybe you could even ask Chad to write a similar AI code.
+But there's one thing that we have that others don't.
+And that's an extreme patience.
+A patience so large that even if we never crack the code to AI stock prediction, we would have learned so much by doing these forecasting models that it all would have been worth it.
+So where do we go next?
+Well, we implement your changes.
+Of course, this is where we're at with this code right now.
+So if I click run here, we compare our machine learning model, which is making predictions about which stock to buy and sell each day in blue, to a buy and hold strategy where we just buy the S&amp;P and never sell.
+This is being shown in green.
+Of course, if you just randomly bought and sold stocks each day, you could by pure chance actually outperform the market.
+So this is being shown in the faded gray lines where we evolve a bunch of portfolios each randomly buying and selling stocks each day.
+If our machine learning model greatly outperforms the random noise of buying and selling random stocks and the S&amp;P, then we can be confident the model's actually working.
+&gt;&gt; You should introduce an early epoch cut off when the validation accuracy hasn't progressed for 10 to 15 epochs in a row to avoid overfitting.
+&gt;&gt; Easy fix.
+That's called early stopping.
+I didn't do that before because well, maybe more epochs will help this work.
+Okay, probably not.
+So yeah, let's implement that.
+There's no point to reimulate because this doesn't actually increase our prediction accuracy.
+It only lowers the amount of time required for training because the model isn't seeing that accuracy is not improving with more epochs.
+So, it just stops it early.
+&gt;&gt; I really liked your video subscribed.
+I just have a few questions about your video.
+Have you tried predicting tomorrow's log returns instead of rather if it goes up or down?
+What are some of the best performing features?
+How does your random runs work?
+&gt;&gt; In my previous model, I was just predicting whether or not a stock would go up the next day.
+A simple yes or no.
+But the problem with that is that it ignores how much the stock is expected to move.
+For example, a stock might be very likely to go up, but only by 0.1%.
+While another stock might have a smaller chance of going up, but could move by 5%.
+The binary prediction treats both the same, which isn't very useful if you're trying to pick the best opportunities.
+That's why I'm now predicting log returns, and I agree with this commenter.
+Essentially, the expected percentage change for the next day.
+This gives a continuous measure of how much a stock might move, which lets us decide whether or not to buy.
+But it also allows us to rank stocks by the expected return.
+It's much closer to how traders actually think about opportunities and not just whether a stock goes up, but by how much.
+chat GBD.
+What's wrong with my code?
+Oh.
+Oh, there's no return.
+We can also compute the permutation importance, which will describe, well, the importance of each feature that we're using in our model.
+This doesn't contribute to an improvement in the accuracy of our model, but will allow us to have a better appreciation for what features are actually providing us with the most value.
+So you can see in this bar plot that things like the closing value, yesterday open log returns and 20-day momentum are a couple things that contribute the most to our algorithm and allowing it to achieve a higher accuracy.
+&gt;&gt; You could add more features, volume based features, use a treebased model and in that use time decay weights with recent data points have more weight.
+&gt;&gt; Okay, that's a fantastic idea.
+The market changes over time.
+Patterns appear, disappear, and new ones emerge as people react to them.
+So if our model is trying to learn from these patterns, it makes sense to give more weight to the most recent data.
+That way, the model focuses on what's currently relevant rather than being overly influenced by old market behavior that might no longer apply.
+Now, with all the changes we've made, it's probably time that we test the model.
+Now that we have log returns, we're actually going to have to change the way we do our back testing.
+We now have to consider the predicted log return where we can comb through each stock for each day and find the highest return.
+Now, if all the returns are below zero, we just won't buy for that day.
+What you might notice is that the predicted logar strategy, which we believe to be better, might actually be performing worse than our previous version one.
+In reality, this might be better, but it's still not able to accurately make predictions and is just fitting in with the noise of all the randomly evolved portfolios buying and selling random stocks each day.
+So, this is still nothing more than a complete guess.
+So, where do we go from here?
+Well, I'll tell you.
+You keep giving me comments telling me either how dumb I am or giving suggestions on how to improve my code.
+You guys have been so kind and helpful, and I'm so thankful to every single one of you that's watched my last video.
+And if you've enjoyed this video, then subscribe so you don't miss my next iteration of this code version three.

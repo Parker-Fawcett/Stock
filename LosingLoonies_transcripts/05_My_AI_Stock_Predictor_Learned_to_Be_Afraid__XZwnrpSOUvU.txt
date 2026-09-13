@@ -1,0 +1,103 @@
+Kind: captions Language: en It is clear to me now that my AI stock predictor has been missing something all along.
+Something so obvious that I'm wondering why I haven't included it since the beginning.
+It's missing a certain human element.
+[music] I have long believed that if anyone were to build a code that could predict a future stock's value using AI, that it wouldn't use obvious indicators like price-to-earnings ratios, company debt, or earnings reports.
+I mean, come on.
+Who cares about those things?
+We live in a new age where human emotion, fear, and greed dictate a company's [music] value.
+Yes, these are the things we should be looking at.
+past year, I've been working countless hours after my day job developing my long short-term memory stock price predictor as an experiment to take a shot at predicting future company value [music] based on current real-world parameters.
+The code is built to take company fundamentals, earnings reports, news sentiment scores, and even insider buying to make predictions of over a thousand companies' future value.
+And for some reason, I never thought to add the missing human element that is fear and emotion until one commenter brought this up and a lightbulb went off in my head.
+Some people invest based on their emotions.
+And a code that could quickly interpret this to make stock purchases may capitalize on market gaps that have momentarily opened.
+And before we dive in, we should ask ourselves some simple questions.
+Now, how can human emotion be quantified?
+As in, how do you actually put a number on it?
+And there's a couple criteria that we should keep in mind when thinking about this.
+The human emotion indicator should be quick to update because, well, a lagging indicator might not be useful if we want to predict tomorrow's stock value.
+Secondly, describe how people feel en masse, not just some small group of 4chan users.
+And three, be publicly available either free or paid.
+I mean, I got to use that GitHub sponsorship money for something now.
+So, for example, we wouldn't rely on polling data because, well, this is a very delayed indicator of how people feel.
+And it's not really useful if we want to make short-term predictions.
+Now, this problem of trying to put a number on human emotion escalates in three layers.
+We can think of each layer as we go deeper, kind of like an iceberg.
+At the surface are these simple concepts.
+They're very easy to obtain.
+At the very top of the iceberg is the VIX, which is the volatility index, which roughly describes, well, how volatile the market is.
+One layer deep could be things like the CNN Fear and Greed Index.
+It's public, easy to obtain.
+And deeper are Reddit, Twitter, X comment sections.
+Noisy data, but possibly indicating shifts in public sentiment.
+Fear in the market exists at different depths with increasingly more complicated barriers to obtaining that data.
+One simple way of including human emotion and fear is to describe it through volatility.
+If stocks are en masse seeing large swings going up or down, this is what is known as volatility.
+And thankfully, there's an index that describes this.
+It's called the VIX.
+It's a bit difficult to describe exactly how it's calculated, and the methodology is maybe a bit too much to go over in this video.
+But just think of it as a description of how volatile the market is at any point in time.
+This is our layer one depth of complexity.
+It's a good idea to start with this, and then [music] we can see how this changes our backtest.
+And then we can implement something more complicated with a higher chance of success.
+You got to walk before you can run, right?
+We can use our script for downloading stock data to download the VIX, process it, and add it to our model as an input parameter.
+I've gone ahead and attached it to the stocks we have in our list and calculated the volatility on a 10, 20, and 30-day backwards-looking rolling average.
+Next, we can train our model, view the results, and see if this made an improvement.
+Implementing the volatility as an input parameter in our backtest, we can see that the model is not really improving.
+It ends up making very little purchases early on, which dodges two recessions, which is great, but it's very clearly not doing this because it knows something we don't.
+It's doing it because it's getting almost no buy signals.
+Here, we used a confidence score of 50%, meaning the model needed to be at least 50% confident that a particular stock would give an unusually high return for it to buy.
+And well, it didn't buy much.
+You can learn a little bit by looking at the feature importance and seeing that it put almost no weighting on anything except a ridiculous amount on the intraday range, which I found a little bit surprising and probably tells you that the model isn't really learning.
+The VIX is nice, but describing volatility in the market does not directly describe fear and greed.
+For this, we need to engineer our own parameter, a single number.
+And thankfully, CNN has the notorious Fear and Greed Index going back in time, which we can use as an input parameter to our model.
+One critical problem is that the public data set for the CNN Fear and Greed Index only goes back to 2011, which massively cuts off our model.
+Rather, this guy stinks.
+But we can implement it into our training set regardless, retrain, and test to see the results.
+The nice part of this code is that we actually have a full history log of all the trades that we made, what their expected returns were based on the model, and what the actual real-world return was on that trade.
+It even tells us how long the model thought to hold for in order to achieve the maximum possible return out of all possible periods to hold the stock for.
+The really fun part is to see these massive jumps in the backtest and then think, "Okay, yeah, there's no way that we got that high of a return." And then of course, to go to Yahoo Finance and see that for that particular stock, we actually did get a massive return, and the prediction software did predict it correctly.
+It's also worth noting that these large jumps that you see are the result of a stock being purchased at that point, and then the stock being sold later on.
+In the end, the return was much better than the S&amp;P baseline, and the feature importance also shifted notably.
+Now, I include a bunch of my other codes for free on my GitHub, which you can get access to through a link in the description.
+But this code in particular has taken me over a year of development, and I'm still improving the code.
+So, if you want access and the support of a PhD grad with crippling student debt, you can get this code and other private repositories by supporting my work as a GitHub sponsor.
+Including a fear and greed parameter should help our model, but it could actually make it worse.
+That's because some companies may be correlated or anti-correlated with the fear and greed factor.
+This might sound a bit confusing at first, but allow me to explain.
+So, here's a plot of the Tesla stock price in green overlaid with the Fear and Greed Index in red.
+And for reference, a lower value of the Fear and Greed Index is a market that is becoming more fearful.
+Now, if you focus on May to June of 2021, the Greed and Fear Index begins to decline towards increased fear in the market.
+And so too did Tesla.
+People became more fearful, and they started to sell off Tesla.
+That sort of makes sense.
+If we plot the correlation between Tesla and the Fear and Greed Index in time, we see that during this dip, the correlation is positive.
+It's positive because a decrease in the fear and greed, where people become more fearful, corresponds to a decrease in the Tesla share price.
+That is a correlation.
+Let's contrast this with Dollarama, a classic company that is known for doing really well during market downturns.
+Conceptually, if people are uneasy or worried about a market recession, it may lead one to believe that as the economy declines and people pull back on their expenses, they tend to shop at discount stores like Dollarama and Walmart, which then see increased revenues, a higher valuation, and therefore the stock price actually increases.
+During a comparison over the same time period, we can notice that the correlation swings deeply negative from May to June, actually the opposite of what Tesla did.
+Since as the fear in the markets increased, the Dollarama share price actually performs pretty well.
+So, the Fear and Greed Index is lowering and the share price is increasing.
+This is anti-correlated.
+To account for this, we need to add a new parameter to our model, which is the Fear and Greed Sensitivity Factor, which can be positive for correlated or negative for anti-correlated.
+The model will get a fuller picture and through training can actually implicitly incorporate that Fear and Greed Sensitivity Factor into the multiplicative weightings of our model to accurately describe how fear and greed influence a particular stock.
+Otherwise, we're training a model and saying, "Hey, if the markets are fearful, the stock drops." That makes sense, right?
+But then you show it another stock for the training run, and the stock does the exact opposite.
+So, it can never actually latch on to any patterns.
+[music] You need to feed it a parameter to describe those differences in correlation.
+The actual algorithm used will be a backward-looking parameter that describes how correlated the stocks were to the Fear and Greed parameter over the past 60 days.
+We add this into our model, we retrain, and we view the result.
+The results of this backtest are pretty surprising as it seems that there actually was an improvement.
+We're definitely predicting stocks better.
+We're getting better returns, [music] at least within the backtest.
+I've said it before and I'll say it again.
+This doesn't prove it works, but these are without a doubt steps in the right direction, and that's all that really matters.
+Moving forward, we will continue to make iterative improvements to this code using your viewer suggestions.
+I read every single comment you guys leave, so please do not go easy on me.
+Everything you write is useful.
+I also update this code regularly, and you can get access to all my work with data sets through private access alone by becoming a GitHub sponsor.
+You can also check out my public repositories by following Losing Looneys on GitHub.
+Like and subscribe so you don't miss future videos, and I'll see you guys in the next one.

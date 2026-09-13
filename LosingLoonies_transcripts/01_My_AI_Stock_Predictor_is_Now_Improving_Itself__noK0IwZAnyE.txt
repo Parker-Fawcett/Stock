@@ -1,0 +1,100 @@
+Kind: captions Language: en I handed the stupidest stock trading bot I've ever built one simple instruction, make yourself smarter and keep going until you've beaten the market.
+So it rewrote itself over and over again.
+I've spent the last year after my day job manually building an algorithm that reads thousands of inputs on a stock, its history, insider trading, and even new sentiment to predict where it's heading into the future.
+So this time I'm not touching it.
+I'm handing it straight to an AI and telling it to improve itself then feeding that improved code back in and telling it to do it all over again over and over and over again until we beat the market.
+Guys, it's really that simple.
+Recursive self-improvement is the ability for an AI to improve itself.
+Lads, history is upon us.
+Our laziness can flourish.
+So let's max out my Claude usage and blindly blunder past the efficient market hypothesis and see if a self-improving model can beat Wall Street.
+But first, where we left off.
+So I retrained the old model and ran it on every stock in our database.
+The green lines are the AI strategy across a bunch of random seeds and the thin gray lines are just portfolios with stocks that are picked at random.
+Basically, a representation of a trader that has no idea what they're doing.
+At first, it looks like a win.
+The AI strategy returns 23.8% per year versus the random picks of 0.4% per year.
+But those shaded bands are the plus and minus three sigma spread and they overlap almost completely.
+So it's nothing to bet your life savings on.
+It's basically still returning the same as randomness.
+So out with the old and in with the new.
+Now, instead of thinking instead of using our own brains, I figured look, these things code better than I ever will.
+So screw it.
+I'll get Claude to fix my code for me.
+So that's what I did.
+I told it to improve my market predictor.
+Then I told it again and again just over and over putting that $150 a month Claude Max subscription to work.
+This is what the physics PhD was for, guys.
+And I'm only at 8% of my weekly Claude usage and I've got student loans to pay back.
+So the first thing it found wasn't actually an improvement to the model.
+it was a bug I hadn't noticed.
+My model scores every stock over four time frames: one day, one week, one month, and six months out.
+And it just bought whichever was scoring the highest.
+So, it always ended up picking six months out because stocks tend to drift up given a long enough time horizon.
+It wasn't really predicting anything.
+It had just become a long-term investor.
+So, the fix is to rank them by annual returns instead.
+1% in a day obviously beats 2% in [music] a month.
+So, I let it fix everything and rerun the backtest.
+Now, those gray lines that you're seeing used to be random single stock picks.
+But, the first self-improvement changed them.
+Each one is now 25 random stocks, which basically tracks the market on average.
+So, the only way the green escapes this cloud of random picks is by picking genuinely good stocks.
+I honestly don't know why the hell it chose to do this, but there you go.
+The model apparently has a 26% compound annual growth rate, while the equal weight universe of the stocks we give this backtest is about 10%, which I find very hard to believe.
+So, I asked it a second time to improve the code.
+This time it tells me the actual problem is the list of stocks chosen for the backtest.
+And when I first built this thing, I had stupidly grabbed an alphabetical chunk of the market.
+It pointed out that if you only download companies that still exist today, you've basically deleted everybody that went bankrupt, and your model looks like a genius because you hid all of the losers.
+Now, we've been down this path before.
+It's basically survivorship bias.
+So, you need to be very particular about the data you acquire.
+And this data is hard to get.
+So, I've partnered with Massive to pull it through their API.
+And yeah, while I usually don't feature products I use, Massive's financial data API is literally what makes these backtests possible.
+So, I have an affiliate link in the description if you want to try it for yourself.
+Now, here's the trap.
+If you just ask an AI for the old S&amp;P 500 membership list, it'll confidently make one up out of thin air.
+Also, So tried that, and it just hallucinated a bunch of garbage.
+You can't remember your way out of survivorship free data.
+You have to go and get it.
+So the model actually went and did this, but it did two main things.
+For who was in the index on a given day, it pulled a historical membership data set off of GitHub, every change that went all the way back to the '90s, and I'm going to credit them below.
+It also grabbed prices, including the companies that went bankrupt right to their last trading day, and that data came from massive.
+Put those together and you finally have a fair fight, which is a real S&amp;P 500 membership, the winners and the losers.
+And this time it actually seemed to perform pretty well, but of course, it could be tricking itself.
+Now, I know what you're thinking.
+Asking a model to improve itself over and over again by hand is tedious.
+So for the last round, I'm going to take myself out of the equation.
+I'll have the model propose a change, test it, and then keep it only if it beats the current best, then repeat it on its own.
+And out of 14 different iterations, it decided to keep only one improvement.
+It actually noticed that my 6-month prediction goes completely stale.
+Basically, the stock pick was purely dependent on today's data, and by month three, whatever made that stock look really good in the first place had already played out.
+So you're effectively buying and holding a month's old opinion.
+Incredibly, this is something I actually hadn't thought about.
+As we make a prediction about the future, we should be continuously updating to determine if the stock we locked in has maybe new information which hurts the probability of it being an outperformer in the future.
+The model also came up with 13 different ideas and then just threw them all away.
+Before any of that self-improvement stuff even started, Claude forcefully sealed off a chunk of financial data, data in my folder from 2025 until the present day.
+So this final test runs on data the model has actually never seen before.
+I'm running this backtest for the very first time, and once I do, the self-improvement script has actually told me it will literally never run it twice.
+Here we can see the results.
+The AI strategy returned 30.4%, which is fantastic on data it has never seen before.
+This sounds incredible until this shows up next to it.
+The market made 33.5.
+&gt;&gt; [music] &gt;&gt; So, it did not beat the index.
+And you can watch it happen.
+My portfolio in green, the market in white on that sealed window.
+I'm ahead for maybe a year and then right at the end the market walks past me.
+Effectively, I've become the market.
+And the only question that matters is did this stock picking add anything on top of just buying the market?
+[music] And the answer is statistically, no.
+It's indistinguishable from random.
+The 30% came from riding the index, not the [music] model.
+I'm sorry.
+I can't lie to you.
+I'm not like other YouTubers.
+If you have any ideas for how to improve this, let me know in the comments.
+I want to keep improving this with your suggestions.
+Also, I've posted this code for my GitHub sponsors.
+Link in the description below where you can download it for yourself.
+I'll catch you guys in the next one.

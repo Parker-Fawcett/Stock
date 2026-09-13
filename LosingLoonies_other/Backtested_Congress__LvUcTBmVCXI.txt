@@ -1,0 +1,116 @@
+Kind: captions Language: en Everyone online says copy the politicians and you'll get rich.
+So, I backtested every trade I could find to see if you can actually profit off of politicians' greed.
+And it turns out to be a lot more complicated than I initially thought.
+Because what I found in the data was a hidden story in plain sight connecting Congress trades, corporate lobbying, and government contracts.
+If you're new here, I'm a PhD physicist who backtests investing myths.
+I've built AI stock predictors, Wall Street bets trading bots, but none of it works.
+And why would it?
+I've been competing against these guys.
+I mean, come on.
+If Nancy Pelosi's disclosed portfolio is up almost 887% since 2014, why can't we do the same?
+So, here's the plan.
+We will pull [music] every disclosed trade, buy what they bought, sell what they sold, and then compare to the S&amp;P.
+So, here's exactly what I built.
+First, I pulled every trade Congress has publicly disclosed [music] since 2012, roughly 100,000 of them.
+Then, I wrote a backtest with one dead simple rule.
+For every time someone in Congress buys, [music] purchase that stock the exact day the politician did, then hold it for 60 days, and then sell.
+And yeah, I kind of got a lot of data from this.
+This is every trade priced against real historic data, equal weighting, and just 10 grand [music] to start in our hypothetical portfolio.
+All racing against just buying the S&amp;P.
+So, we can actually see that uh is Congress losing?
+This doesn't make any sense.
+Okay, so $10,000 copying every congressional buy grows to about $39,000, [music] but in that same time the S&amp;P grows to $57,000.
+Per trade, this strategy trails the market by about 0.4%.
+So, it's actually not working, which is kind of strange.
+They win on 56% of their trades, but only beat the S&amp;P fewer than half the time.
+[music] But, look at what happens when you focus on individual trades.
+The biggest winners are all up here.
+How does a portfolio of winners with average trades returning 10 to 30% lose to the market?
+Well, it's because I sold everything after 60 days, of course.
+And Congress doesn't sell on a timer.
+Many of them will actually hold their trades for many years.
+So, what if you held for exactly as long as they did and sold when they sold?
+Well, to even test that, I needed every trade and every filing.
+And I got it all from one place, Quiver Quantitative.
+They're the first sponsor I've said yes to in a full year on YouTube, and I only broke the streak because the data is genuinely that good.
+Technically, yes, this data is all public, but unless you love scraping data from dozens of government websites by hand, I'd recommend using Quiver because they will provide you with Congress trades, corporate lobbying spend, federal contract awards, insider transactions, and more all through one single API.
+I've pulled all of this into my Python backtests with clean JSON, rate limits that don't punish you, and endpoints that actually map to how you think about the data.
+It's just made this project so simple.
+It just wouldn't be practical for me to build this without it.
+Oh, but I don't code, Loonies.
+Well, good news for you, they built a Congress backtester and politician leaderboard you can just click through.
+Link in the description, and the checkout code Loonies gets you 50% off for your first year.
+But, first, [music] about that problem I've been hiding.
+My first version of this code is cheating in two main ways.
+Firstly, it bought the exact day that they did, but nobody actually finds out about the trades for weeks.
+And secondly, it sold everything after an arbitrary 60-days.
+So, I'm going to fix my code to only buy when the trade actually becomes public, which is a lot more realistic.
+And in comparing the V2 of this model, you can see that it's still underperforming, which means that the issue is in the 60-day holding period.
+But, buying after the disclosure delay can still hurt returns in some cases.
+For example, Josh Gottheimer bought EBS on June 15th of 2020.
+And once it was filed, about 24 days later, a lot of the gains had already occurred.
+But, that's not to say that copying this trade didn't work because clearly the return was good.
+11% over 2 months is great, but you can see that a lot of the gains have already been lost.
+So, I rebuilt the code the honest way.
+Hold every position until the politician actually sells and only ever trade on dates a real person could act on.
+And well, surprisingly, the average trade actually edges out the market.
+9 and 1/2% versus 9.
+[music] So, yeah, Congress wins on average.
+So, it appears copying Congress trades has a small edge, maybe half a percent at best.
+But, that's not enough.
+I want to beat Nancy Pelosi.
+Instead of copying what they bought, what if the signal is everything around the trade?
+The lobbying, the contracts, the congressional attention, all combined.
+Now, let's look at Lockheed Martin, for example.
+This top row shows the congressional trades and the vertical axis is just the magnitude of those trades.
+I'm showing green and red arrows to represent what they bought and what they sold.
+And you can see that in time, there's lots of congressional trades for Lockheed.
+The middle row is the corporate lobbying spend, which is just the money that Lockheed invested to influence government legislation.
+It's all pretty consistent.
+And in the bottom row, federal contract awards, which Lockheed gets a lot of.
+Now, when a committee member buys a company that's also a top lobbyist and a top contractor, it kind of gets you thinking.
+Maybe that's a signal.
+Maybe a lobbying buys government influence, influence wins contracts, and a contract is just a government wiring cash straight to the company.
+More revenue, higher stock.
+So, when a congressman who helps hand out those contracts is also buying the stock, well, maybe we should be following them.
+So, let's get right in before the contract lands and ride the government's money.
+And on paper, this should print money, right?
+So, I built it.
+Every month, I score all 32 of these federally wired companies on three things.
+How much they spent on lobbying over the past year, how much they won in federal contracts, and how many different members of Congress actually bought that stock.
+So, there are three different indicators to look at.
+And I'm going going them all on the same scale and normalize them.
+That way I can add them together and buy the one that [music] has the highest score.
+The higher the score, the more plugged into Washington that company is.
+Then I bought the top eight with equal weightings and a month later I'm going to rescore all of them, all 32, and rebalance it into the new top eight.
+And it actually kind of works.
+No joke.
+$10,000 becomes $42,000 and the market did 38.
+So did this actually beat the S&amp;P?
+Am I going crazy?
+Was this the real strategy all along?
+To investigate this, I'm going to run a control.
+Ignore the signal completely.
+No lobbying, no contracts, no Congress, and just buy all 32 companies.
+Unfortunately, it appeared that the control was actually better than my signal and just buying these companies and holding did better.
+So can this signal actually pick a winner?
+I lined up the eight stocks that ranked highest against the ones it ranked lowest.
+It was backwards.
+Yeah, it was backwards the whole time.
+The eight companies that the signal told me were going to be great actually made 42,000 and the eight that it told me to avoid 178,000.
+It almost seems like following these contracts does absolutely nothing to help us.
+Following the money actually somehow seemed to give us lower returns.
+And here's the honest reason and it's not because lobbying makes a company bad.
+Microsoft lobbies harder than almost anyone and it's one of the biggest winners here.
+It's that companies that are most dependent on Washington, the defense [music] giants, big oil, big pharma, are slow, mature businesses.
+The market's real growth companies have been way less reliant on these government contracts and got rich building products, not buying influence.
+So can you get rich copying Congress?
+The answer is probably not.
+I mean everyone assumes that companies wired into Washington are the ones that have the real advantage, but the truth is they rarely do.
+Although this was a preliminary look into the data and there's still so much to explore.
+So I'm going to employ your suggestions in this code to make iterative improvements and push our collective herd mind towards a winning strategy to test.
+And if you have theories related to how these data sets can be used to our advantage, let me know in the comments below and I might just explore it in a future video.
+However, what I showed you is worth exploring further.
+And if you want to try any of this for yourself, all the code's on my GitHub completely for free, link in the description.
+And I'll see you guys in the next one.
+&gt;&gt; [music]

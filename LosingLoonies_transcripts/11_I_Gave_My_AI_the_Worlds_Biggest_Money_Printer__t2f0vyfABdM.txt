@@ -1,0 +1,110 @@
+Kind: captions Language: en There's one number that moves markets, can trigger recessions, or even drive the biggest bull runs in history, and somehow I never gave it to my stock trading AI.
+Quick reset for the new viewers.
+This is a neural network that tries to predict the value of a list of stock tickers, built from scratch by me, a physicist with apparently a lot of time to waste.
+We've been building this thing together, iteration by iteration, based on your suggestions, to create what I'd call the first community-powered stock prediction tool.
+And while I was looking through your comments, looking for a new improvement to make, I noticed something I genuinely missed, but I shouldn't have, because it's super important.
+Every serious investor watches the Federal Reserve.
+When the Fed moves, markets react.
+When the Fed even speaks, volatility spikes.
+There are entire industries built around predicting what a dozen people in a room are going to do with one number.
+So, in this video, I'm going to add the Fed to [music] my model, run the backtest, and show you if including this indicator actually helped, and I'm going [music] to test it properly this time.
+Before we touch the code, we need to know what the Fed actually does.
+The Fed basically works in two main ways.
+There's the money printer.
+When the Fed wants to juice the economy, like it did back in COVID days, it conjures up money out of thin air to buy government bonds.
+This floods the system with cash and pumps up asset prices, which is great if you're an investor, but bad if you care about inflation.
+Then there's interest rates, basically the cost to borrow money, and the Fed constantly fiddles with this.
+Low interest rates mean that borrowing is cheap, businesses grow, people spend, life is great.
+However, it can send inflation to the moon.
+High rates means borrowing is expensive, stocks grow slower, the economy grows slower, and apparently Donald Trump is very angry.
+But this slams the brakes on inflation.
+So, let's add this information to our long short-term memory neural network to see if it can improve our predictions.
+Before making any changes, we should understand where we left off.
+The neon green line represents the AI strategy, and the thick white line is the S&amp;P, basically a representation of the the returns, and we want to try to beat this.
+Currently, our AI is not beating the market, but that's okay because we're going to try to improve this.
+The red line is super important, but I'll share with you what it means in just a moment.
+The many thin lines that you're seeing are chaotic, odd, and going every direction, but they represent a bunch of portfolios where someone is buying random stocks from our list each day.
+So, if our AI strategy was way above those randomly bought portfolios, we know that it probably works.
+And you can see here with the vertical lines where the algorithm is buying and selling a particular stock it believes will give above market returns.
+And this is all getting a bit confusing, so let's just back up a second.
+We only have a single prediction run from our model shown in green, and we could have just gotten lucky.
+So, this is a little bit misleading, but I'm going to show you how we'll handle this in just a minute.
+Let's start our improvement by adding the money printer or quantitative easing.
+I'm pulling this data from the Fed's balance sheet, which is basically a measure of how much money it's pumping into the market.
+The automatic downloading and processing scripts I've written pull all this data up to the current date.
+I'll then add the feature, retrain the model, and perform the backtest.
+The AI prediction is actually far above the spy or baseline market returns and is in the upper region of the random run, which is very good and could [music] indicate that this is working.
+But that's exactly the thing, it's in the upper region of the random runs, and by pure chance and probability, it could be a random run itself.
+There could actually be no edge here, and we just got really lucky.
+So, there's no real point to evaluating any metrics at the moment, they're essentially meaningless.
+And this is where I want to make a change to the code that actually means something, something you guys have been repeatedly requesting.
+So, you see this red line that I had referenced earlier, this line represents the average AI portfolio equity.
+What does that mean?
+Well, basically, I re-ran the AI prediction several times, and by chance, based on the weightings that are produced by the neural network, I will get different prediction results every single time.
+These thin green lines that you're seeing are those repeated strategy predictions that get averaged to become the red line, which is a better representation of what the AI can actually do.
+So, let's go back to the start before we added quantitative easing and this money printer data to get an idea of how our AI performed before we made this change.
+Let's rerun the model, process the data, retrain, and view the result of our back test.
+All right, so if there's one thing I've noticed about the back test, it's that we have 100 random portfolios, 50 AI portfolios, and a white line for the S&amp;P, but also a red line for the mean AI strategy.
+Okay, maybe we need to simplify this into uncertainty bands that represent the spread of these random runs because I'm clearly not smart enough to understand everything that's happening here.
+At first, it looks like the average AI strategy in red is performing the same as the average of the randomly bought portfolios.
+So, it's basically not working.
+But, around September of 2024, it starts to gain a lead and actually maintain it.
+The neon green AI run is a single run, and you can see that for the single portfolio simulation, we actually did pretty well, but it's not representative of the average.
+We really care about the mean AI return, and we can see that for the red bands, which are the one sigma, think of it as the uncertainty, for 50 different runs, some returns were very high, and some actually wiped out our portfolio entirely.
+So, with this better way of quantifying the data, I went back to the start, reran my simulation without quantitative easing, and these were the results.
+Where we bought companies at random, we achieved a compound annual growth rate of 4%.
+That's our baseline.
+The average AI based strategy returned a compound annual growth rate of 29%.
+Now, that is suspiciously high, and I do not fully trust it.
+So, take that number with a grain of salt.
+I welcome any suggestions in the comments to explore if that number is actually real, and yeah, it's probably not.
+Now, implementing the data on quantitative easing, we can retrain, rerun the back test, and the new mean AI strategy to 12%.
+So, it actually got worse.
+This probably makes sense because the model is just so uncertain that the compound annual growth rate can be wildly different even with many Monte Carlo runs.
+Also, quantitative easing is not used regularly.
+In recent memory, only during 2008 and 2020 during COVID to stimulate the economy.
+So, the money printer idea was a bust and it's embarrassing because it's in the title of this video.
+But, here's what's nagging me.
+Remember that one number I mentioned at the very start?
+The one that moves markets, triggers recessions, and drives the biggest bull runs in history?
+That was never the money printer.
+It's interest rates.
+And my model has been completely blind to it this entire time.
+&gt;&gt; [music] &gt;&gt; Sure, quantitative easing doesn't occur often, but the Fed isn't just sitting around all day doing nothing.
+They are determining what to set interest rates at in order to achieve two main things: maximum employment [music] and price stability.
+Basically, it's market manipulation that we've all agreed is the good kind.
+And unfortunately, I haven't even included this in my stock prediction tool up until this moment.
+So, let's add it.
+I gave the model a few different views of the interest rates because the level of the interest rates matters way less than what they're actually doing.
+First, the one-day change, is the rate up or down right now?
+Then the 20-day change, a bigger trend because markets care more about the direction of travel than any single move.
+And finally, a simple binary, is the Fed in hiking mode?
+Yes or no?
+Because rates are high and rates are climbing should be two completely different signals to an investor.
+We rerun the model and see the result.
+I'm doing 100 Monte Carlo runs for the AI prediction and we can see that the mean AI portfolio in red is actually slightly above the baseline in white and the spread of the AI portfolios is smaller than the random runs and actually biased upwards.
+It might be working, but it might not.
+It's really It's to tell if it's working.
+The compound annual growth rate for the AI strategy was 24%, which is actually worse than before we added interest rates and the quantitative easing to the model.
+So, look, I'm not going to lie to you.
+This channel is built on honesty, experimentation, and viewer feedback.
+But a bad result is still a result, and I think the reason behind this one is probably the most interesting part.
+So, here's the thing.
+I probably did not beat the market, but I figured out why the obvious answer was never going to work.
+Think about it.
+Interest rates and quantitative easing are probably the most watched numbers in the market.
+Entire industries try to predict them.
+So, the second that information goes public, it's priced in.
+Every trader has reacted before my model even saw it, and that's the trap.
+You can't build an edge out of information that everyone else already has, which means the answer isn't more famous indicators, it's actually the opposite.
+We need strange information, things nobody has priced in yet.
+The same reason some firms literally buy satellite photos of how many cars are parked at a company's stores to predict its stock.
+It's strange, weird, and almost nobody uses it.
+So, how do we find signal like that?
+That is a much harder problem, and that's exactly the one I want to crack next.
+Real quick before that, I post all my code on GitHub for sponsors, link below.
+I'm paying back my student loans one video at a time, [music] and every sponsor helps.
+And it goes straight back into the channel.
+And if you think that's all talk, go watch my first video and you'll definitely see for yourself.
+So, I'm going to keep building this thing because, honestly, this is super fun and I love it.
+&gt;&gt; [music]

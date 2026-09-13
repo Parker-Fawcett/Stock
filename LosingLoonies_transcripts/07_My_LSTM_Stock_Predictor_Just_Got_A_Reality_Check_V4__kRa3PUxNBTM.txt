@@ -1,0 +1,147 @@
+Kind: captions Language: en Okay, I've had it.
+Progress just hasn't been fast enough.
+And while you guys have been absolutely incredible with your suggestions, mathematicians, data scientists, actual financial analysts leaving essays in the comment section, I'm still here feeling lost half the time.
+&gt;&gt; YOU'LL NEVER BE BETTER THAN GREEN CODE.
+&gt;&gt; We've made iterative improvements to the long short-term memory stock price [music] predictor.
+Not just predicting the value of a list of 500 stock tickers for the next day, but also multiple time horizons like 7 days, 1 week, and 6 months.
+We switch to a riskbased strategy that prioritizes predictions with lower uncertainty, even when that means taking smaller, more reliable returns.
+It is easy to convince ourselves that this LSTM stock predictor is working when Yeah, I mean, it's probably not.
+This is a fool's game.
+Probably a complete waste of time between overfitting, overlapping sequences, and missing important features.
+This thing is feeding us lies, not valid predictions.
+So, today I'm done messing around.
+I'm hoping to make major improvements, implementing your suggestions.
+This is version four of the AI stock predictor.
+And remember, this is about learning and enjoying working with data to optimize our finances.
+Perhaps the lessons we learn here will be applicable in other scenarios related to our finances where machine learning can actually make a difference.
+And yeah, like always, the code is available on GitHub for sponsors, which helps me with my $100,000 of student loans that I'm hoping to pay off.
+So, let's get into it.
+Before anything else, I need to fix a small but important mistake from the last video.
+I normalize my forecasting horizons by dividing the return by the number of days.
+So, the 1-day normalized return was the 1-day return divided by 1.
+And the oneweek normalized return was the 1E return divided by five trading days.
+That sounds logical until you remember that investment returns don't grow linearly.
+They compound.
+I'm stupid.
+If you earn 5% on day one and another 5% on day two, that isn't a 10% gain.
+Day 2's 5% applies to the new gain.
+So, instead of dividing by days, we should use the compound annual growth rate, but we're going to use it on a per daily basis.
+So, this is the correct formula.
+This is a tiny change in the code, but it makes Horizons comparable and consistent.
+Small improvements, but the model still gets better.
+Slow progress is still progress.
+&gt;&gt; You need to be careful with overfitting.
+&gt;&gt; And now the elephant in the room.
+I got dogpiled for this one, and I completely agree with you guys.
+And when I actually went back to examine what I was doing, this is a good call.
+My approach was fundamentally broken.
+Let me show you visually what was happening because this is important for anyone doing [music] time series machine learning.
+Imagine you're predicting tomorrow's weather.
+You feed the model lots of data.
+Temperature, humidity, [music] wind speed, all good stuff.
+But you also give it random junk.
+Who the president is, what songs are trending, how many coffees you drank, if the last 30 days were warm and sunny and all of those random things just happen to line up.
+The model might latch on to everything, even the nonsense, as if it caused the weather.
+So the model learns a super specific pattern.
+When [music] it's warm, humidity is low, wind is calm, Taylor Swift is charting, and Trump is the president, tomorrow will be sunny.
+That works only as long as the world stays exactly like that.
+But when the weather shifts, colder [music] days, more rain, or any unrelated detail changes, the model can't adapt.
+It memorized the past instead of understanding the real relationships.
+So, one tiny change makes its predictions completely collapse.
+We've assembled our model with a sliding historical window of data.
+Each time we increment the window and forecasting date by one, moving it forward to generate a new opportunity for the model to guess at what the stock value is and tweak its internal weightings for training.
+So, window one is days 1 through 7.
+Window 2 is days 2 through 8.
+Window 3 is days 3 through 9.
+If we're assuming a 7-day historical window, which means that six out of seven days overlap with the previous window for every single [music] training example, you're basically feeding the model thousands of copies of the same data with tiny little variations, like trying to [music] teach someone to recognize faces by using 10,000 photos of the exact same person blinking slightly differently.
+Of course, the model memorizes it.
+[music] The validation looks beautiful.
+It's seen the same thing over and over again.
+And this creates two big problems.
+Firstly, the training data was full of near duplicates.
+The model wasn't learning any patterns.
+It memorized specific prices.
+And secondly, the validation wasn't actually [music] validation.
+The validation set only differed from the training set by one day.
+So that's overfitting.
+The model learns the noise, not the signal.
+Now, here's how I fixed it.
+The fix [music] was surprisingly simple.
+I just use independent windows.
+Instead of shifting the window by one day at a time, I now jump the entire window length.
+[music] So if we assume a window of 90 days, window one is going to be days 1 through 90.
+Window 2 is days 91 through 180.
+So on and so forth.
+You get the point.
+There's no overlap.
+In the code modification I've made, I take the maximum possible window size, which for us is 6 months.
+This means that we now have far less data to actually train on because our windows being fed into the model for training are now taking these massive six-month steps rather than the daily step that we were taking before.
+We're going to need a lot more data.
+The benefit to this code modification is that we have a training set the model can't memorize, a validation set with entirely different data, and a model that can finally generalize, which is really the essence of this.
+Overfitting doesn't mean that we necessarily get falsely accurate [music] testing accuracy.
+It actually may mean the opposite.
+With training being focused on repeated similar data, there's no chance for the model to latch on to general trends in the market based on all of our input parameters.
+This flaw existed in versions 1, 2, and three of the code, and version 4 finally fixes it.
+And honestly, this is one of those changes that improves the credibility of this entire project.
+That being said, there's still so much wrong with this [music] code.
+So much to learn.
+So, let's not get ahead of ourselves.
+Another important aspect of changing this is that our prediction data sets now only generate predictions once [music] every 6 months, which means that we have way less data for back testing.
+We can add a new function called [music] process stock for inference that will allow us to use the model to make daily predictions for each stock in our list during [music] our testing data set.
+Trust me, you cannot make a stock PREDICTION MODEL USING DAILY PRICE DATA.
+WHAT THESE MODELS DO IS GENERALIZE THE OUTPUTS TO GET THE LOWEST error rate on average.
+So, YOU WILL ALWAYS GET BUY SIGNALS, usually around plus 0.1%.
+As the training data is just noise &gt;&gt; classification, the target was way too noisy.
+If there's one thing I've learned in other machine learning models, it's that very noisy data does not fit well.
+Originally, my target was tomorrow's log return.
+And if you've ever looked at daily returns on a log scale, they're tiny, jittery noise.
+It's nothing.
+[music] It's fairy dust.
+They're dominated by intraday noise by things like temporary volatility, microructure effects, and sometimes a stray Trump tweet.
+From a machine learning perspective, that's a nightmare target.
+And pairing that with a mean squared error, MSE, loss function that makes things even worse.
+MSE rewards the model for predicting the mean.
+So the model just cheats.
+It outputs 0001 every day, nails the loss score, and learns absolutely [music] nothing.
+And yeah, on average it's right, but we can't generate predictions with this.
+This is a classic good loss, terrible model trap.
+So, how could classification solve this?
+[music] We stop trying to predict the exact return for the next day and instead ask a far more meaningful question.
+Will the return exceed a tradable threshold?
+This turns the problem into a classification task.
+For example, to create the target for prediction, we could simply ask, is the 1-day return above 2%.
+So, we only buy if we go above this threshold.
+This is a tiny change in the code, but a massive change in behavior.
+Now the model outputs probabilities, not noisy decimal targets.
+We can compare its accuracy against randomness.
+We can set confidence thresholds.
+We can detect uncertainty.
+And we can finally evaluate whether the model is actually capturing real structure or just memorizing noise.
+But most importantly, classification focuses the model on meaningful price movements rather than useless micro noise.
+We care about getting better than average market returns, not predicting the exact log return on a daily basis, right?
+[music] So why are we doing that?
+But how do we determine what an acceptable return is for our model?
+I could say we want to buy only if our predicted return over the 1-day horizon is [music] above 2%.
+But that's no systematic process.
+Besides, what if we're in a trending upwards market where each stock slowly ticks upwards by 1% [music] each day?
+I don't want to miss out on that.
+And I also don't want to just return the market average.
+Otherwise, I'd buy and hold and then there's no point to any of the series.
+We just want to do better than the average market return.
+We could look at the average return of our list of stocks for each time window.
+And we can look at the average return for each forecasting horizon.
+one day, one week, one month, six months for the entire list of stock tickers.
+But we [music] don't want to return the average.
+So let's find the standard deviation of those returns and then say that a buy signal is simply the average return for a given window plus two sigma of those returns such that we are consistently achieving higher returns compared to the average for the stocks that we've selected.
+This alone makes version 4 dramatically more stable and realistic.
+Here's where we landed.
+We finally fixed the insane overfitting caused by overlapping windows.
+We replaced a noisy, meaningless regression target with clean tradable classification targets.
+And we set the stage for uncertainty modeling and more robust future improvements in version 4.
+There's still a ton of work ahead, hyperparameter tuning, uncertainty calibration, and more realistic back tests, better feature engineering, and eventually portfolio level decisions.
+Version 4 finally feels like a model that might learn something [music] instead of just memorizing noise.
+If you'd like to get access to the code yourself, just follow the link below.
+You'll also find access to all my free repositories on the Losing Looney GitHub.
+Additionally, I also have a Discord community which you can join to find similar data enjoyers working on finance related material.
+Please do continue to leave your suggestions in the comments and I'll keep on iterating and continuously improving this code.
+I'll see you guys in the next one.

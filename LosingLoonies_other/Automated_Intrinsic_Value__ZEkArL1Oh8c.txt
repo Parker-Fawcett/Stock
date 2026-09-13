@@ -1,0 +1,99 @@
+Kind: captions Language: en In my last video, I tried to build a Python script to find intrinsically undervalued stocks, and a lot of you correctly pointed out that the backtest wasn't exactly valid.
+The idea wasn't necessarily bad, &gt;&gt; You sure about that?
+&gt;&gt; but the backtest had flaws that were feeding us lies.
+So, today I am implementing your suggestions to make iterative and continuous improvements to my code that determines the intrinsic value of a list of stocks and simulates a valid backtested portfolio to help me come to tested conclusions if intrinsic value is even correct to consider.
+This is a more long-term strategy, something I actually believe could work.
+But then again, I know nothing and I'm reliant on your feedback to learn and grow my work.
+This is version two of the intrinsic value monitor.
+A quick note, this work comes from a physicist perspective, not somebody in finances, and as such I am greatly misinformed, uneducated, but I also have a fresh perspective on how to approach these problems.
+The original goal of this project was pretty simple.
+Take a list of stocks, estimate their intrinsic value using a very basic Graham style formula, and then invest only when the market price is significantly below that estimate.
+You buy discounted companies, and then you sell once they were reverted back towards their fair value.
+But before we can even think about improving performance, we have to make sure that the model isn't accidentally lying to us.
+As always, this project is available on GitHub where you can get access to my code repository and all future versions of the code as I continue to improve it.
+All money that I'm making from GitHub sponsors is going to go directly to paying my [&nbsp;__&nbsp;] $100,000 student loans.
+Let's go.
+And that brings us into why the original backtest was invalid.
+In the original version, the backtest scanned a list of stock tickers that exist today, and that's a massive problem.
+Because over 30, 40, 50 years, companies have gone bankrupt, been acquired, delisted, or disappeared entirely.
+And by only testing companies that survived today, I was implicitly assuming that every investment had a happy ending, which is obviously not true.
+This is a super simple thing to avoid.
+It is survivorship bias.
+&gt;&gt; You'd have to test this on the historical constituents of the S&amp;P 500, [music] including delisted stocks for this to be even remotely valid.
+If you only test tickers that are in the S&amp;P 500 today, then you have survivor bias.
+&gt;&gt; Well, maybe it's easy to recognize, actually quite difficult to avoid.
+So, comparing my backtest to a historical S&amp;P return, I may have actually had inflated results, higher returns than reality, and convince myself that the model might work when it doesn't.
+So, let's get into survivorship bias.
+Fixing this was actually not as easy as I initially expected.
+I pulled Discord members, searched around online, and quickly realized that there really isn't a clean, publicly available solution.
+I ended up boiling this problem down into a few broad categories.
+I could use full point market databases, which is really the gold standard.
+I could use something like the CRSP, which is the Center for Research in Security Prices, and these datasets track all listed securities, delistings, bankruptcies, and acquisitions.
+It's basically the index membership at each point in time.
+Additionally, all fundamentals are reported as the original, so there's no look-ahead bias.
+The problem with this is that even if I could access the data, I can't legally redistribute it.
+The entire goal of this project, and really my channel in general, is to keep all the code I create open source and reproducible, and that immediately rules out proprietary datasets.
+So, this one is completely off the table.
+Then there's index reconstruction, which is actually what I'm going to attempt here, which is to use publicly available S&amp;P [music] membership change logs.
+We reconstruct the index through time using entry and removal dates, and at any point in time during the backtest, I allow investments in stocks that were valid members at that time.
+There's some pretty big limitations, as we'll quickly realize.
+For example, reconstructing this membership accurately is definitely non-trivial.
+It is difficult.
+It does not perfectly account for companies removed due to acquisitions or companies that disappeared entirely, is some survivorship bias that can leak through depending on data quality and assumptions.
+Another option was the broad market universe, which is all stocks listed at a time T, which I feel like I have to mention cuz somebody is going to say something about this.
+The concept is to define the investment universe as every stock listed on an exchange at that point in time, and there's a bunch of problems with this.
+Primarily, that there's massive complexity very early in this project, and there's still so many things that we need to take care of.
+So, trying to even tackle that concept in advance is way too much.
+I'm only one guy.
+Please, don't do it to me.
+This would require reliable delistings and historical listings data, which I do not have, and many publicly available data sets still contain survivorship bias, especially on fundamentals.
+So, I decided to go with this temporary fix of number two, which is index reconstruction, specifically reconstructing the S&amp;P 500 membership.
+This is one that may work for the time being, since there's just so much to improve on in this code.
+It's important we don't get too carried away with completely eliminating survivorship bias immediately.
+I decided to take publicly available data for the S&amp;P 500 membership, when stocks were added and when they were removed.
+I recreated a list based on this information, and I only used this recreated membership list to choose what stocks to invest in.
+So, at any point in time during the back test, I'm pulling the currently acceptable members from that list.
+If a stock hasn't been added yet, I don't use it.
+If a stock was just removed for whatever reason, I'm no longer allowed to use it.
+This is, I feel, a realistic representation of what someone could have invested in.
+This guarantees that I'm not selecting tickers that didn't exist yet, but it does not guarantee that survivorship bias is fully eliminated.
+There are a couple issues with doing this.
+Primarily, that survivorship bias is not completely eliminated, and I actually have not perfectly reconstructed the S&amp;P 500.
+No matter how hard I try, I don't even have 500 stocks in the membership list as a function of time.
+Some stocks have been missed, and those stocks could have been bad performers for whatever reason, meaning that the list is biased high.
+I've selected higher performers than I would have if I truly had a representative sample of the S&amp;P 500 in time.
+So, how do I mitigate for this?
+Well, instead of comparing to the S&amp;P 500 index, which would be unfair, I compare my strategy to a naive baseline built from the same universe.
+The baseline is an equal weighted portfolio of all eligible constituents at each point in time.
+It happens to be higher than the actual S&amp;P 500, so yes, my membership bias list is biased high, and I'm missing stocks in this list that performed poorly and having an equal weighting of all companies in the list that I do have is not consistent with what the S&amp;P actually was, but this is the best bet that I have right now because keeping track of weightings is just really not possible for me.
+But my comparisons will be made to this evenly weighted membership return, the one that I have synthetically created myself.
+Meaning that if I bought an equal price of each stock in my list and held it for the entire duration, which basically means what if I bought an equal price of each stock in my list and held it for an entire duration that I've determined for my backtest.
+If a company is removed from the membership list, I just rebalance the portfolio accordingly such that it's evenly weighted across all members.
+This is super crude, but if my method outperforms the baseline, then we will try to make this a little bit more robust.
+But there's no point in trying to make a perfect non-biased data set with no survivorship bias if my model can even outperform that crude baseline.
+&gt;&gt; What were the exact data sources used in the backtest?
+And were they point-in-time or revised historical data?
+&gt;&gt; Another problem was point-in-time data errors.
+And this is subtle, but can be just as damaging.
+It's effectively look-ahead bias.
+When we pull historical financial data, what we actually get is revised data.
+It's been cleaned up with information that wasn't known at that time.
+That means that the model can accidentally use future earnings or corrected reports before investors actually saw them.
+That is look-ahead bias and it can completely invalidate a backtest.
+So I implement a conservative reporting lag, which I know you guys are going to absolutely hate, but bear with me here.
+This is intentionally conservative and instead of trying to perfectly model reporting dates, I assume that becomes usable 90 days after the quarter ends.
+That means that the model is always late, but this model is meant to be long-term, so that should be fine.
+We are avoiding some complexity in doing this, which sure makes our lives easier, but it makes it more difficult for the model to outperform the market.
+Since we plan to use this code for long-term investments hoping to latch onto broad market swings due to changes in sentiment, I think that this is a fine conservatism to make at least for now.
+We just need to make a point of this in the future in case we want to revisit this and improve the method.
+Once you apply these two corrections, results usually get worse.
+Draw downs increase, some strategies just stop working entirely, and yeah, maybe mine gets worse, but that's actually kind of the point.
+Any model that collapses when you remove bias wasn't discovering anything.
+It was probably discovering data leakage, but we do need a good baseline to work from.
+From here, the plan is simple, but it is slow.
+We're going to build honestly, break things, fix them, create multiple indicators for intrinsic value, and weight them according to the domain of highest accuracy.
+Some next steps might include building better intrinsic value models, quality filters, smarter exits, or risk control, but only after the foundation is rock solid.
+If you guys have ideas, criticisms, or flaws you want me to address in the next video, please leave them in the comments below.
+If you're interested in getting access to the code, you can find it in the link in the description.
+I hope to see you guys in the next iteration in version three where I plan to improve my code to potentially automate my finances and increase my abysmal net worth.
+I'll see you guys in the next one.

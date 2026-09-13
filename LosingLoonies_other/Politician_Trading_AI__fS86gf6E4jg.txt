@@ -1,0 +1,79 @@
+Kind: captions Language: en Politicians beat the market by 10% every single year.
+So, I did what every reasonable person would do.
+I fed every trade they've ever made into my AI stock predictor.
+I've been feeding this thing everything it can find.
+I want to keep improving this.
+I want more data, more insider knowledge.
+I want the shares they sold, the shares they bought.
+How much money did they spend?
+Were they on stocks?
+Were they on options?
+And to my surprise, this absolute legend has already created this data set.
+Have mercy on my soul.
+They categorized everything.
+They even wrote down if their spouse made the purchase.
+Politicians are literally trading on information we do not have.
+So, if I can feed this into my model, this thing should be unstoppable.
+Now, this code makes predictions for what companies could see unusually high returns over a certain time horizon and uses a whole bunch of data to make that prediction.
+And to be honest, this is getting a lot more complex than I initially expected, but we are making progress.
+While scanning comments from my last video, there was one suggestion that stood out to me.
+And no, it wasn't adding a based and feared indicator.
+If we could include political trades as an input to this model, we may be able to use their insider knowledge to our advantage and automate this code to quickly pull data, run our forecast, and choose the stock that has the highest probability of giving outsized returns.
+This Senate financial disclosure data set stores every single reported trade in a clean, readable JSON.
+So, instead of manually sifting through government PDFs, we've got the ticker symbols, amounts, dates, and senator names all structured and ready to be fed into our model.
+But before we implement these senator trades, we have to do some housecleaning first.
+Here's my issue.
+How do I even know if a model has improved as we add features or modifications to our code?
+And many commenters asked me about what metric I'm using to quantify how well my model performs, and there really is none.
+And I'm going to be transparent.
+I'm not a financial expert.
+I'm a physicist approaching this problem logically.
+I thought about it like this.
+I could compare my results to the S&amp;P or funds, but since today I can only see stocks that have survived, stocks that have actually made it to the present day without the companies going bankrupt, that's just not a fair comparison.
+It's It's judging how hard a marathon is by interviewing the people who cross the finish line.
+Essentially, it's hard to come up with a good baseline.
+So, my solution to this is to use my list of stock tickers, which comprises about a thousand companies, and simulate the portfolio of a brainless investor.
+Someone who just buys and sells random stocks from my list every single day with no strategy or logic.
+And this faded gray line represents that investor, making those random trades every single day.
+The white line is just someone that invested an equal amount of money into every single company in my list of a thousand tickers.
+And the green line is the AI model portfolio, which appears to be doing quite well, but you're going to see in a moment that it is misleading.
+Here, I'm looking at 500 random runs.
+The spread of returns gives me an idea for the uncertainty in the market, how lucky or unlucky you can get just by buying random companies with no strategy or logic.
+My metric for how my AI model performed is to see how large my return was compared to that uncertainty of those portfolios with random purchases.
+To characterize the actual spread or uncertainty of these randomly bought portfolios, we'd want bands that represent one or two sigma standard deviation, but that's a little bit confusing.
+Plus, it's all clustered, so instead we can actually just flip this plot around and bin this into a histogram.
+The histogram will show us how many times we've achieved a certain return.
+The x-axis represents the total return for a given portfolio, and the vertical axis is the number of portfolios with such a return.
+We can see that there are actually a lot of portfolios with very negative returns just by randomly buying and selling.
+And we even get one with a 300% return.
+So, very nice for that simulated investor.
+Now, these returns are not normalized over the period of time that our portfolio has grown, but we can compare the random returns to the AI model portfolio return to get an idea of how much of an outlier it was.
+Many of you asked that I include some basic metrics as an output so we can better characterize the model's performance.
+Because of that, I've included the number of completed trades, the max drawdown, and the compound annual growth rate.
+I don't think the sharp ratio makes sense here, but feel free to argue with me in the comments.
+Before we add political trade history to our model, here's what the model's already doing.
+36% compound annual growth.
+Seems a bit high.
+That's already beating the random purchases by a mile.
+So, when we add insider knowledge, this thing can only get better, right?
+Adding these metrics will allow us to better quantify how much of an improvement we've gained by adding political trades to our AI stock predictor.
+The entire Senate trade history is gathered from this absolute legend.
+We then create a helper script to go through this information and organize it by ticker.
+Then, with this political trade database, we create new code in our processing script to add the political trades by date to our list of stock data.
+There's a lot of information that we get from this, including how many political trades hit the stock that day, how many were buys, how many were sells, exchanges, how many were options or regular stocks, if they were buying bonds or other securities, the number of senators that filed that day for that particular stock.
+We get a range of how much money they put on that particular asset, and we've also gone ahead and calculated the midpoint on that amount of money, and then taken the log scale, so that way massive numbers don't dominate.
+This will then get fed into our model, where we train, forecast, and then run our backtest to see if there is any improvement.
+Now, after 517 trading days, here are the results.
+The compound annual growth rate with politician trades, 22%.
+Wait, no, that's uh that's uh that's lower, right?
+We went from 36 to 22 by adding what should have been the most valuable data in the market?
+Okay, there's something wrong here.
+This is likely because the model's not learning, it's guessing.
+And also, it may seem like political trades will give you an unfair advantage, but the STOCK Act actually requires that the trades be filed with a 45-day time lag, at which point their trades may have already been factored into the market simply by others hearing about it and then buying before we do.
+There are a whole bunch of things that we could improve from where we are now.
+And with the new metrics, we should be in as good of a position as we've ever been to make this more robust.
+I've been combing through all of your suggestions to make sure that we don't leave a single stone unturned.
+And if you want to get access to this code yourself and support a PhD grad with crippling student debt, you can get access to all my work with data sets through private access alone by becoming a GitHub sponsor.
+Check the link in the description.
+I also have a Patreon for those that would like behind the scenes access.
+See you guys in the next one.

@@ -1,0 +1,129 @@
+Kind: captions Language: en In my last video, a lot of you guys said the same thing.
+This is interesting, but it's not how real investing works.
+This long short-term memory stock price predictor operating to always buy stocks by classifying if returns will be above a minimum threshold is always going to buy, and that's just not realistic.
+Rev up those fryers cuz I am sure hungry.
+&gt;&gt; [screaming] &gt;&gt; So, in this video, I stopped trying to make the model smart and I focused on making it more disciplined.
+This project started as a simple question.
+Can I make a machine learning model help us make better investing decisions?
+I mean, no, right?
+Because the market is just so volatile and random walk-like that no model could latch on to patterns.
+But, I'm going to die trying.
+Over the last few versions, we fixed some pretty massive problems.
+We reduced overfitting from overlapping windows, we stopped predicting meaningless daily noise, and we switched from regression to classification so the model could have a better chance at making higher signal-to-noise ratio decisions.
+But, the commenters were still right.
+Something was definitely missing.
+The model was behaving like a machine that had to trade, and real investors just don't do that.
+So, this is version five of the AI stock price predictor where the biggest improvement isn't a new feature or model.
+It's learning when to do nothing.
+Just to set the stage, the model looks at over 500 stock tickers.
+It uses historical price data, engineered features, new sentiment scoring, and a whole bunch of other random [&nbsp;__&nbsp;] that you can find on the GitHub to effectively determine through classification, so basically yes or no, if we should buy a stock based on if the stock in our training data went up for a different time horizon, like 1 week, 2 weeks, 3 weeks, whatever.
+I've been using your viewer suggestions to continuously improve this code and posted it on GitHub where a bunch of you have responded to me with improvements to the code.
+And in version four, we stopped predicting exact returns, instead asked a simple question, will the return exceed a meaningful threshold?
+If we're really uncertain about if buying a stock will give us a high return, then maybe we just don't buy it.
+We're too uncertain.
+So, that's exactly what we do.
+Only follow through on buying if the adjusted probability, which is the predicted probability of an unusually high return minus the standard deviation or uncertainty of that predicted probability.
+So, let's just say that we make a prediction and we are really certain that we have very high returns for this time horizon.
+The standard deviation is low, and the predicted probability is high because we are very certain.
+This effectively gives us an adjusted probability that is also very high.
+If it is high enough to overcome our minimum threshold, then we execute the buy.
+So, let's look at a couple examples.
+Here, the minimum accepted probability is 0%.
+So, it's basically just a random guess.
+The adjusted probability is the predicted probability.
+There's no consideration for the uncertainty at all in the predicted probability.
+It could be a completely false description of the probability.
+Maybe it could even say that we're 100% confident that this is going to give us a high return, but there's no subtraction term that would subtract the uncertainty to show this.
+This is our baseline for us to improve upon by implementing this uncertainty concept.
+In case two, here we've adjusted the minimum accepted probability to just a 10% chance of the classification being correct.
+And we account for this uncertainty in our classification by bumping the standard deviation up to about 0.1.
+We see that the success rate drops a bit and the returns decrease, which doesn't really make any sense.
+It effectively tells us that the model is not latching onto any important features.
+Okay, so this is becoming kind of a [&nbsp;__&nbsp;] mess.
+So, what if we enter a forecasting model and we lower that threshold for a buy signal?
+All right, that took so long, I think I actually got a cold while waiting.
+You can see all the forecasts that were generated.
+In each one of these files, there's a predicted probability, a predicted probability standard deviation.
+You can run our backtest with this configuration.
+So, we'll just start off with $1, 50 random runs just so we can look at the standard deviation of our random runs.
+We'll make sure that we have at least 100 tickers within the backtest.
+Maybe we'll change our minimum accepted to about 30% and we'll just leave the standard deviation factor kind of small for now.
+The white line is the spy, but of course, I've grabbed a bunch of random tickers that exist today, so there's some survivorship bias.
+So, really what we should do is we should look at sort of this equal weighting of all the stocks in my list.
+Now, what's interesting is that if you look at the strategy we've employed with our AI stock predictor, and this is the first time that it's ever done this, it actually looks like it works extremely well.
+Now, there's some days that performed really, really bad and some days it performed really well, but it seems to do way better than the equal weighting of all the stocks in our list.
+Let's zoom in on some of the interactions that we've had here.
+So, these are all buy signals.
+2024 12 12.
+Go to our trade summary log, 2024 12 12.
+This was a sell date.
+Okay, so we must have sold up here, and that's where we realized our gains.
+So, when did we buy?
+Okay, so we probably held this for quite a while.
+It looks like we bought down here.
+Yeah, that was the third.
+Okay, so we bought here.
+This is 2024 06 13.
+If you come into our trade log summary, 2024 06 13 right here.
+This is when we buy, and you can see we're holding for 6 months.
+So, we're selling on 2024 12 12, which is actually exactly what I said before.
+It says that we have a 31% gain.
+It said that it was a 36% chance that this was going to go up.
+Wasn't very certain, and the predicted probability standard deviation was actually pretty low.
+It's just 0.105.
+So, if you do the subtraction, it'll be above 0.3, which was our minimum acceptance.
+So, this did go through, which makes sense.
+This is CIA.
+Uh on 2024 06 13.
+I've been developing a PTSD for financial modeling, and I think using windows is a critical improvement.
+However, I'd argue that your windows should overlap.
+Splitting by 90 days with no overlap gives you four training sections a year, three sections of trading days.
+I'd recommend making each window exactly 1 day off the previous, meaning they correlate 89 out of 90 days.
+The second improvement was to allow overlapping windows and use purge and walk-forward splits.
+So, this is the fix.
+Up until now, I was taking a 90-day window and then I was jumping forward 126 days to avoid any overlap.
+This kept things super clean, but it also threw away a ton of training data.
+So, this upgrade is pretty simple.
+I'm just letting windows overlap again, but I'm trying to do it safely.
+Instead of skipping 126 days, I use a small stride, like 1 or 5 days.
+So, each sample is a sliding window over time.
+The problem isn't overlap itself.
+The problem is leakage.
+My labels look ahead up to 6 months.
+So, if a training window's labels uses dates that fall inside of the validation, then that's cheating.
+So, I'm basically switching to walk-forward splits and purging.
+Walk-forward means that I train on the past and I test on the future, and purging simply means that I drop any training window whose label reaches into the validation period.
+That way, I keep more of my data, and the model never sees the future even indirectly.
+One important detail is that I do shuffle the training windows on every epoch.
+So, the model learns patterns and it's not recognizing the history.
+But, I do not shuffle the validation or test.
+Those stay in real time order, so evaluation still mirrors live trading.
+The results of this are that I get way more data, which is great, but this does come at a cost.
+Now that there's a lot more windows, training the model took a little bit longer.
+So, I decided to switch from training on all stock tickers in my list to just 300 stocks, which sucks.
+Yes, I know, but this was just taking way too long.
+I may end up training on those thousand stock tickers and let you know in the pinned comments how they turned out.
+The training accuracy increased with the number of epochs, but the validation decreased, which effectively tells me that the model is not noticing recognizable patterns to which it can actually train properly.
+Instead, it's just memorizing the training set.
+At least we know there isn't any obvious leakage, am I right?
+The final accuracy in the backtest was 62%, but I think that this is not statistically significant, obviously.
+Also, the portfolio value backtest shows that it appears to be basically a random guess, and in fact, all features are important to this model, which really isn't a good sign.
+So, what happened after all of these fixes?
+First, I did make this model a little bit more realistic.
+The backtest is cleaner, the plots are making sense, but the results are a bit of a reality check.
+I did reduce the universe of stocks from 1,000 to 300 just to get training times a little bit under control, and even then, the training curve really tells the story.
+The training AUC kept climbing, but validation AUC drifted down from about 0.6 to 0.5 over 25 epochs, which is basically the model saying that it can memorize the past, [music] but it's definitely not generalizing.
+This doesn't mean that the project's dead.
+It just means that we need to continue on with our continuous improvement of this model using your suggestions.
+Version five doesn't prove that the model works, but we are inching closer through continuous improvement.
+Little by little, we are making progress and learning along the way, and that's really all that matters.
+Everybody wants the view, but nobody wants to climb.
+There is a lot of work ahead.
+Better calibration, portfolio construction, considerations for uncertainty and diversification, importing better features and parameters, considerations for [&nbsp;__&nbsp;] Reddit posts, I don't know.
+But, at least for now, the model behaves a little bit more like an investor, which is good.
+As always, the code is on the GitHub for sponsors.
+It helps me chip away at my student loans.
+I'm also posting anything else for free, like comparisons between investing in the stock market or paying your student loans as quickly as possible.
+I do read every comment that you guys leave, so keep tearing this apart.
+That's how this is going to get better.
+I'll see you guys in the next one.

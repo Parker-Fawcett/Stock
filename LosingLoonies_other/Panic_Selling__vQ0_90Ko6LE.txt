@@ -1,0 +1,141 @@
+Kind: captions Language: en I'm sure you've heard this a bunch, that young investors have the biggest advantage, time.
+And when it comes to building wealth, statistically they are wasting it.
+I built a simulation to model 40 years of investing decisions.
+Now, let me show you what I found.
+Here's $10,000 invested in SPY.
+The green line holds through everything.
+No matter what happens, it does not sell.
+The orange line does the same thing until 2008.
+SPY drops by 30% from its peak.
+You panic and sell everything.
+You sit in cash for 6 months, then you go back in.
+Same market, same starting point.
+Now, watch this.
+You just lost over $5,000, which is equivalent to 10% of your final portfolio with one poor decision.
+Now, in this video, I'm going to share with you the research and statistics to help you avoid common investing mistakes.
+And all my claims will be backed up with real data.
+I've read through numerous end-of-year reports, and I'm going to condense it into the simplest playbook I can with graphs, math, and receipts to validate my claims.
+In the end, we should end up with real actions I plan to implement to help me pay off my crazy student debt and build wealth in the smartest way possible.
+And we're going to model everything.
+Over the past few months, I've tested AI stock predictors, technical indicators, and intrinsic value models, and every single time the boring ETF baseline won.
+So, today I want to understand why using real data.
+Now, I have a theory.
+Young investors are making high-frequency decisions in a low-frequency game.
+And the human brain was not built to strategize what is best for you long-term.
+Instead, prefers short-term high-risk, high-reward excitement that algorithms [music] and institutions profit off of.
+This is further compounded by a fast-paced, dopamine-influencer-filled society that would prefer to teach someone how they can win big in the stock market rather than teaching them genuine lessons with verifiable data.
+&gt;&gt; [music] &gt;&gt; God, got a headache now.
+First, let's define young investors for this video.
+Let's call it roughly 18 to 35.
+So, newer, more self-directed, more online, and based on the data, more likely to constantly be touching their portfolios.
+Let's pull this up.
+It's the CIRO 2024 Canadian Investment Survey.
+Yeah, I know it's a little bit boring, but this is useful stuff.
+Also, the CIRO is the Canadian Investment Regulatory Organization, and they basically want to understand how Canadians feel about investing, financial advice, risk, and money.
+They use these results to spot trends and guide financial education efforts across Canada.
+Whatever.
+Here's what jumped out to me.
+53% of investors under 35 have DIY, do-it-yourself, investments.
+Okay, sure.
+So, that's probably me and you.
+There's nothing alarming about that.
+And a lot of them are new.
+Among DIY investors aged 18 to 35, 61% opened their DIY account in just the last 3 years, which is fascinating.
+Now, get this.
+60% of the 18 to 35-year-old investors check their investments daily or weekly.
+Which, and this is kind of an opinion, likely opens you up to being emotionally tied to the market and not strategically tied.
+Statistically, over the last 40 years, 46% of days saw negative returns.
+And young investors aren't just DIY, they're also the highest frequency checkers.
+In a 2008-style scenario, down 30% in 3 months, young investors were more likely to say that they would sell.
+SPY actually crashed 30% in 2008.
+The market did this.
+The investors who panicked sold here, sat out, came back 6 months later, and that one decision cost them a lot of money.
+about people that claim that they're high risk tolerance?
+Well, then one in four still says that they'd sell.
+So, this isn't strategy.
+This is setting ourselves up to be manipulated by our emotions.
+We are literally building a system that encourages us to fail.
+This system we have created for ourselves is very human.
+Prospect theory basically says that humans feel losses harder than gains of the same size.
+If you combine this loss aversion with frequent checking, you get what's typically called a myopic loss aversion, which is really just a bunch of fancy terminology for saying that the more that you look at something, the more it feels worse.
+Creating a system that allows you to check investments regularly is a system designed [music] to make you fail.
+Because of this, I'm introducing a new rule.
+I will only check investments bi-weekly.
+[music] Now, you might think, "Okay, cool, but does behavior really cost that much?" Morningstar measures something called the investor return gap.
+By the way, this 2025 Mind the Gap report is just absolutely packed with phenomenal information.
+I recommend you check it out.
+In this report, they put together a comparison.
+Imagine a fund returns 10% per year for 10 years.
+That is the time-weighted return.
+But this assumes you bought right at the start and held for the entire period.
+In reality, most people don't do this.
+They buy more of an ETF or fund when they think it will perform well and maybe less when they think it will underperform.
+So, they also compared the dollar-weighted return, which is the return based on the amount of money currently in the fund, which accounts for the buying and selling of that fund from investors.
+This is the return that the investors actually got from the fund on average.
+So, what did they find?
+The average dollar invested in the US stock funds earned 7% per year over 10 years, while those funds earned 8.2% per year, which is a 1.2% gap stemming from the timing and magnitude of investor cash flows.
+That is an astounding statistic and would lead us to believe that the statistically correct option is to purchase an ETF not based on timing, but just to buy whenever we can and to never sell that ETF or time any future purchases and just leave it alone.
+Statistically, this method performs 1.2% better than if we had timed our purchases or strategically sold when we believed it was appropriate to do so.
+The report was clear.
+Less trading consistently will statistically improve your returns.
+1% may sound small, but it is not.
+1% over 40 years might be a completely different life.
+Okay, so retail investors, buying and selling is statistically hurting the returns.
+But surely, if your livelihood depends on this, you're probably beating the market, right?
+We can start with the SPIVA report.
+SPIVA, I think I'm saying that right, stands for the S&amp;P Indices versus Active [music] Funds.
+And the S&amp;P Global has been tracking those for 20 years.
+The premise is simple.
+They measured how many professional actively managed funds actually beat their benchmark index, so the S&amp;P.
+The numbers are insane.
+Here's the Canadian number for 2024.
+Sorry, my Americans and Europeans, this is all I have, but the numbers are also telling for the US and the rest of the world.
+88.7% of Canadian equity funds underperformed the index in a single year.
+But it gets worse over time.
+It wasn't just a bad year.
+Over 10 years, that number climbs to 95.5% couldn't beat the S&amp;P index.
+In Canadian-focused equity funds, 100% underperformed after 10 years, every single one.
+And here is something else that the fund industry does not advertise to you.
+Nearly half of all Canadian equity funds, about 47%, didn't even survive that 10-year period.
+They were quietly merged or shut down.
+US picture is no different.
+65% of large-cap active funds underperformed the S&amp;P 500 in 2024.
+And over 15 years, there's not a single category where active managers beat their benchmark.
+Even when your livelihood depends on investing, equity funds still don't beat the market.
+And then there are retail investors behaving as if they can, which statistically is kind of foolish.
+So, here's what I'm doing to my personal investment strategy.
+I'm going to invest in broad market ETFs.
+And yes, ETFs have management fees, but I should select the appropriate ETF that is broad market with low fees.
+This should be a passive fund, so not actively managed.
+Thirdly, I'm dollar-cost averaging, so not buying and selling based on if I think a crash is about to happen or if I think the market is about to boom.
+Just buy bi-weekly as an automatic withdrawal from my paycheck.
+So, here is what I'm actually changing about my own investing because of all of this.
+I have $117,000 in student debt.
+I cannot afford to lose money to bad behavior on top.
+So, here is a summary of the rules I will implement in my own investing strategy.
+I'm only going to check my investments bi-weekly.
+This will reduce my probability of panic selling or FOMO buying.
+And it's probably mentally good for me.
+I'll buy passively managed broad market ETFs, something that tracks the general market.
+And if actively managed funds consistently underperform, I assume that I can personally outperform people that spend their lives investing and researching stocks?
+Thirdly, I'm going to automate my contributions and dollar-cost average.
+If the market is up, keep buying.
+If the market is down, keep buying.
+Just keep buying.
+It's pretty simple, really.
+The average investor does not earn market returns, and that is a major problem, mostly created by psychology.
+But on this channel, we are not the average.
+We will use statistics to make the correct decisions for our financial futures.
+So, some conclusions.
+This is part of an ongoing series I'd like to create where I review industry operational experience or OPEX statistics, surveys, and other information that I can use to my advantage.
+Essentially, taking a researcher style to investing.
+There are those that have come before us.
+There are those in the present who can provide us with meaningful statistics.
+So, why don't we use this?
+If you appreciate this content, let me know in the comments below and I will continue to make this style of video.
+Additionally, you can support me through GitHub sponsors so I can continue to chip away at my student debt and reinvest in my channel.
+You get access to my private repositories where I'm continuously improving several experimental codes.
+Maybe someday my investing algorithms will start to work and I can put a bit of that YouTube money into a fun experiment and we can all get rich together.
+Probably not likely.
+I'll see you guys in the next one.
+Cheers.

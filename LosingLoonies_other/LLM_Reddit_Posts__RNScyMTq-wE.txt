@@ -1,0 +1,167 @@
+Kind: captions Language: en I built the world's stupidest trading bot that uses Reddit posts to predict which stocks are about to explode before they actually do.
+And it failed miserably because Oxford beat me to the punch and has already developed an algorithm to do exactly this, which is now publicized.
+Last time I built a bot to trade off Wall Street bets and it lost to the S&amp;P baseline.
+Then you guys left 600 comments detailing every important improvement I should make.
+And I went through every single one of them and have assembled a list that I will use to create the best Wall Street Bets trading algorithm implementing your suggestions to beat these brainiac Oxford quants with comment section creativity.
+So about the Oxford paper, they didn't actually build a trading algorithm.
+Instead, they built three specific places where a signal might exist [music] and then three big warnings about where it doesn't.
+Today, the comment section beats Oxford accuracy with five minutes of coding.
+Then, I want to go straight into every single warning that Oxford specifically told us to avoid.
+And by the end, I'm going to show you two doors that I still haven't opened yet, and which ones we're going to be opening next.
+But before we beat Oxford, I owe the comment section one test, [music] the one everybody asked for, the one that got a,000 up votes.
+All right, so quick recap in case you missed my last video, by the way.
+Definitely go check that out.
+We had scanned through Wall Street Bets posts counting the number of mentions for a particular stock ticker every single day.
+We then bought the hype, basically the most popular stock for a given day, and then we sold it when it lost its popularity.
+And we lost to the S&amp;P every single time, as expected.
+We then tried to buy the fastest risers, maybe stocks where mentions were spiking suddenly, and we also lost.
+So sadly, these two different strategies did not work.
+But you guys pointed out exactly why, and Oxford actually knew it, too.
+You can't just buy the most mentioned stock with the fastest riser because the sentiment could actually be negative.
+Maybe the company is about to declare bankruptcy and that's why everybody's talking about it.
+So, it's probably not a good time to buy.
+Oxford actually went through the effort of handlabeling 4,000 posts either bullish, bearish, or neutral.
+They then fine-tuned an AI called Finnbert and hit an accuracy of 69%.
+And then they tested investing based on sentiment for every Wall Street Bets post and they lost money.
+Fantastic.
+&gt;&gt; [music] &gt;&gt; So, we do need sentiment.
+And boy oh boy, do I have a plan for this.
+But before we get to that, I have to address your most upvoted comment.
+Did you try doing the opposite?
+&gt;&gt; So, if the crowd is reliably wrong, then inverting them should be reliable, right?
+I mean, come on.
+It's basically free money.
+Let's bet against Wall Street bets, which means we will short the most mentioned stocks.
+[music] So when the company we bet on crashes, we see massive returns because surely the most mentioned stocks are overhyped right now.
+At first I chose the GameStop year running the back test from January to February of 2021.
+I know it's an interesting [music] time period to choose.
+Now this quickly resulted in all of us losing our money together as GameStop exploded in value and we lost everything during our short.
+We could run a bunch of individual random portfolios where we short stocks on the date they are mentioned in the subreddit.
+This could generally tell us if Wall Street Bets is on average consistently wrong.
+And maybe we can make a profit by just betting against the [music] whole forum in general.
+And unfortunately, this too does not work with our portfolio coming in just below average market return.
+But running this during the GameStop year would be misleading.
+It was a massive outlier.
+So, let's pull data for the entirety of 2025.
+Now, what you're seeing is our simulated portfolio in green compared to the S&amp;P in red.
+Even by shorting the most mentioned stock throughout this entire year, there's only a single fleeting moment where the strategy was beating the S&amp;P.
+And how did we do by shorting random stocks on the Wall Street Bets forum?
+Well, also not great.
+These uncapped downsides mean that our risk is so much higher than simply buying and holding a stock, which results in these rather poor returns.
+The median return for our shorting strategy was approximately minus 1.09% over 2025 to 2026 as compared to the S&amp;P return of about 18%.
+So do the opposite isn't a cheat code.
+[music] And we just confirmed Oxford's second warning that shorting the crowd does not work.
+But the comment section had a much better idea.
+The idea that 40 of you pointed out.
+Okay, quick thing.
+All of this goes up on GitHub for my sponsors.
+every script, every back test, everything.
+600 of you already run it and you can cancel any time, but every month I merge your ideas into the code.
+So, the people who stay get something that keeps getting smarter.
+Plus, you get to support a struggling PhD grad.
+Link in the description.
+I should maybe stop publishing this stuff because, as one of you have already pointed out, &gt;&gt; don't publish all [music] your secrets in a YouTube video.
+Tsunoo.
+&gt;&gt; Okay, back to the Oxford thing.
+Roughly 40 of you said the same thing.
+Use an LLM that classifies sentiment for each post.
+That way we know if people are bullish or bearish on a stock.
+[music] We buy the ones we like and short the ones we hate.
+Okay.
+Oxford did this too by labeling 4,000 posts by hand fine-tuned in a Finnbert model and hit an accuracy of 69%.
+[music] So that's the number that we have to beat.
+They did it with two PhDs hand labeling.
+And I'm going to use Finnbert for the entire [music] thing.
+Finnbert is just Google's language model that is specifically trained on financial sentiment data.
+It's able to generate an indicator for positive or negative sentiment based [music] on text alone.
+And yes, I know a lot of posts are super sarcastic, but I'm hopeful we can beat this thing [music] regardless.
+So, I used Finn to classify posts from January to February of 2025 into positive or negative sentiment.
+Then, I validated them by hand to get a sense for its accuracy.
+I ended up checking about 200 posts with confidence levels above 90%.
+[music] And yeah, I know that this is like way less than the 4,000 posts manually validated by the Oxford level PhDs, but I am lazy and pucker up for this.
+In those 200 posts, the prediction accuracy that I found was 94%.
+[music] Which is pretty damn good.
+Now, full disclosure, I am cheating a little bit because the Oxford 69% accuracy was on three different classes, both bullish, bearish, and neutral.
+[music] And across every post, which is very difficult, some are sarcastic or not really obvious.
+I'm doing two classes only, both bearish and bullish on the easiest high confidence posts only, which I think makes [music] much more sense for creating a trading algorithm.
+The advantage in this case is that our algorithm only uses data that has high confidence [music] rather than the sarcastic posts that are uncertain.
+So with better accuracy, can we beat the Oxford model?
+That is the question.
+Okay, this is a recap on the algorithm in case you're taking notes.
+Basically, every day we're going to scan through Wall Street Bets posts and label it as bullish or bearish using our LLM.
+Then each stock ticker mentioned, we calculate a score.
+I want the score to make use of positive and negative sentiment.
+And I also want it to be dead simple because I'm not that smart.
+So the score is going to be the number of bullish posts mentioning that stock minus the number of bearish posts mentioning that stock.
+Whichever stock has the highest score that day is the one that we're going to buy.
+We then hold it until a different stock takes the top spot.
+Then we rotate to that new one instead.
+I decided not to have any diversification because come on, live a little.
+In my short back test, we see that buying the stock with the highest positive sentiment does really well compared to buying and holding the S&amp;P.
+This worked super well, and we even had a day give plus 25% returns.
+The total return over these two months was 51%.
+Which amounts to a compound annual growth rate of over a,000%.
+H the spy over the same time period [music] did a compound annual growth rate of 10%.
+So, is this thing actually working?
+Am I making a massive mistake by uploading this video to YouTube?
+Is this commenter right?
+I genuinely don't know.
+But if my physics background taught me anything, it's that a good scientist always seeks to disprove himself.
+So, let's try to investigate this further.
+My first thought was that I got lucky.
+I mean, we only looked at January to February of 2025, so maybe let's look at all of 2025.
+I then pulled the data from January of 2025 to January of 2026 and let Finnbert get to work.
+And there are a lot of posts to classify, so this took a couple of hours.
+Okay.
+I mean, this is what I'd expect.
+It has no real edge.
+Uh oh.
+Oh gosh.
+Okay.
+Okay.
+This is working really well.
+All right.
+So, I went back to my code to investigate because if something looks too good to be true, it probably is.
+And I ended up finding this.
+This simple less than symbol is the difference between the code working or not.
+It's basically allowing us to use the current-day sentiment for tomorrow's prediction.
+But the way I had wrote it allowed the program to look at the community reaction and then buy it before the news has spread into the market value.
+Basically, I had really bad look ahead bias.
+The model was cheating off of tomorrow's knowledge.
+So, now that we fixed our look ahead bias, we can rerun the code and see the results.
+Here we're going long on stocks based on high scores from our sentiment.
+We can see that the model unfortunately does not work.
+So simply following the crowd is definitely a bad idea.
+But stick around for a bit because we're not done yet.
+We still need to short Wall Street Bets based on sentiment.
+Following Wall Street Bets positive sentiment gave a 1-year return of minus 49%.
+Which is uh not good.
+Maybe you don't trust Wall Street bets with your next stock trade.
+So, what if we bet against stocks that have highc scoring positive sentiment?
+In my opinion, this is what would give the highest probability of working because we're purposely betting against a degenerate crowd of gamblers.
+So, we should have a pretty good shot at winning, right?
+Also, quick note, the algorithm flags words like tech, bull, and meme as tickers because they are real ETFs.
+So, when Wall Street Bets says this is a meme stock, my bot thinks they're hyping the meme ETF, which is a cute bug, but it doesn't really change the results by much.
+So, here we go.
+Finally, let's short Wall Street Bets with sentiment.
+Now, we can see that the volatility is super high because of the uncapped downsides.
+And while the market in general took a downswing in February of 2025, which helped our short positions, we quickly lost all of our gains.
+and the S&amp;P quickly recovers back to beating the strategy.
+So, no, it did not work.
+We walked into every warning Oxford left for us.
+Don't follow the hype.
+We did and lost 49%.
+Don't trade on aggregate forum sentiment.
+We did.
+No edge.
+But here's what we didn't do.
+Oxford's paper has a few findings I just glossed over, and I thought I'd save the best for last.
+Oxford built a network map of which assets get discussed together and most of the big clusters lost money.
+But small niche clusters did have positive returns.
+So maybe small groups of weirdos like me and you talking about boring stocks might actually work.
+Now we have a lot more work to do and I need your help.
+So drop a comment with your ideas and I will explore them in the next [music] video.
+The code for this is on GitHub.
+Have fun playing around with it.
+But if you solve something, you are obligated to tell me about it.
+I'll see you guys in the next one.

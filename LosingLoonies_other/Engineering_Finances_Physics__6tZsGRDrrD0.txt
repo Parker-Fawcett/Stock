@@ -1,0 +1,100 @@
+Kind: captions Language: en In this video, I will break down where I'm at in paying off $150,000 in student debt, my approach to allocating money from my typical 9-to-ive job, and long-term goals for increasing my net worth to eventually fly to the [&nbsp;__&nbsp;] moon and escape the hell hole that is this planet Earth.
+It is January 10th, 2026.
+My current net worth is - 38,677.
+I acrewed this from school and getting a PhD, which allowed me to make $87,000 per year in a fairly poor part of Canada.
+So, yes, this does seem pretty low, but this income is still 1.5 times the average individual income where I live.
+So, relax.
+I've tracked my finances every week, detailing all the values and all of my accounts, projecting my net worth growth over this year.
+I've invested all my free cash, kept track of spending on average, and allocated what I had left over to specific areas that interest me, such as savings, investments, retirement funds, and travel funds.
+I grew my net worth by about $22,000 in the past year, and I'm officially one year into my first real job after university.
+Okay, so that's a lot and allow me to break this down for you.
+9 to5 Joe.
+My career in science is based on enjoyment, not money.
+That much is clear.
+If I cared about money more than enjoyment, I would have gone into finance or business or some [&nbsp;__&nbsp;] I don't know.
+The upper end of my salary might be 120 to 140 Canadian per year where I am, but there are options of moving or switching careers.
+My salary is $87,000 per year, but I expect to see about a 12% raise.
+Some part due to inflation and also stepping up a pay grade by January 20th in a couple of weeks, which would be my one-year anniversary at my job, which is a pretty decent raise.
+This would give me about an additional $500 to $600 per month to allocate into my free cash, which is what I term money that doesn't get used up and I can allocate towards things [music] I'm interested in.
+I have short-term goals at my current job, which are to gain experience and connections, which will provide me with optionality down the road to either go up in the food chain at my current job or transfer my skills and experience into a different field or company to achieve either more happiness [music] or less happiness.
+My general strategy around how to do this is a little bit strange, so feel free to critique.
+I generally make decisions around a simple concept.
+I want to move towards something that makes me happier or more money or combinations thereof, like making more money, but my happiness stays the same or making the same amount of money, but my happiness increases.
+I do not move towards decisions that sacrifice my happiness for money.
+And I'm willing to sacrifice some money for happiness, but that would need to be evaluated with a little bit more context.
+All decisions that I make in my career are based on this.
+Would you like to become a supervisor?
+Well, do I like technical work or do I like supervising and going to meetings all day?
+No, I [&nbsp;__&nbsp;] hate meetings.
+I absolutely love technical work.
+Then I won't be a supervisor even if it pays better.
+I mean, sure, being a supervisor might look good on paper, but if it's not what you want to do longterm, why do it even if it looks good on the resume?
+Then there's long-term goals which revolve around developing connections and and becoming an expert in my field with diverse experience.
+Technically superior.
+There's a lot that I have to do to set myself up for this.
+Training and continuous learning should be a part of my daily life.
+I should never say that I'm done learning or that I do not have time for training.
+Optimizing income for optionality.
+Money doesn't buy happiness, but money does give freedom, security, and optionality.
+I grew up poor and I know this very well.
+Freedom, security, and optionality will decrease stresses in my life.
+And while those are not happiness, they are adjacent to it.
+I track average spending in each category for things that are essential or routine as part of living like buying clothes, paying for gas, and car repairs.
+I find an average cost for each of these things.
+Here, look, this is this program I wrote that pulls data from my bank accounts and tracks spending in each category.
+I tell the program what item represents what, and then that goes into a database to be used for repeat items in the future.
+I can sort of customize this how I want and pull average spending for each category and my average income to determine what extra cash I have to put towards things I care about.
+I assign percentages for how much I should allocate to each category.
+And this can change monthtomonth depending on what I feel is necessary.
+And then I set up an auto deposit on the pay date and just turn my brain off and it takes care of itself.
+This way I know I'm working towards my goals like a firsttime home buyer's account, a retirement account, a tax, free savings account, emergency fund, wedding fund, you get the point.
+I track my net worth in time to ensure I'm on the right track.
+I favor investments that are boring.
+I dollar cost average.
+I don't pretend to know what I'm doing and I never listen to hype and fear.
+I just invest regardless.
+This has allowed me to increase my net worth by $22,000 in one year, which isn't a lot compared to my debt, but is a lot when you consider how much I actually get paid.
+Then there's growing income, and I'd like to grow my income to provide more optionality.
+[&nbsp;__&nbsp;] I'm using that word a lot.
+And more freedom beyond what I currently have right now.
+If I work twice as hard at my job, I don't get paid twice as much.
+I can stay idle and receive payraises.
+I mean, that's probably not smart to do.
+But I have no avenue to convert this passion I have for life and learning [music] into something that's creative to grow as I put more effort in.
+which is why I started this YouTube channel in August to track my life and finances and ideas and share it with others.
+My first video was [&nbsp;__&nbsp;] And I mean, most of my other videos are still kind of [&nbsp;__&nbsp;] And after one month, I had something like 10 subscribers.
+And after 5 1/2 months, I had 18,000 subscribers.
+I code lots of fun tools and decided to post them on my GitHub for $10 a month so viewers could have access to all my code and future versions as part of those subscriptions.
+The support for these fun projects was astounding and I still can't believe the channel has grown so quickly.
+I started posting videos more regularly.
+I started to develop a routine.
+Monday to Friday, wake up 5:40 a.m.
+Drive to work.
+Arrive for 7:00 a.m.
+Work until 3 p.m.
+Arrive home at 4 p.m.
+Run, clean, eat 2 hours of YouTube.
+Scripting, editing, research, and coding, filming, learning, repeat on weekends, run, family, cook, clean, friends.
+YouTube, YouTube, YouTube.
+Income from YouTube, [&nbsp;__&nbsp;] that's a lot.
+Income from YouTube was stable at about $4,000 a month, combined from YouTube ads, GitHub sponsors, and Patreon.
+I created a Discord to grow a community, learning to provide as much value as possible to viewers and developing coding projects to improve my finances, automate my investing strategy.
+I save 40% of all business income for taxes, 30% for business reinvestments, buying data, new microphones, whatever.
+30% goes into paying myself, which really just means that it gets directly deposited into an investment account, dividend growing investments that allow me to compound wealth faster.
+This aspect of my life is in its infancy, so there's little I can say here.
+I have no idea what this will become, if it will become anything, if I actually provide value, if all my videos are [&nbsp;__&nbsp;] or if this is just a waste of time.
+But I enjoy it and I really enjoy the community of thoughtful people that I've gathered here.
+So maybe it's all worth it.
+Anyways, ultimately, this has provided me with a personal passion that gives me optionality in life and more potential to grow proportional to the effort I put in.
+Some final thoughts.
+One issue with the systems and mental models I've developed is that I can close myself into a box and shut down opportunity I would have taken otherwise.
+It is important for me to open up to the fact that I might be wrong.
+I know nothing and all I can do is keep improving and learning.
+I will keep track of my progress and I welcome any thought you may have about the systems I've developed for myself, where you think I've gone wrong or what I can improve.
+Effectively, this is similar to my other videos, improving code with viewer suggestion.
+This could be life improvement with viewer suggestion.
+I might even implement some of your suggestions and get back to you in the future on how they're working out for me.
+Hopefully, I don't end up homeless.
+Anyways, love you guys.
+I'll see you in the next video.
+Take care.

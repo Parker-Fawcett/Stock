@@ -1,0 +1,168 @@
+Kind: captions Language: en In this video, I'm going to test a simple question using real data.
+Should you be dollar cost averaging, investing routinely, no matter what, or should you stop investing when someone thinks a recession is coming?
+Either based on public fear, or actual indicators of an impending recession.
+Hearing screaming.
+&gt;&gt; I'll show you step by step exactly how I built a back test that compares traditional dollar averaging against a strategy that only invests when public sentiment suggests we aren't heading into a recession.
+By the end of this video, we'll know whether ignoring recession fear is actually smart [music] or if public opinion and recession indicators could save you from losing your money.
+And if you want the code, you can find it on my GitHub completely free of charge and totally open source.
+My strategy is to leverage data in science to come to realistic tested conclusions about what is right or wrong.
+We can actually construct an algorithm to mimic the investing of a regular 9to-5 Joe like myself.
+We can gather data showing public interest in recessions and model a fear indicator to describe people's belief that there will be a recession and only invest our money in this backtested portfolio when we believe we are not entering this recession.
+Holy [&nbsp;__&nbsp;] I said the word recession a lot.
+So, a lot of people in the comments ask me quite often how they can learn to code.
+And I'd say the best way is just by doing.
+So, if you'd like, you can follow along.
+So, I'll just start by importing some generic modules and we'll create some configuration variables.
+So, in this model, you're going to be contributing on every paycheck.
+Let's just say that your contribution is $200 and that you're, you know, working this 9 toive job.
+You get paid bi-weekly.
+So, you're going to contribute every 14 days and we need to assume a date that we're going to start investing.
+And I'm just going to pick 2005, but you could pick any date.
+And we'll load in our spy data with pandas.
+Okay.
+So, I want to model recession fears just based on public opinion.
+So, I went to Google Trends and just typed in recession and then pulled that data going as far back as I can.
+And this is what the interest looks like.
+So I could go back to 2004 and get a parameter basically from 0 to 100 on how how many searches were happening at the time for the word recession.
+So that's my very crude way of approximating public interest in a recession.
+Just sort of saying that's maybe proportional to people's fears of a recession.
+Now I'm just converting the months in this variable to something that's more readable.
+Let's maybe start by just trying to simulate the returns one could expect if they were just investing in the market based on $200 every 14 days.
+And initially the portfolio value will be zero.
+And we'll also make a comparison to a portfolio that does not receive any investment returns.
+But it's just like putting money in a savings account.
+You're not actually investing in the market.
+We also need to keep track of the last investment date.
+And then we can maybe have an if statement later on that says based on our current investment date and the actual date that it is right now, we can look at that difference in number of days.
+And if that exceeds or is equal to 14 days, so we've gone past 2 weeks since our last investment, then we should invest this contribution amount of $200 and then update the last investment date just so that way we're routinely investing every 2 weeks.
+Now, I'd like to create the variable basically index start, which is going to equal the index in our spy.
+So this number right here on the left.
+So for this one, it's 613.
+that will be the index that we start investing on because right now we have a date but we actually don't know that the index so we have to sort of look that up.
+So we're going to look for the smallest difference between [music] uh this date and whatever date we have in spy and then find the corresponding index to that date.
+Okay.
+So there we go.
+So if we type in like 2005 January 10, it spits back 1306.
+So if we go to 1306 [music] that is January 10th 2005.
+So we have the right index.
+So think about what we want to do right now.
+We basically want to loop from this index in our spy through every single date and at each date compute a return based on our portfolio value and if we've reached this limit of going past 14 days or at 14 days between when we invested last we want to put in $200 and then just keep evolving that portfolio amount by whatever returns we're getting in the market.
+So that should be pretty simple.
+So we can say for i in range of the index starting and then we'll evolve that index by one.
+So we don't need to put anything um after this length of [music] dates.
+So it'll go all the way from our index right here to the index length of dates which would be the very last one.
+And we're going to evolve it by one like this.
+But we don't we don't need to type that.
+Then our portfolio value is just going to be equal to the current value of spy on today's date which is just going to be I divided by spy with yesterday's value.
+So it's actually just going to be I minus 1.
+And then that's going to be our return.
+If you have a 1% return, this is going to be 1.01.
+And you would multiply that by the portfolio value.
+But actually we can make this a little bit simpler.
+Instead of writing multiply by the portfolio value, we can just put a multiplication here.
+Now our portfolio value has evolved.
+But we also need to add to the portfolio.
+So we'll say if the last investment date is equal to none because right now it will be none.
+So the first day that this runs, we'll put in 200 bucks or for all the other days where we actually have given the last investment date an actual date when we do invest.
+We want to say that the the current date that we're at right now minus the last investment date and then get the days of that difference is larger or equal to the contribution every well in this case 14 days.
+And if that is true, we want to say that our portfolio value is going to be equal to the same portfolio value whatever it is, but we're going to add the contribution.
+And the portfolio value with no return is also just going to equal whatever it is plus the contribution.
+But we're not going to evolve that with a return.
+As you can see here, this if statement is true if we are actually investing.
+So, we're going to need to update the last investment date, whatever the current date is today.
+Good.
+So, that's everything we need, but we're going to need to append dates to form a plot.
+So, for every time that we evolve through this, we're evolving through a new day.
+So, we'll take a variable that we'll call x, which we could define early on.
+And I guess we're also going to need a y, which is going to be our portfolio value, and maybe a y for no contributions.
+And we call this function.
+We'll get these three parameters back.
+Good.
+So, we could call this function right now and it would give us the full evolution with these arrays to describe the entire evolution of our portfolio uh with investments or just being thrown into savings and you're not actually getting a return.
+Now, we'd like to plot this.
+So, we can create a plot strategy which is going to take in some inputs.
+So, we're definitely going to want to take in our dates um probably the amount of money that we've made from investments.
+Okay, so we'll say that X is equal to our dates.
+Y base is just going to be if we're putting money into the market, dollar cost averaging, and we're not doing anything crazy, just regular boring investing, [music] brainless.
+The strategy is going to be whatever we're trying to do to avoid the recession, whether it's listening to public information and public concern about an impending recession or some indicator that we're going to test later on to see if that can somehow save us some more money.
+And then this Y contribution is just going to be for putting our money in a savings account, we have no care in the world for investment returns, which obviously is a terrible [&nbsp;__&nbsp;] strategy.
+We'll actually comment out the plot with the strategy just because we haven't implemented anything like that.
+We're just trying to get this set up in a very simple manner at the moment.
+Okay, so there you go.
+Since 2005, you're just putting money straight into your savings.
+You'd have about $105,000.
+But if you were investing in the spy, you'd have $356,000.
+So that's pretty good.
+Surprise, surprise.
+Investing is great.
+Um, this is with dollar cost averaging.
+So there's been absolutely no avoidance of any recessions.
+Now, so let's try to implement this Google Trends fear into our algorithm to see that if we are putting money into a savings account, we don't put any money into the market and we just wait until these recession public recession fears have vanished and then we put all our money back into the account once those are all gone.
+What does that look like?
+So maybe let's just create a little helper function called always invest.
+And we'll just call this function anytime we want to always invest.
+So always Yeah, silly little function.
+So always invest.
+And we're also going to create a function which is the Google trend boolean.
+We'll take a date then a try function and we'll look at the Google trend fear CSV that we have and we'll locate the exact month that we're going to input in that CSV.
+We'll look at our recession value.
+And from what I've seen, it seems like when we actually were in a recession, when we look back in history, uh the value goes to about 20.
+So if this is below 20, return true.
+You can invest.
+Otherwise, it'll be false.
+Okay.
+Now, when we actually start to avoid putting money into the market, we're still gaining this $200 that we could invest on each paycheck.
+So, what we need to do is we need to create a variable called value to invest.
+So, this is money that we're we're saving.
+We're putting aside until we believe that there's not a recession.
+And right now, it's going to be at zero.
+What we can do is we can pass into our evolve portfolio function that describes whether or not we can or can't invest.
+So, we'll pass in always invest.
+And we can create the variable that is the allow variable which will be a bunch of true or falses for each date that says whether or not we can actually invest based on our strategy.
+So then in our if statement we'll say if allow is true you can invest otherwise you're not going to invest at all but you will add this money to the stockpile of money that you could invest.
+Now, of course, every time you believe there's a recession, this value is going to grow and grow and grow up until the point where you don't think there's a recession anymore, and you're going to dump all of this into the market, which means that when this is true, you should always be adding whatever that value to invest is to your portfolio value.
+And then, of course, you should make it zero because you've dumped it all into your portfolio.
+Okay, so I think that's Google Trends.
+Now, hopefully this hopefully this works.
+So, then we can change our plot to actually include the strategy.
+So, pass the contribution &gt;&gt; vocal stem of the day.
+&gt;&gt; Oh my [&nbsp;__&nbsp;] god, there's bugs everywhere.
+What the [&nbsp;__&nbsp;] am I doing?
+Oh.
+Oh my god.
+There we go.
+Okay, so this was according to Google Trends all the places where people were concerned that there was a recession coming obviously in 2008.
+Uh COVID fears.
+You could look at this and say, "Well, yeah, of course, it's really good that we didn't invest during this time if we're following public fear about recessions, but you're also missing massive opportunities to gain a lot of money." The green line is if we're doing dollar cost averaging and the white line is the Google Trends recession indicator, public fear sentiment sort of rating that we've given.
+You can see that if you're always investing, you do in the end up with a little bit more money.
+Now, Google Trends is still a pretty crude way of doing this just purely based on public sentiment.
+But there are real recession indicators out there that we can use.
+Like for example, Sam's rule, which is this really simple sort of real-time way to tell if the US economy has already entered a recession.
+That way, we're not relying on public sentiment.
+This is a real indicator that people use.
+It effectively says that if the 3-month average unemployment rate rises by.5 percentage points above its lowest level in the past 12 months, then a recession has started.
+So, we can use this indicator and then back test our entire portfolio to see if potentially using this indicator of a recession could actually avoid us losing a lot of money or maybe dollar cost averaging is still just the way to go to just turn your brain off and keep putting money into the market.
+So, let's get to work in coding this up.
+So, I have here the US unemployment rate on a monthly basis going back to 2000.
+And then we'll create another function that will give us a true or false statement on whether or not we should invest based on this data.
+And we'll evaluate it based on Sam's rule.
+So, I created a little script here that basically uses the unemployment rate to calculate the SAMs rule to determine when we're actually entering a recession.
+And I've gone ahead and stored it in this CSV.
+Basically, the unemployment rate in time, the unemployment average over a 3-month interval.
+And then I give a flag, which is the SAM recession flag, either yes, we're in a recession or no, we are not.
+So, we can import this into our Python file, which is what we've written, and then start to create our boolean.
+So, we can try The most important part of what this back test is showing us is that we can try to time the market as an average person.
+Calculating indicators or listening to what people tell you, but you're basically guaranteed to lose and end up with lower returns.
+Timing the market is just not possible.
+It's mostly a guess as to when a recession will start.
+And by holding your cash, you're missing out on the most important aspect of investing, which is time.
+Time spent in the market is the most important thing.
+of course, also investing in good businesses.
+But if you're investing in the market sort of as a whole, there's really no reason to wait to invest even if you think something bad is about to happen because you've seen the back test.
+And when people think there might be a recession, even when indicators tell you so, you still end up losing by waiting.
+So, if you found this video helpful, make sure to like and subscribe.
+You can find the code on my GitHub completely for free.
+Links are in the description.
+You can play with this code yourself.
+And if I made any mistakes, please let me know in the comments.
+So, thanks for watching and I'll see you guys in the next

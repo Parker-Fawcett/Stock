@@ -1,0 +1,168 @@
+Kind: captions Language: en What if you had $75,000 in savings but $117,000 in student debt?
+Do you invest all your savings and pay off your loans or do you invest it even if you had accidentally invested on the worst day in history?
+That's the scenario I've tested and the results will probably surprise you.
+Now, this is actually my situation.
+I have $117,000 in student debt.
+My monthly loan payment is $622.
+And at that rate, it's going to take me about 15 1/2 years to pay it off.
+Since those payments eat up most of my cash, I don't really have much left over to invest each month.
+But during school, I managed to save up quite a bit through bursceries, grants, and side work.
+So, right now, I have about $75,000 sitting in my investment account.
+And that creates a pretty big decision point for me.
+Now, I've set up two experiments to simulate what would happen over time.
+Case one, I take the entire $75,000 in savings and dump it straight into my student loans.
+Then, I keep paying my monthly student loan payments as usual.
+Once the loans are fully gone, I redirect that same $622 a month into the stock market instead.
+I'd be able to pay off my student loans faster.
+I'd be able to put money into the market faster.
+So, that's option one.
+Now, case two, I leave the $75,000 invested into the market.
+I keep making my monthly student loan payments as scheduled, but that means I'm carrying much more debt for much longer before I ever start investing extra money beyond that lumpsum.
+Now, the common advice you will hear is that if you pay off your student loans first, it's a pretty safe bet.
+The market goes up, the market goes down.
+But debt is guaranteed and I get that.
+If you have credit cards or highinterest debt, absolutely, that's priority numero uno.
+But this isn't credit card debt.
+And in Canada, federal and provincial student loans currently have 0% interest.
+But I'm not just going to use the average market returns.
+I actually pulled historical data from the S&amp;P 500 all the way back to 1935.
+And I calculated every possible return for 20 years, every single day.
+And then I found the absolute worst day to invest in the past 90 years.
+So if you would have invested in 1962, February 28th, you would have seen a 60% return over 20 years, which is pretty bad.
+So for reference, the S&amp;P on average returns about 7%.
+So you would expect that over 20 years, on average, you get about 140% return.
+So it's actually less than half of that.
+This is pretty bad.
+But over the long term, I mean, this is 20 years, we're still positive.
+So if you wait, you will get your positive return.
+So let me run you through the code right now.
+This is going to be my student loan parameter.
+This is actually my real student loan that I owe right now.
+This is my savings account, $75,000 approximately.
+And my real payment each and every single month.
+So, we're going to look over 20 years to find the worst day to invest.
+If we run this, it's going to search through every single day in my spy CSV.
+So, this is data going from 1936, sorry, 1935, all the way to 2025.
+For each and every single month, I have real uh stock market data.
+So, this represents if we take my savings account and we dump it straight into my student loan.
+So, you can see right here at the bottom, this is my savings account, it'll go right to zero.
+Even though it started off at $75,000, we've taken it all and we put it directly into the student loan.
+So, student loan isn't minus $112,000.
+It's about - $42,000 right now.
+So, that's great.
+We're going to have nothing in our savings account at all because we're taking $622 every single month and we're putting it into our student loan, paying that off.
+And you're going to see that the debt is going to slowly go down and our net worth over time is negative.
+But you'll see this linear trend, which is basically just a result of our monthly payments.
+So in 1962, the worst day to invest, February 28th, it takes us until 1967 until we've actually paid off our student loans.
+So it still takes a while.
+That's about 5 years where we have nothing in our savings account because we're putting everything into our student loans.
+Now, right at that point, we're at zero net worth and we begin to put money into the market.
+So, every month we put in $622 and that'll track with respect to the S&amp;P.
+So, you can see our net worth now is it's no no longer growing linearly.
+It's actually kind of fluctuating with respect to the stock market.
+And our savings account value is growing as well.
+And at this point, our savings account is effectively our net worth because we have nothing in uh we have nothing as student loans.
+That's zero.
+So at the end of the 20 years, right, 1982, now gone from 1962 to 1982, we can see that our new net worth is at about $122,000.
+So that's our net worth with this method, $122,000.
+This is if we take all of our money and we dump it straight into paying off our student loans immediately, day one after finishing school, and then we wait five years to pay off our student loans and then we start to put money into the market.
+Okay, so this is what my parents would say.
+This is the safest bet.
+This is super safe.
+Now, let's look at again the worst case scenario for investing in the stock market on this specific day.
+We're going to keep all our money in the market.
+We're going to look at this for the next 20 years.
+So, this is if we're paying off our loans slowly.
+If you pay off your loans slowly, you keep the money in the savings account.
+All right?
+So, we're still at $75,000 here.
+And our growth is going to be much worse.
+It's going to be much worse than the average.
+So, this is the worst case scenario.
+Our student loan amount stays at about minus $117,000.
+It's 1962 and we don't finish paying this until 1977.
+It's kind of funny to say 1977.
+I know the year is 2025, but we're doing this because I think it's a good example to to describe, you know, the worst case scenario for someone back then with such a large student loan.
+It's completely unrealistic.
+So 1962 to 1977.
+So it's 15 years to pay off the student loan.
+um which was quite a long time.
+But you have to keep in mind that it's the net worth that matters, boys.
+It's the net worth that matters.
+So we look at our net worth again.
+Same same thing as the the exact same thing as the other case number one.
+We're starting off at about - $40,000 of net worth - $42,000, but now we're tracking the S&amp;P and our net worth is going to grow based on our payments.
+Yes.
+But it'll also grow with respect to this shittier return.
+So what is our net worth at the end of the 20 years?
+Well, it's if we just zoom in here, we're hovering at about $153,000.
+So, this is actually better.
+This is a better return than if we had paid our student loan right away, which is pretty incredible.
+So, now let's look at something that's maybe a little bit different.
+Let's look at 20 years ago.
+If we had invested, what would our returns look like?
+So, let's go back to case one now and look at paying our student loans as quickly as possible.
+We take all our savings, we dump it into our student loan account.
+So, let's run this now.
+So, we're going to look back 20 years ago.
+Now, in this case, we're not trying to find the worst case return, but let's just get an idea of 20 years ago, if we had invested in the market versus if we had paid off our student loans as quickly as possible, what types of returns would we have gotten?
+What would our net worth be?
+So, 20 years ago, the year is 2005, we've decided to take all of our savings and dump it straight into our student loans.
+So, just as before, our savings account is zero up until about 2011, where we've paid off our student loans.
+We began to invest into the market about $622 every single month.
+Now, by 2025, our net worth is about $286,000.
+The returns here are much better.
+So, let's keep that number in mind.
+$280 approximately $280,000 roughly.
+Okay?
+And this is if we pay off our loan as quickly as possible.
+If we pay it now, we take all our savings, we put it into the student loan.
+Now, what if we did this slowly?
+So, let's look 20 years ago.
+So 20 years ago, we decided to keep our savings account in the market with all of our money that we've saved up.
+We have about $70,000, $75,000 in our savings account.
+This is going to grow with respect to the S&amp;P and we take a long time to pay off our student loans.
+We don't end up paying it off till 2021.
+But you got to look at our net worth now.
+Our net worth is absolutely phenomenal.
+Now you can see here we've actually crossed we've gone from a net worth of about $40,000 in 2005 to a net worth of almost zero in 2007.
+Now in 3 years the growth of our portfolio has almost been able to counteract the the negative aspect of our net worth at minus $40,000 in about four years which is absolutely ridiculous.
+Comes back down again but it just takes off which is why you need to have money in the market.
+This is absolutely phenomenal.
+We're looking at in 2025 a net worth of about $450,000 which is massive.
+That is a massive difference.
+Absolutely massive.
+Now, there's a couple things to consider here.
+I'm talking about this sort of in like an ideal world.
+We're looking at, yeah, the worst case scenario with investing at the worst possible time or maybe you invested 20 years ago.
+What does that look like?
+Obviously, it's going to be much better.
+But there is absolutely some risk involved in doing this.
+Okay?
+I would not suggest going out and investing your student loans.
+That sounds like a terrible idea.
+When you're young, you're dumb.
+You make the worst decisions.
+You could invest in penny stocks or Bitcoin and lose it all or something happens.
+Who knows?
+You make a poor decision and you're losing hundreds of thousands of dollars that is significant.
+But you will have a student loan for a long time and you do need to invest in the market.
+So, there's a bit of a balance here.
+You need to be very safe, focused on not losing any money at all.
+Keeping things boring, not trying to be super focused on buying and selling.
+It should be boring, boring, boring.
+Most people lose in the market.
+Most retail investors lose in the market.
+When you have a lot of debt, that doesn't necessarily mean that you shouldn't be investing in the market, especially with something that's very low interest.
+Now, of course, if your student loan is higher interest, you probably should be paying that off as quickly as possible.
+If your student loans, and I'm not quite sure how it works in other places in the world, is four, you know, 5%, maybe that is actually worth it because by paying that off, you're effectively getting a four or 5% interest almost like investing in the market, but it's guaranteed.
+So, that could definitely be something that's good.
+Or maybe splitting your money up between paying off student loans and paying into the market.
+Either of those things is good, but you really want to be focused on not losing money.
+We don't want to lose money.
+Rule number one, never lose money.
+Anyways guys, just some thoughts.
+If you have any comments or ideas about this or some that I've done wrong, which is probably pretty pretty likely, uh please leave it in the comments.
+I'd be interested to hear what you guys think.
+Cheers, boys.
+I'll uh see you in the next one.

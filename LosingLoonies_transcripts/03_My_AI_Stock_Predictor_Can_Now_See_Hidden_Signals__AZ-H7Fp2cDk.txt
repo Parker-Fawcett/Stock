@@ -1,0 +1,115 @@
+Kind: captions Language: en This is a Fourier transform, a way of breaking down signals in time to a representation of their individual frequencies.
+And this is my community-built AI stock predictor.
+For the past year now, I've been building an AI stock prediction tool with the help of this community.
+We've added new sentiment, insider trading, and even added fear and greed from the markets.
+And every single time one of you leaves a comment that completely reshapes this code.
+Now, I've spun the slot machine of YouTube comments until I eventually found this gem, the Fourier transform.
+It's beautiful.
+I studied MRI physics during my PhD, so this stuff is my jam.
+This is the essential tool that allows so much of what I've done to function.
+I spent the last 5 years basically doing nothing but Fourier transforms.
+Now, can the same tool that allows an MRI to work, creates noise-canceling headphones, and digital signal processing, also be used to find hidden frequencies in the stock market that finally allow this AI stock predictor to crush and get insane returns?
+Maybe.
+Okay, well, quick explainer because this stuff is really important.
+Everything that changes in time has a frequency.
+Ocean's tides, your heartbeat, and yeah, even the stock market.
+If you understand a Fourier transform in one of these examples, you understand them in all.
+Waves can help you describe so many different things in the real world.
+Sound waves are the pressure changes in air.
+A wave that oscillates up and down consistently with the same time between peaks has one frequency.
+This is a wave in time, and this is the frequency of that wave converted into an audio signal for you to listen to.
+The frequency can increase or it can decrease.
+We can also add frequencies together of many different waves.
+Here are two waves of the same frequency added together.
+Notice that the only thing that has changed when adding these two waves together is that their amplitudes have grown, so the sound has become louder.
+Waves can also add to each other to increase or decrease the volume.
+Adding two waves together of the same frequency, but where one is shifted slightly, can actually cause sounds to vanish because the waves are adding to perfectly cancel.
+Here are two waves added with different frequencies.
+Notice that the sound becomes more complex.
+With more waves of different amplitudes and different frequencies, the sound gets even more complex.
+The sound can become so complex that it is now hard to understand exactly what we're looking at.
+So, let's [music] go back to the single frequency wave.
+Applying the Fourier transform to this signal spits out a new signal.
+But this new signal isn't just showing the wave over time, it's showing the wave's ingredients.
+It shows you the pure frequencies comprising the original time-based signal.
+We've now moved from the time domain over to the frequency domain.
+Let's go ahead and add a second [music] higher frequency to our original wave and see what happens to the Fourier transformed signal.
+And look at that, all the ingredients are listed to us in this frequency domain.
+The lower frequency wave and the higher frequency wave.
+This is not immediately apparent [music] in the time-based signal.
+In fact, the horizontal axis is actually showing us the frequency of these waves and the height, or vertical axis, is showing us the amplitude of those waves.
+This is especially helpful with complex signals that have many different waves all added together with different frequencies and different amplitudes.
+It breaks down into their so-called recipe.
+This can be applied to any time-based signal, and it can even be applied to sound in fun ways where we can look at my voice on the frequency axis.
+This is the time signal of my voice, and this is the frequency domain signal of my voice.
+I can remove the lower frequency component by forcing all signal in that low frequency region to be zero.
+Now, the only thing that remains is the higher frequency signal.
+I can also remove the high frequency component by forcing all signal in that high frequency region to be zero, and we're left with the low frequency part of my voice.
+Okay, so there's one thing I've been holding off answering until now.
+How does this actually help us understand stock market prices?
+Okay, we can start by simulating a hypothetical company that sees seasonal increases in their market value.
+Maybe they increase around Christmas time.
+Let's just call the company Bath &amp; Body Limited.
+BBL has a stock price that oscillates because people like to buy more of it during the uptick in their seasonal sales.
+However, noise in the markets, people buying and selling cause the stock to look like this.
+It's random, confusing, and just kind of looks like noise.
+We apply a Fourier transform, and voila, we have on the other side all of the frequencies that make up the stock [music] price.
+And this spike right here, this is the seasonal oscillation.
+We could actually use this to make a prediction.
+This is something that at one point people did genuinely look towards as an indicator.
+It doesn't guarantee the price will go up, but through all the noise, it means that there can be upwards or downwards momentum during these periods that is driving the market price within that noise.
+Some of the best firms in the world will include this in their analysis of stock prices, and we're going to add it to our AI stock predictor.
+So, here's what I tried first.
+I took every stock in my list and I ran a Fourier transform on every single one.
+I fed every frequency into the model, their exact frequencies and amplitudes.
+Every peak in the frequency spectrum from the fastest oscillation to the slowest.
+I retrained and backtested, and here are the results.
+The results are Okay, well, the results are actually not that good.
+The model actually got worse, and I'm not sure why, but I do have a bit of a clue.
+Maybe we're just feeding this thing too much noise, too much data with absolutely no signal.
+These tiny small amplitude frequencies might be random variation for no coherent reason.
+By throwing all of this data into our model, I'd given it an ocean of new features.
+What we should be looking at are the largest amplitude swings in the market, the dominant rhythms driving the stock's movement.
+So, I rewrote this code to include a search algorithm to find the largest peak in our frequency data and use that as an input to our model.
+That way we focus on the most impactful frequencies within a particular stock.
+Before making this improvement, I'll be honest with you.
+I've actually been misleading you this entire time.
+There's a major flaw in how I've presented this, and it ends up being a trap many traders fall into.
+Because we've only run the model once, and a broken clock is still right twice a day.
+The model could have just guessed and gotten it right.
+And that's an issue we're all very familiar with.
+So, how do I fix this problem?
+And yeah, I'm a physicist, but that really doesn't mean that this has to be complicated.
+So, I ran the model over and over.
+Well, actually only three times, but it proves the point regardless.
+If this really worked, you should be able to change your random seed, retrain the model, run your predictions again, and it would be able to predict accurately over and over again, thousands of times.
+This is the essence of a Monte Carlo simulation where we want to explore how certain our model is.
+A Monte Carlo simulation is an extremely powerful tool that is incredibly simple, but it sounds complicated.
+Imagine you're playing a good old-fashioned game of coin toss with the lads.
+You predict coin toss will result in the coin landing on heads.
+You flip the coin, and it landed on heads.
+Absolutely incredible.
+The single run of this match would indicate that you can predict the outcome of a coin toss with 100% accuracy.
+You are a wizard.
+It sounds silly, but that's basically what we've done with this model.
+We ran a single backtest, saw that it worked, and then concluded that the model works.
+So, you need to run multiple tests, like ideally hundreds or thousands, to hone in on the true accuracy of the model.
+And in relation to our story, realize that you are not a coin toss-predicting wizard.
+So, my first run, you can actually see that the model performed pretty well.
+There was a massive spike at the end, which was a little bit curious, but it outperformed the average baseline of the list of stock tickers I have.
+Now, I can run the exact same thing again, and yeah, this is getting a little bit confusing, but the newest model is right here in my neon green.
+This thin green line you're seeing here is actually the previous run that we had, and the red line is just the average of our predictions.
+If we were to run this many, many, many times, [music] that red line being the average of all of our AI predictions, would give us a better indication of if this model is actually outperforming the baseline.
+And let's run it a third time.
+And now it actually seems to be underperforming, at least in the beginning.
+It is absolutely incredible to me the amount of community suggestions we've implemented so far in this predictor.
+And I want to remind you that this was not done in just a day.
+This has been slowly developed throughout a year of work.
+So, if you want access to the full private repository and to join in on this community-led project, I shared the entire code with anyone who becomes a GitHub sponsor, [music] link in the description.
+All proceeds are going back to pay my PhD student loans.
+Now, I'll say what I always say.
+This doesn't prove that the model works.
+Backtests are not real life, and I am deeply aware that the market has a long history of humbling people that think they figured it out.
+But we have crossed off one path to continue improving our community AI stock predictor.
+This is something I genuinely couldn't have done alone.
+&gt;&gt; [music]

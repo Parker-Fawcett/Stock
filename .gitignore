@@ -1,0 +1,15 @@
+# Regenerable data (re-download with run.py / insider.py)
+data/raw/
+data/cache/
+data/insider/raw/
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+
+# macOS
+.DS_Store
+
+# Secrets: never commit API keys (use FMP_KEY env var)
+.env

@@ -1,0 +1,116 @@
+Kind: captions Language: en In this video, I'm going to be validating and back testing the best MACD trading strategy, apparently with an 86% win rate.
+In the original video from Trading Lab, he doesn't actually show the back tests, but his comment section seemed to be filled with people making absolute bank.
+There are so many videos about MACD trading strategies.
+So, why can't we use coding in our math knowledge to get in on this profit?
+That's exactly what I'll break down for you in this video today.
+I'm literally going to hold your hand through building this code.
+Now, why isn't everyone doing this?
+Even the greatest investor of all time, Warren Buffett, only made about a 20% return yearly.
+So clearly, he didn't have access to YouTube.
+If you want to make money, this is a pretty attractive video to watch.
+3.8 million views.
+Now, if you want to increase your net worth, most people wouldn't be watching the video that you're watching right now.
+So, good for you.
+They would watch something that's flashy and fun, like the video we're talking about, and something that makes you quick money.
+So, does this actually work?
+Okay, so what is MACD?
+First of all, MACD stands for the moving average convergence divergence, which sounds pretty complicated, but it's actually rather simple.
+It's basically a momentum indicator that shows how fast the price is moving compared to its recent trend.
+He uses two lines, a fast 12 period moving average, and then a slower 26 period one.
+The MACD line is just the difference between them.
+Then there's a signal line, which is the 9 period average of the MACD.
+And when the MACD crosses above it, that's usually a bullish sign, and when it crosses below, it's usually bearish.
+There's also bars that we use called the histogram which shows how far apart these lines are.
+Basically, it's how strong the momentum is.
+So, the MACD isn't really predicting the future.
+It basically just helps to see whether or not the momentum is speeding up or slowing down.
+So, that's a pretty brief overview.
+So, we can build this algorithm with code and then apply it to any stock we want to determine if there's indeed a buy signal.
+Then, we back test the strategy over any stock and time period to see if we can actually make some real money with the strategy.
+One thing I noticed is that most of these videos are never actually back tested, which I find kind of curious.
+It will show these one-off cases or maybe even 10 cases where the strategy does work.
+But why wouldn't you build in an algorithm to test an entire data set?
+I followed the instructions from this video many times and it's a little bit confusing, but I think I understand what Trading Lab is doing.
+This MACD strategy is made up of four different components.
+There's the MACD line, which is a 12-day exponential moving average subtracted from the 26day exponential moving average.
+There's also a signal line which is basically just the moving average of the MACD over 9 days and then a histogram like I've said before which is the difference between the MACD line and the signal line.
+Now with all this built we can continue to follow along with the video's instructions.
+The video states that there is a buy signal when the MACD line crosses the signal line in an upwards direction.
+This can be noticed when the histogram is going from a negative value to a positive value.
+And this is important.
+The MACD and signal values both have to be less than zero.
+So those are a couple criteria that we have to implement into our code.
+Okay, so I just went ahead and I coded this up.
+I have my MACD and signal.
+And if we just run this, we're looking at Apple data right now.
+So this is dating back to 2010.
+We have over 3,000 columns to analyze.
+And in the top plot is the closing value of Apple.
+The x-axis is the date range and the middle plot is the MACD and signal indicator.
+So you can actually see this is an example of where we'd have a buy signal.
+Okay, so it actually took me a little while to find an example of this, but this would be a perfect example right here.
+The MACD line is crossing over the signal line in an upwards direction and both the MACD and signal values are below zero.
+So this would be a buy indicator right here.
+And this is going to be analyzed automatically in our code.
+Now we've set up the code.
+We can see where we've added arrows in the code to show where exactly we have buy indications.
+So if you were to zoom in on each one of these arrows, you'll actually see that our criteria is being met.
+And what's nice about this is that we can dump in as much data as we want for any stock and we'll be able to back test a large amount of this stock data to see if this is actually working.
+Now, in the video, Trading Lab follows up by saying that there's an issue most people encounter, and that's that most people use this indicator by itself, which doesn't really work.
+So, what else do we need to add?
+You can actually see regions where there's downwards trends in the market, but we're still getting indications to buy.
+So, Trading Lab actually says to not trade against the trend.
+We would want to be trading during an upward trend.
+Okay, sure.
+We want to trade during an upward trend, but how do we know if we're actually in an upwards trend or a downwards trend?
+So, what does Trading Lab say as a solution?
+Well, we just add a 200 day moving average, which honestly I think is completely fair.
+I mean, we have to work on what we're given with.
+This will smooth out the past 200 days and give us some larger perspective on where the market is actually moving.
+But, of course, past results are not necessarily indicators for future returns, but this is what we have to work with.
+So, let's see how this plays out.
+Now, we've added a 200 day moving average to our plot.
+Now, if the actual stock price is above the 200 day moving average, we're in an upward trend.
+And if the price is below the 200 day moving average, we're in a downward trend.
+We also only want to trade when we're in an upward trend.
+As said in the video, we just put this all together, right?
+We only buy when the MACD line crosses the signal line and is going upwards.
+But when the MACD and signal line of course are both below zero, we also only buy when we're in an upwards trend.
+So, we've met all this criteria in our code.
+So, what if we buy a stock based on this?
+When do we sell?
+The criteria is actually very specific.
+We want to target a 1.5 profit ratio.
+So how does this tool perform so far?
+But there is one final thing that trading lab one final thing that trading lab claims will fix this algorithm.
+This is to combine the MACD strategy with price action.
+Now what does this mean?
+Well, we have to identify a key support where the price hits and bounces.
+But in my analysis, I found that this made absolutely no difference at all.
+So we're not even going to bother to include it because it does literally nothing.
+It is still nothing more than a random guess.
+Okay, so at this point you probably might be saying, what's the actual accuracy of this algorithm?
+So I've gone ahead and actually coded this up.
+And if we run this now, just to take a look at our simulated portfolio, you'll see that we started with $1,000 back in 2010.
+And by about mid 2025, we can see that we're at $1,100.
+So this really hasn't done much.
+In fact, the buy and hold strategy would have returned way better returns than this.
+This is basically just a random guess, but it's actually performing almost worse than a random guess.
+And if you were to look at the return, it's actually 46% of the trades were profitable, not 80%.
+So, I want this to be a huge lesson for you guys that what you see online, don't trust it.
+If this actually worked, it probably wouldn't be something that gets shared on YouTube.
+And if it were so easy, so many people would have implemented it that this opportunity to make money has basically vanished.
+And just to prove to you that this doesn't work with any other stock techers, I've loaded in Amazon as well.
+And we can run the same thing on this different data set.
+We can see all of our buy indications here.
+And from about 2000 to 2021, our portfolio has gone from a,000 to,500, which is absolutely abysmal when you consider the returns of Amazon over this period.
+This is a terrible, terrible strategy to actually make money even if even if the accuracy was high, which actually currently for this data set, it's pretty good at 62%.
+The fact that you make such frequent trades, but you're not buying and holding means that you're missing out on such significant profits over that time period.
+The fact that you're buying and selling so frequently, but you're not buying and holding and missing out on all these potential gains means that your net worth growth over this time is absolutely abysmal.
+You should really just buy good stocks and hold them for the long term and not worry about all this fairy dust that people put on the internet.
+So, I appreciate you guys watching this video.
+Link in the Patreon.
+Help me pay off my student loans and make more of this educational content.
+I appreciate you guys watching so far.
+Make sure to like and subscribe.
+I will see you guys later.

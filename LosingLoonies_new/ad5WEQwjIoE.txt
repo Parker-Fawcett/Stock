@@ -1,0 +1,168 @@
+Kind: captions Language: en I've been getting questions about how my spreadsheet works for tracking my finances.
+I've been able to increase my net worth by about $20,000 in the past year of working my 9 to5 on an 80k salary.
+So, today I'll share with you in detail exactly how I'm planning to use this sheet to track my net worth growth in time and eventually get out of debt.
+There's also a link in the description to the spreadsheet.
+You can pick it up completely for free.
+In the spirit of this channel, trying to maximize our net worth and build our income to give us as much freedom in life.
+I think that something like this, tracking what goes out and what comes in and where to allocate the extra to build investments and savings is probably the most impactful step one can take to wealth building.
+But it's also the most boring.
+As a highle overview, the spreadsheet is broken up into three parts.
+This cash flow tracking to see what money is coming in, what money is going out on average.
+We take all of our extra money and we look at the difference of these two values and place that extra money where it matters the most to us.
+think rainy day fund, saving for a new house, retirement investments, and we prefer to place this money in an area that'll allow us to make even more money.
+So maybe favoring investments, but we also do need an emergency cash pile.
+So this percent allocation may change depending on our situations.
+There's net worth tracking to make sure we're on the right path, growing our net worth, and looking at the sum of all of our accounts, including debts from credit cards or student loans.
+We also project out what our net worth may be in a year's time.
+Then there's investment tracking, which is a simple outline of our investments.
+I tend to avoid this sheet because I want my investments to be tied as little as possible to my emotions.
+This is mainly for tracking and staying organized.
+So, allow me to step you through the spreadsheet.
+And we're going to start with the cash flow tracking, which is probably the most important part of this spreadsheet.
+This is what's actually going to help you in using every last dollar you have to increase your net worth as much as possible.
+And my approach is pretty simple.
+I basically look at everything that I'm spending my money on.
+Look at how much money is going out and how much money is coming in.
+I find the difference and then I allocate that difference in cash towards things that matter the most for me.
+Like for instance, my retirement, my wedding, maybe saving for a house and then of course the rainy day fund which is very very important.
+Now these numbers are all a little bit made up.
+So for instance, if I was filling this out for the first time from your shoes, I would come down to all of these categories and you could fill in let's say the first month here.
+So it's currently November 2025.
+So maybe I would fill this in as November.
+Oh my god.
+I would delete all the other values.
+I would look at each category and change the values according to myself.
+Now, I've included this to have a partner split.
+So, I split everything equitably with my partner.
+You could enter in your bi-weekly pay and their bi-weekly pay also.
+And it'll compute based on all the parameters in this sheet, what fraction of things you're going to pay for, what fraction, and how much money they should send you if you're paying for all of these expenses.
+But if it's just you, that's completely fine.
+Just put it at zero.
+And it says that your fraction is 100%.
+Then you would come down and fill everything in accordingly.
+So, you would look at your rent cost.
+You would type in your rent, let's say it's 1,600.
+Your internet, let's just say it's, I don't know, 100.
+And you would do this, so on and so forth.
+Now, when you get to elements like car insurance, food, student loans.
+Now, student loans might be fixed.
+Phone bill might not be fixed.
+Gas might not be fixed, eating out, that's not fixed.
+So, there's a bunch of elements that'll change from month to month.
+So, for example, electricity.
+What I do is I have an average value.
+So, for instance, November, I'll look at how much I spent on electricity in November.
+I'll put that at $75.
+And then next month if I spend let's say a little bit more money.
+So this would be in December.
+We spent $90.
+This averaged section will take the average of these values because I don't really know how much I'm going to spend on electricity in a given month.
+But I think finding an average is a pretty good middle ground.
+And I've done that for all the things that make sense to do it for gas, eating out, subscriptions, other.
+So all of these elements are things that I'm going to have to pay for.
+It's everything that's going out of my account.
+When this is updated, you have a pretty accurate representation of the average quantity of money that is leaving per month.
+The next important step would be to fill in how much money you're bringing in.
+This is going to be from your main job or you could add other income sources.
+Now, for me, I only have my main job.
+And what I've done is I've just entered in my bi-weekly paycheck, and this is going to compute how much money I'm getting per year.
+So, let's say $55,000 after taxes.
+What then occurs below is your monthly pay is computed.
+So, obviously, this yearly amount divided by 12.
+And your bi-weekly amount.
+And then, really importantly, how much money you have left over at the end of the month to allocate.
+So, this is just going to be your monthly pay minus the total amount of money that's leaving your account.
+So, this value here subtracted by this value.
+And we have an amount that's left over.
+And we'd want to allocate this towards things that matter the most to us.
+I really value making my money work for me and investing.
+So, I'm going to have some percentage in investing.
+And you can actually set this based on the allocation.
+So, as you make more money, you're going to have more money being invested or going towards your rainy day fund or your wedding or whatever.
+So, let's just say I want half of my money going in an RRSP and the other half going into a rainy day fund just in case your car breaks down for whatever reason.
+Good.
+So, now all of your money is being allocated accordingly.
+And you can scroll down to this next section which says what your bi-weekly variable allocations should be.
+So, this is on each paycheck how much money you should be putting into each corresponding account.
+And if you want to change, then you're going to have to go down and update this section as well.
+So, this says that on each paycheck I should put $360 into my RRSP and my rainy day fund.
+And this accounts for about 31% of my total monthly income.
+And because I'm really focused on debt reduction, I also factor in how much money is going towards increasing my net worth in the form of saving for a firsttime home or your RRSP or paying off your student loans or dividend income that gets reinvested.
+So, what I've done here to calculate the total percentage of monthly income that's actually going towards increasing your net worth, I've simply summed up the total amount going towards all of these different accounts or dividend reinvestments and dividing by the total amount of income that you're getting from dividends plus your job.
+So, this is cash flow tracking.
+Now, there's a whole bunch of things that you can change and fine-tuning that you can do.
+If you have any questions, just leave them in the comments and I'll try my best to get back to you.
+Now, another element to this is going to be the net worth tracking where every week you'll sit down and look at all of your accounts, whatever loans you have, investments, checking, savings, and any credit cards.
+So, if I were starting this, let's say today, your net worth is simply the sum of all of the accounts.
+Your net worth change on the first day is going to be nothing because you have no previous data to work off of.
+Same with the percent change.
+You would fill in all of these values and even make changes if, for example, you don't have a student loan or maybe you have something else that you want to add.
+And you would type in the date.
+So it's November the 11th today.
+So we could enter that in.
+The next time that you'll report is just going to be 1 week after that.
+So what you could do is type in equals the previous day.
+And then plus 7.
+Now if we drag this down, this should increment by one week.
+We can go all the way down to the very next year of 2026, pretty much the same day.
+And every week you'll just fill this in.
+So let's say that on the next week after this, my student loan has stayed the same.
+I've lost a little bit in investments.
+I have a little bit more in my checking account.
+And we've updated all of these accordingly.
+And then the week after I come along and I select all this, just holding shift, clicking ax, clicking this button here, and dragging down and filling in my new values.
+Let's say my investments have gone up, my checking has gone down a little bit, my savings has increased, so on and so forth.
+You get the point.
+So what you can see is that your net worth change is being tracked.
+Your total net worth is also being tracked.
+And then what's happening here, which is really, really interesting, is it's showing you how much money you're expected to have gained in one year.
+Now, of course, we've only filled in a couple values, so this is really inaccurate, but it's basically just doing a straight line fit on your net worth and then projecting that out for 52 weeks.
+And then this would be for 2026, exactly 1 year from today, this is what your net worth is expected to be.
+So, as you fill this in, this will be a more accurate representation of what your net worth will be, but it just takes a little while to get started.
+And as you fill this in, your plot will eventually begin to update as well.
+This can be really good to make sure you're actually on track with your net worth growth and that everything is going according to plan and to get some idea of what your projections are as well.
+And next up is investment tracking, which isn't extremely detailed, but is just a simple sheet that I'm using for myself.
+Most of my interest is in net worth growth and non-investment.
+But of course, tracking our investments from day to day to see how much we've actually gained is pretty advantageous.
+So the way I've set this up is pretty simple.
+You're just going to enter in the ticker.
+So let's say that we're looking at Nvidia.
+You would come here and type in the ticker name.
+Everything else will update and everything in yellow you should be updating yourself.
+So you're going to have to type in how much you bought that, how many shares you bought, if there's a dividend, what the percentage is, [music] and this will give you your dividend income per year.
+So, let's say that Nvidia does not have a dividend.
+So, there's no money to be gained based on that.
+Now, as you update each of these accounts, you can change them and update each row with the uh investment that you have that's of interest.
+You should also update how much you've actually invested into the stocks.
+So, let's say that I've put in $1,000 into these accounts and I've bought a bunch of stocks with this money.
+You would say that you put in $1,000.
+And then your portfolio value is calculated by just summing up the total value of each stock.
+And then your net profit is simply the subtraction of these two.
+And each day the sum of all profits and losses are calculated.
+So it's a pretty simple investment tracking tool that I'm using right [music] now.
+And I hope that all of this can be of use to you in tracking your own net worth.
+Obviously there's major improvements that could be made to this.
+So if you see anything that stands out to you that could be improved to make this maybe a little bit more automated or [music] more detailed and helpful, then please leave a comment in the description.
+I'm going to try to change this, maybe make a version, too.
+This is just what I've been using cuz it works for me.
+I know this can be a bit tedious, but most net worth trackers out there are going to be tedious because they're directly hooked up to your bank accounts and you're going to have to constantly verify it.
+So, this is effectively the same thing and we even have a little bit more control in terms [music] of what type of math we can do or projections.
+Now, I find probably the most useful thing that I have in this ensemble of spreadsheets is the net worth tracking and the cash flow tracking because what's nice here is that let's say that you get some raise and you come along here and you there now these cells reference each other.
+you come along here and you just update your bi-weekly pay and let's say you're getting a little bit more money.
+What happens to this percent allocation because it remains fixed.
+Um you're going to have a correspondingly higher contribution to the accounts that you care about.
+So right now it's 750 and then we'll just update this.
+Now it goes to 970 and these values also update.
+So you can go in here and update your average values.
+Um, let's say that you're spending a lot less money on groceries and you're actually going to get more money to invest in your RRSP or whatever accounts, uh, rainy day fund, things that you care about, right?
+Or if you are splitting things equitably with your partner, if they get more money, you'll have a corresponding less of [music] a fraction that you're actually going to be spending on, let's say, rent, um, and then more money to put into investments.
+Now, I know not everybody does things equitably.
+It's just the way that I do it and it works for us.
+Um, you can just have this as a solo a solo uh and just delete all of this because it doesn't really matter, right?
+Anyways guys, I hope you appreciate this.
+I hope this is useful to you.
+There's anything to change at all in this sheet, please let me know in the description.
+I'll try to make a V2 at some point.
+And uh I hope you get some value out of this video.
+So I'll talk to you guys later.
+See?

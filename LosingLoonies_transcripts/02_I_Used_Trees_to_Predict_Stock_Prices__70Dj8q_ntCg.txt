@@ -1,0 +1,109 @@
+Kind: captions Language: en Everyone told me to use a transformer, but they were all wrong.
+For financial data, there's something that's much better, and it beat the neural network I spent a year building.
+Allow me to introduce decision trees.
+And if you're new here, I'm a PhD physicist, and I spent the last year after my day job building the most over-engineered stock predictor I possibly could, publicly and with your suggestions.
+It takes in company fundamentals, news sentiment, insider trading filings, and a pile of technical indicators, and tries to predict where a thousand stock tickers are going.
+It's an LSTM, or long short-term memory model.
+You told me that LSTMs are not suitable for stock prediction, and you're absolutely correct.
+Here's the thing, an LSTM is built for sequences, and my data isn't really a sequence, it's just a [music] big table, big spreadsheet full of indicators, one row per day.
+Everyone said to look at transformers, but transformers are also built for sequences.
+So, what does work?
+Apparently, decision trees.
+The backtest actually outperformed both the spy and old LSTM, but with some major caveats, and you'll soon find out what I mean by that in a little bit.
+So, meet XGBoost.
+XGBoost stands for extreme gradient boosting, and underneath the intimidating name, it's really just a flowchart.
+Super simple.
+One decision tree is just a series of yes or no questions.
+Is volatility above this level?
+Is MACD positive?
+Yes, yes, no.
+Okay, then the stock probably goes up.
+Straightforward, but a single tree is almost useless, so the trick is boosting.
+Now, let's try to imagine guessing the price of a car as an analogy, but you don't really know where to start, so maybe let's just guess $10,000 for absolutely every car in the market.
+The decision tree asks, is there high mileage on this car?
+Yes, okay, then let's take $2,000 off.
+New tires?
+Add $500.
+And you stack up a bunch of questions and answer until you're left with the final price.
+But we're applying that to stocks, obviously, not cars.
+Between 2015 and 2019, gradient boosted trees won more than half of all winning Kaggle competitions on tabular data.
+So, it is good.
+So, let's run the comparison.
+My old LSTM against the new model.
+The only thing that changes is the model, of course.
+All the data stays the same.
+Before I could run the fight, I had to audit my own pipeline because it's extremely easy to write a bug that makes you look brilliant.
+First, my 6-month labels could straddle the boundary between training and testing data, which is a pretty big mistake, meaning the model could technically peek into the future.
+So, I had to fix this first.
+Now, the fix is straightforward.
+It's just a purge and embargo.
+And if you don't know what that means, that's fine.
+It's basically just a gap between the training data and the testing data, about 6 months worth.
+Then, I built the XGBoost side, and building it was mostly deleting things.
+No 60-day window, no Monte Carlo dropout, no attention layer.
+This is much simpler than before.
+Life is great.
+Okay, let's test the AUC, and forget about money for a second, which, yeah, I know, it's hard.
+AUC is the probability the model gives the winner a higher score than the loser.
+A 0.5 is just a random guess, and a 1.0 means it always gets that order correct.
+The flowchart from 2014 ranks stocks better than the neural network I've spent a year on, consistently, which sucks.
+And my first thought was not nice.
+My first thought was that I probably have a leak somewhere.
+Trees find leaks fast.
+And if there's a feature in there that secretly encodes the future, XGBoost will sniff it out, and it'll look like a genius for about 9 seconds until somebody in the comments finds it.
+So, a couple of checks first.
+We can look towards the feature importance, which describes, well, how important a feature is in constructing our prediction model.
+The most important features are nothing that are future-looking.
+A leak usually shows up as one feature doing extremely well as compared to the others.
+Also, the difference in accuracy between either model right now is modest.
+And if the trees had crushed me, I'd be a little bit suspicious.
+A small consistent win is exactly what the research predicts for trees on daily tabular data.
+It's real small, yes, but it is real.
+The boring model also ranks better, which raises the only question anyone actually cares about.
+Does the model make money?
+For reference, [music] here's a single run of the old LSTM method.
+The AI portfolio is the green line and the thin gray lines are randomly bought stocks in our ticker list.
+So, it describes the spread of random buyers.
+We only allow the algorithm to buy stocks from our list and in that list, we only have stocks that survived.
+So, there is a lot of survivorship bias.
+Now, because of this, we actually expect the LSTM model to outperform the spy, but it actually performs worse, which is surprising.
+So, what about the decision trees?
+Initially, they do pretty well, but the volatility is clearly much higher.
+In the end, we end up with a compound annual growth rate of 61%, which is about six times better than the average market [music] return.
+My LSTM, the thing I've built for a year now, the thing with the attention layer, the Monte Carlo dropout, it did 4.4%.
+Yikes.
+That was a year of work.
+It wasn't even close.
+The decision trees just invalidated all the progress I've made on this LSTM.
+But, look at this.
+XGBoost turned into a day trader.
+Almost every trade in its log is a one-day hold.
+Why?
+Because its one-day model was both its most accurate and its most confident.
+The backtest picks the highest probability candidate each day, so it just keeps picking these one-day bets.
+However, my LSTM turned into a buy and holder.
+Its probabilities were weak, so it made 32 trades and sat in positions for months.
+But, I've been fooled by a pretty backtest before.
+So, let's use some critical thinking before we throw our entire portfolio into this bad boy.
+First, how much risk did it take to get there?
+The trees are still better, but I got there at 85% annualized volatility with a 63% drawdown.
+It nearly lost two-thirds of its account [music] on the way to that number.
+So, a bit too much risk for me.
+Second question, is it actually making better calls per trade?
+It looks like they're the same, both near a coin flip.
+It just makes more trades.
+A profit factor of 1.39 across 236 trades is a very tall tower built on a very thin ledge.
+We also didn't factor in trading fees.
+So, yeah.
+So, So put a cost knob in the backtest and you can see that once this is factored in, well, you can see for yourself.
+Of course, we did make improvements, and it isn't fair to push that aside because eventually this could be good enough where trading fees don't actually hurt you as much.
+But let's compare this to the spy.
+Just buying the S&amp;P 500 and doing absolutely nothing gave plus 62% at less than 1/3 of the risk.
+And once you charge realistic trading costs, my tree model lands right about at the break-even point.
+The best risk-adjusted return in this whole experiment came from the guy who just bought an index fund and then went outside for a walk.
+The trees genuinely outranked my year of LSTM work, which is actually great.
+It's real progress.
+So if you want to mess around with this code yourself, I've included links in the description to the GitHub repository.
+All public repos are made available to anyone, and the stock predictor is made available to you upon becoming a GitHub sponsor.
+Yes, I'm still paying those damn student loans.
+I'll see you guys in the next one.

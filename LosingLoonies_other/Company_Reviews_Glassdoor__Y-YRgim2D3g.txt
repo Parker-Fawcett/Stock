@@ -1,0 +1,97 @@
+Kind: captions Language: en I want to become an insider trader, but how does one become an insider trader with absolutely no insider knowledge?
+Allow me to explain.
+We have been building an AI stock predictor for several months now, and despite what every finance bro on YouTube tells you, nothing actually works.
+But I'm a physicist.
+I'm a problem-solver, [music] so I had to get a little bit creative.
+We find ourselves in a time where one stray Trump tweet can bring the market crashing down.
+So how are we going to compete with this, guys?
+The solution?
+Glassdoor.
+A place where disgruntled employees will come to complain about their organization.
+Do you hate your CEO?
+Come and write a review.
+Do you love your work culture?
+Come and leave a review.
+And there are so many reviews on this website, literally hundreds of thousands.
+This tree diagram shows the number of companies that received a review on the vertical axis.
+This evolves in time where a new branch is created for every new review included for a given company.
+My hypothesis is that bad reviews could indicate a company's likelihood to do better or worse over time.
+And since the source is coming from people that actually work at the company, I mean, guys, this is like the closest thing to insider trading that we can get without becoming senators ourselves.
+Let's not do that.
+Now, Glassdoor could be an indicator of company health, and it's just so weird and uncommonly discussed that there could be real patterns to take advantage of that firms have not yet found.
+And thankfully, I don't have to illegally perform web scraping because these fantastic data sets already exist online with Glassdoor reviews.
+Thank you to the person that definitely did not break terms of service to get this.
+Before diving right in, we should understand the fundamental baseline structure of this data.
+going to create some basic structure just to look at, you know, a bunch of parameters in this code, whatever I find interesting.
+So here are six histograms showing how the company is actually being rated by its employees.
+You can see for the most part, a lot of people actually prefer their company.
+They're giving them four or five-star ratings.
+People really appreciate the culture, the overall rating, you know, so on and so forth.
+There's a bunch of things.
+For the most part, it actually skews to the right, which is positive, until you get to the ratings of the management, which yeah, it kind of makes sense.
+Most people [&nbsp;__&nbsp;] hate management, so yeah, this is kind of all over the place.
+But what I want to know is can we find reviews that are consistently getting worse over time, which is indicating some fundamental problem within the company.
+So I wrote a script to find three companies that had average reviews trending in a negative direction.
+Like, [&nbsp;__&nbsp;] what is Metro Bank?
+XPO Logistics.
+Oh, yeah, okay, Facebook.
+I know this one.
+Yeah, yeah, yeah.
+And what's this I see?
+Is this Facebook having a negative review score that's consistently getting worse and worse and worse in time from 2017 to 2021?
+I wonder what their stock market price was doing.
+Oh, okay, yeah, it was doing It was doing great, actually.
+Okay.
+Oh, my [&nbsp;__&nbsp;] Oh, no, it's like the employees actually saw it before the stock market did.
+Okay, we're not onto something.
+We We cannot be onto something.
+There's no way that the firms haven't caught onto this, right?
+Employee reviews?
+This is something everyone should know.
+All right, I mean, let's let's let's keep looking at the data.
+Let's keep looking at the data.
+I started to question what the data actually looks like in time cuz it's just one instance.
+And okay, well, that didn't really answer anything.
+It's kind of interesting to see that if we do a rolling average of 100 reviews in time, some of them are kind of smoothed out, and you can see there's periods of positivity and negativity in the trends, sure.
+But [&nbsp;__&nbsp;] McDonald's has so many reviews that a 100 review rolling average isn't able to smooth out the noise.
+As you can expect, you can see that there's some companies that see ratings decline sharply for one reason or the other.
+So sure, maybe in some instances, companies get bad reviews, but it doesn't predict a stock value crashing.
+I mean, come on.
+So our real question is, what is the relationship between positive reviews and the future company's price?
+So what we actually care about here is the correlation between those two [music] parameters.
+So here are the correlations for a bunch of stocks.
+Now, the way I've set this data up is that a positive correlation means that the Glassdoor reviews are getting more and more positive in time.
+And it also happens to be that the future stock value about 6 months in advance is also going up.
+On the left-hand side is a negative correlation, which means that the company reviews are getting better and better in time, but the future stock value actually went down.
+If there was a true correlation, there'd just be a bunch of data on one side and not the other.
+But hold on, this is a lot of data, and this is just one statistic.
+So maybe we can experiment with a machine learning model to find these subtle correlations in this data set.
+I then proceeded to import the data, verify the data was not crap, write the model, train the model, evaluate its accuracy, and also review something that is critical, the baseline accuracy, because it's the simplest, most brainless strategy.
+You just always buy.
+This is an important comparison to make because imagine every stock in your data set trended upwards with absolutely no down days.
+Always buying everything would give you a 100% win rate, but it doesn't mean that your model actually learned anything, so we do need to compare to this baseline.
+Oh.
+Okay.
+That didn't really work, then, did it?
+Let's be real, guys.
+There was no way I was about to plug in some Glassdoor reviews and get a prediction of a future company's value.
+This is not how the world works.
+But you can't tell me that this Facebook data doesn't look a little bit suspicious.
+I mean, is it a potential indicator?
+Maybe.
+So pairing this with company fundamentals, news sentiment scoring, fear and greed correlations, everything that we've done before could actually be a genuine benefit.
+I mean, this is what we've been dying for, guys, some sort of edge, something that nobody has thought of before.
+And that's exactly what these Glassdoor reviews are.
+Oh, wait, no.
+How are we going to get the data?
+Okay, so there's one fundamental problem with this, which is we actually need to get the data because so far I've been using a data set on Kaggle.
+If we were doing this for real, we would need to find a way to pull all of this data from Glassdoor reviews for any company that we want.
+And that gets into a little bit of complexity, violating terms of service, whatever, right?
+Okay.
+So if you guys want to see me build an illegal web scraper, leave a comment below.
+We are getting IP banned, boys.
+If you guys want to see more stupid stuff like this, please subscribe so you don't miss the next one.
+Leave a comment below telling me what you want to see me improve, and I'll just do it, okay?
+I'll see you guys in the next one.
+Take care.
+One more about that.
