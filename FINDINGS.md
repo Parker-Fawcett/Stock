@@ -51,6 +51,11 @@ move a verdict.
 11. **Textbook 12-1 momentum, no ML.** Small: tune +9.5% (Sharpe 0.41),
     holdout +16.3% (Sharpe 0.20). Mid: tune +3.3%, holdout +15.1%.
     Positive every half, both universes. Best result in the project.
+12. **Ensemble (50% ML-wide + 50% momentum, zero new params).** Tune:
+    ml -2.2% (Sharpe -0.10), mom +8.7% (+0.40), ens +3.1% (+0.17). Bar
+    was Sharpe > 0.41 with DD > -0.31. Failed — averaging dilutes.
+    The ML adds nothing to momentum. Buried as a signal; kept running
+    in paper only as the losing side of the bet.
 12. **Value lane, real data (12 mega caps, FMP annuals).** Median
     price/IV 2.77 — mega caps never near Graham value. d0.5: zero trades.
     d0.0: +2.7% vs +8.1% fair benchmark, avg 0.4 names. Free FMP caps
