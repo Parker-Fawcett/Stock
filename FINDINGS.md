@@ -94,6 +94,17 @@ which strengthens holdout results and weakens tune ones.
     start Oct 2021): +12.7%/yr vs SPY +10.2%, 4/4 positive years.
     Illustrative only (4 decisions prove nothing), direction matches
     French RMW +2.4%/yr. Costs negligible at 1 rebalance/yr.
+17. **Self-improvement round three (P9 breadth, P10 selectivity).**
+    P9-top30: tune Sharpe 0.59, DD -0.30, passes bar. Promoted once:
+    holdout **+4.3%, DD -0.40, Sharpe 0.16** — positive, weakest
+    promotion yet, DD breached bar out-of-sample again. P10-gate35:
+    Sharpe 0.33, dead — tighter selection concentrated without paying.
+    Budget: 10/20 left.
+18. **Multi-asset trend, quarterly rebalance (Faber's turnover note).**
+    Tune +5.8% (Sharpe 0.58, DD -0.13), holdout +5.8% (Sharpe 0.51,
+    DD -0.27). Identical halves, lower turnover than monthly, same
+    calm profile. Slow ≈ same, cheaper. (Also fixed a slice-CAGR bug
+    that had inflated momentum holdout prints; Sharpe/DD unaffected.)
 12. **Value lane, real data (12 mega caps, FMP annuals).** Median
     price/IV 2.77 — mega caps never near Graham value. d0.5: zero trades.
     d0.0: +2.7% vs +8.1% fair benchmark, avg 0.4 names. Free FMP caps
