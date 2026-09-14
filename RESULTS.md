@@ -3,14 +3,14 @@
 This is the maintained product view of the research. `FINDINGS.md` keeps
 the full history, including failed tests and superseded numbers.
 
-**Last reconciled:** September 13, 2026  
+**Last reconciled:** September 14, 2026  
 **Research posture:** promising momentum result; not ready for real capital.
 
 ## Verdict board
 
 | Line | Status | Current verdict |
 |---|---|---|
-| Textbook 12-1 momentum | **SURVIVED — provisional** | Positive in every tested half. Small-cap beats matched-window SPY in both halves; mid-cap beats it in holdout. Yahoo survivor bias remains. |
+| Textbook 12-1 momentum | **SURVIVED — provisional** | Positive in every tested half, resampling-robust (bootstrap CI stays positive). Beats matched-window SPY on point estimate in both halves (small-cap) / holdout (mid-cap), but that margin's 95% CI crosses zero — directional, not statistically confident. Yahoo survivor bias remains. |
 | Price-based tree ML | **WEAK / NOT USEFUL** | Ranking survives at mean AUC 0.554, but the portfolio is unstable and weaker than momentum. |
 | ML + momentum | **FAILED** | Adding ML reduces CAGR and Sharpe in both halves. |
 | Self-improvement overlays | **MIXED / PIPELINE-SENSITIVE** | On original dates with the fixed ledger, only P5 stays positive. With leak-fixed probabilities and shifted folds, all four are strongly positive later—but none passes that cache's tune gate. |
@@ -39,6 +39,18 @@ Matched-window buy-and-hold SPY returned 11.9% and 16.9% in the two
 momentum halves. The small-cap momentum result is ahead by 5.9 and 4.8
 percentage points respectively. That comparison uses the same dates and
 annualization convention.
+
+A moving-block bootstrap (6-month blocks, 5,000 resamples) on the holdout
+half's monthly excess return over SPY gives a 95% CI of [-0.7%, +1.9%] per
+month for small-cap and [-0.5%, +2.4%] for mid-cap — both cross zero. Mean
+monthly return, CAGR, and Sharpe all stay positive throughout their own
+intervals; only the SPY comparison specifically isn't statistically
+distinguishable from zero at this sample size. CAPM/FF5+Mom regressions add
+one more qualifier: small-cap keeps a marginally significant alpha (+9.0%/yr,
+\(t\)=2.14) after controlling for standard factors including momentum itself,
+but mid-cap's alpha (+0.9%/yr, \(t\)=0.18) does not — most of mid-cap's edge
+is factor exposure, not something beyond it. Full tables in `FINDINGS.md` and
+`PAPER.md` Section 6.5.
 
 ## Self-improvement replay sensitivity
 

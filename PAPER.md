@@ -25,7 +25,9 @@ conclusions move materially even though headline classifier accuracy does not.
 A simpler 12-minus-1-month momentum rule is more stable: after correcting the
 ledger, it produces positive results in both halves of two current-constituent
 universes and outperforms matched-window SPY buy-and-hold in three of four
-universe-period comparisons. A separate point-in-time, dynamic-universe
+universe-period comparisons, though a moving-block bootstrap on the holdout
+half shows this outperformance is directional rather than statistically
+distinguishable from zero. A separate point-in-time, dynamic-universe
 QuantConnect implementation remains strongly positive, although it is not a
 matched estimate of the local backtest. The evidence supports a methodological
 conclusion rather than a claim of newly discovered alpha: portfolio selection
@@ -397,6 +399,53 @@ QuantConnect applies a different execution and fee model. The magnitude could
 reflect those differences. A common-period, comparable-universe experiment is
 still required.
 
+### 6.5 Factor exposure and resampling uncertainty
+
+Section 9 items 1-2 are now complete. We regress each momentum series' monthly
+excess return (over the one-month T-bill) on the Fama-French five factors [7]
+plus a momentum factor [8], using Newey-West standard errors with three lags
+to account for autocorrelation from the 21-trading-day holding period [6].
+Each decision-date
+return is assigned to the calendar month in which it is realized.
+
+**Table 5. CAPM and Fama-French-5-plus-momentum regressions, full sample
+(185 months, March 2011-July 2026)**
+
+| Universe | CAPM alpha (annualized) | \(t\) | FF5+Mom alpha (annualized) | \(t\) | \(R^2\) | Momentum beta | Size beta |
+|---|---:|---:|---:|---:|---:|---:|---:|
+| Small cap | +5.8% | 1.09 | +9.0% | 2.14 | 0.65 | 0.43 (\(t\)=4.9) | 0.96 (\(t\)=6.3) |
+| Mid cap | +1.5% | 0.29 | +0.9% | 0.18 | 0.62 | 0.70 (\(t\)=5.7) | 0.68 (\(t\)=2.4) |
+
+Small-cap momentum retains a marginally significant alpha after controlling
+for market, size, value, profitability, investment, and the academic momentum
+factor itself, at conventional (uncorrected) significance. Mid-cap alpha is
+statistically indistinguishable from zero once those factors are priced in:
+most of its apparent edge loads on known factors, principally momentum and
+size, rather than on something beyond them. Neither figure carries a
+multiple-testing correction; that adjustment is Section 9 item 3.
+
+We next construct a moving-block bootstrap (block length six months, 5,000
+resamples, circular resampling to preserve series length) over the holdout
+half only, for mean monthly return, CAGR, annualized Sharpe ratio, and mean
+monthly excess return over SPY measured on the same decision dates.
+
+**Table 6. Moving-block bootstrap 95% confidence intervals, holdout half
+(94 months)**
+
+| Universe | Mean monthly return | CAGR | Sharpe | Mean monthly excess vs. SPY |
+|---|---|---|---|---|
+| Small cap | +2.06% [+0.58%, +3.68%] | +21.7% [+1.9%, +47.6%] | 0.78 [0.22, 1.46] | +0.59% [-0.66%, +1.85%] |
+| Mid cap | +2.30% [+0.70%, +4.27%] | +24.7% [+3.7%, +54.5%] | 0.81 [0.27, 1.35] | +0.79% [-0.53%, +2.36%] |
+
+Mean return, CAGR, and Sharpe intervals stay entirely positive in both
+universes; the result that momentum makes money in the holdout period is
+resampling-robust. The excess-over-SPY interval crosses zero in both
+universes. A positive point estimate against a matched benchmark is not the
+same claim as a statistically distinguishable one, and Section 6.2's
+comparison should be read with that distinction: the point estimate and the
+window-matching methodology are correct, but the outperformance itself is
+directional, not confidently established, at this sample size.
+
 ## 7. Discussion
 
 The main result is a disconnect between global predictive stability and local
@@ -457,11 +506,10 @@ low portfolio overlap.
 The following analyses will be completed without changing the frozen momentum
 or machine-learning decision rules.
 
-1. Report moving-block-bootstrap confidence intervals for mean monthly return,
-   CAGR, Sharpe difference, and momentum-minus-SPY return.
-2. Estimate CAPM and Fama-French five-factor-plus-momentum regressions using
-   monthly portfolio returns, with heteroskedasticity and autocorrelation
-   consistent standard errors.
+1. **Done (Section 6.5).** Moving-block-bootstrap confidence intervals for mean
+   monthly return, CAGR, Sharpe, and momentum-minus-SPY return.
+2. **Done (Section 6.5).** CAPM and Fama-French five-factor-plus-momentum
+   regressions on monthly portfolio returns, with Newey-West standard errors.
 3. Report the Deflated Sharpe Ratio using the documented research-trial count
    and return skewness and kurtosis; add a conservative sensitivity range that
    includes informal trials.
@@ -543,6 +591,18 @@ https://doi.org/10.3905/jpm.2014.40.5.094
 “Research Guide: Survivorship Bias.” Accessed September 2026.
 https://www.quantconnect.com/docs/v2/cloud-platform/datasets/quantconnect/auxiliary-data
 
+[6] Newey, W. K., and West, K. D. (1987). “A Simple, Positive Semi-Definite,
+Heteroskedasticity and Autocorrelation Consistent Covariance Matrix.”
+*Econometrica*, 55(3), 703–708. https://doi.org/10.2307/1913610
+
+[7] Fama, E. F., and French, K. R. (2015). “A Five-Factor Asset Pricing
+Model.” *Journal of Financial Economics*, 116(1), 1–22.
+https://doi.org/10.1016/j.jfineco.2014.10.010
+
+[8] Carhart, M. M. (1997). “On Persistence in Mutual Fund Performance.”
+*The Journal of Finance*, 52(1), 57–82.
+https://doi.org/10.1111/j.1540-6261.1997.tb03808.x
+
 ## Appendix A. Reproduction map
 
 | Result | Repository entry point | Evidence artifact |
@@ -553,6 +613,7 @@ https://www.quantconnect.com/docs/v2/cloud-platform/datasets/quantconnect/auxili
 | Corrected ML/momentum ensemble | `ens_test.py` | `data/cache/sc_full_v2/` plus console summary recorded in `FINDINGS.md` |
 | Dynamic-universe momentum check | `qc_momentum.py` | QuantConnect result recorded in `FINDINGS.md` and `RESULTS.md` |
 | Immutable prospective series | `paper.py` | `data/paper/runs/`, `data/paper/log_v2.csv`, `data/paper/grades_v2.csv` |
+| Factor regressions and bootstrap CIs | `factor_analysis.py` | Ken French factor cache (`predictor/factors.py`), console summary recorded in `FINDINGS.md` |
 
 ## Appendix B. Evidence-status vocabulary
 

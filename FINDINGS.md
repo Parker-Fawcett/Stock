@@ -811,3 +811,46 @@ block-bootstrap uncertainty, factor regressions, multiple-testing adjustment,
 a matched QuantConnect comparison, selection-stability figures, artifact-level
 provenance, and prospective observations. The eight remaining improvement-loop
 trials stay banked while this measurement work is open.
+
+## Bootstrap and factor regressions (Sep 14, 2026)
+
+`factor_analysis.py` runs the first two items from PAPER.md Section 9 against
+Ken French's public data library (Fama-French 5 + momentum, monthly, through
+Jul 2026 — same source and coverage as the earlier "Factor regimes" section).
+No rule was retuned; this only adds uncertainty quantification around numbers
+already reported. `predictor/factors.py` caches the download; `statsmodels`
+added to `requirements.txt` for HAC (Newey-West, 3 lags) standard errors.
+
+**CAPM / FF5+Mom regressions, full sample (185 months, Mar 2011-Jul 2026),
+monthly momentum return realized the calendar month after its decision date:**
+
+| Universe | CAPM alpha (ann.) | t | FF5+Mom alpha (ann.) | t | R² | Mom beta | SMB beta |
+|---|---:|---:|---:|---:|---:|---:|---:|
+| Small-cap | +5.8% | 1.09 | +9.0% | **2.14** | 0.65 | +0.43 (t=4.9) | +0.96 (t=6.3) |
+| Mid-cap | +1.5% | 0.29 | +0.9% | 0.18 | 0.62 | +0.70 (t=5.7) | +0.68 (t=2.4) |
+
+Small-cap momentum keeps a marginally significant alpha after controlling for
+market, size, value, profitability, investment, and the academic momentum
+factor itself. Mid-cap's alpha is statistically indistinguishable from zero
+once those factors are priced in — most of its apparent edge is loading on
+known factors (mainly momentum and size), not something beyond them. Neither
+number has a multiple-testing adjustment yet (Section 9 item 3, not run here).
+
+**Moving-block bootstrap, 95% CI, holdout half only (94 months, block=6,
+5,000 resamples):**
+
+| Universe | Mean monthly ret | CAGR | Sharpe | Mean monthly excess vs SPY |
+|---|---|---|---|---|
+| Small-cap | +2.06% [+0.58%, +3.68%] | +21.7% [+1.9%, +47.6%] | 0.78 [0.22, 1.46] | +0.59% [-0.66%, +1.85%] |
+| Mid-cap | +2.30% [+0.70%, +4.27%] | +24.7% [+3.7%, +54.5%] | 0.81 [0.27, 1.35] | +0.79% [-0.53%, +2.36%] |
+
+Mean return, CAGR, and Sharpe are positive throughout their intervals in both
+universes — the "momentum makes money" result holds up under resampling.
+**The excess-vs-SPY interval crosses zero in both universes.** "Momentum vs.
+SPY, closed out" above reported the right point estimate and the right
+methodology fix (same window, same dates), but a point estimate beating SPY
+is not the same claim as beating SPY with statistical confidence — that
+section's title overstates what a single-path comparison can close out. The
+honest read: small- and mid-cap momentum's outperformance over SPY in this
+window is directionally consistent but not distinguishable from zero once
+monthly-return sampling noise is accounted for.
