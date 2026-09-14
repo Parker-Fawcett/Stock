@@ -71,7 +71,10 @@ which strengthens holdout results and weakens tune ones.
     ml -2.2% (Sharpe -0.10), mom +8.7% (+0.40), ens +3.1% (+0.17). Bar
     was Sharpe > 0.41 with DD > -0.31. Failed — averaging dilutes.
     The ML adds nothing to momentum. Buried as a signal; kept running
-    in paper only as the losing side of the bet.
+    in paper only as the losing side of the bet. (SUPERSEDED Sep 13,
+    2026: rerun with fresh, leak-fixed probabilities and the corrected
+    momentum ledger — same conclusion, new numbers, see "Rerun under
+    corrected ledger" below.)
 13. **Self-improvement loop, round one (6 proposals, tune-half).**
     P1 printed Sharpe 2.9/CAGR 2900% — investigated, not celebrated:
     nine idiosyncratic biotech/crypto doubles in 1–2 name books during a
@@ -350,7 +353,7 @@ same universes. This is the correctness-first replay REVIEW.md recommended,
 not new strategy search. Everything numbered above (11, 12, 18, 20, and the
 AUC-dependent items) needs a rerun before its number can be cited again.
 
-## Rerun under corrected ledger: momentum and multi-asset (Sep 13, 2026)
+## Rerun under corrected ledger: momentum, multi-asset, ensemble (Sep 13, 2026)
 
 `mom_run.py` and `multi_run.py` rerun after fixing the log-return-averaging
 bug (#4 above), same rules/thresholds/universes/costs, no retuning. One
@@ -412,10 +415,39 @@ different price series (SPY vs this rerun's IWM-relative momentum) and
 hasn't been checked apples-to-apples yet. Needs a direct SPY-benchmarked
 rerun before the regime-correction verdict is revised either way.
 
-`ens_test.py` (the ML/momentum ensemble) was not rerun here — it needs
-fresh probabilities from the walk-forward leak fix first, and averaging
-a fresh ML leg with these new momentum numbers before that regeneration
-would just manufacture a different wrong number.
+`ens_test.py` (the ML/momentum ensemble) was not rerun in the entry
+above — it needed fresh probabilities from the walk-forward leak fix
+first. Done as a follow-up (Sep 13, 2026, same day): regenerated via
+`run.py` on the same smallcap universe (minus `LEG`, price-only —
+matching what `paper.py` actually deploys, no insider merge), 26 folds
+of 7-month test windows, 3 seeds each, cached to
+`data/cache/sc_full_v2` (old cache kept at `data/cache/sc_full`, 24
+folds, for comparison — fold count shifted from the LEG drop, the purge
+fix changing which folds clear the row-count gate, and more price
+history since that cache was built).
+
+**Mean AUC over 78 fits: 0.554** — essentially unchanged from the
+pre-fix 0.550 this file has cited for small-cap price-only ML (item 4).
+Unlike the momentum log-averaging bug, the walk-forward leak turned out
+not to move this particular number much in practice, even though the
+leak itself (validation labels touching the test window) was real and
+is still worth having fixed for any future retuning.
+
+**Ensemble (supersedes item 12), fresh probabilities + fresh momentum leg:**
+| | tune CAGR | tune Sharpe | tune DD | hold CAGR | hold Sharpe | hold DD |
+|---|---:|---:|---:|---:|---:|---:|
+| ML alone | -0.1% | 0.13 | -0.62 | +8.9% | 0.38 | -0.43 |
+| Momentum alone | +14.8% | 0.76 | -0.24 | +17.9% | 0.64 | -0.41 |
+| 50/50 ensemble | +8.6% | 0.54 | -0.41 | +15.4% | 0.60 | -0.41 |
+
+Conclusion unchanged, on corrected numbers: the ensemble underperforms
+momentum alone on both CAGR and Sharpe in both halves — averaging in a
+weaker, more-drawdown-prone ML leg still dilutes rather than helps. The
+item-12 pre-committed bar (Sharpe > 0.41, DD > -0.31) was itself built
+from the momentum figures this session has since revised upward
+(item 11 rerun above); fresh momentum alone clears that bar easily now,
+so the bar is no longer the meaningful comparison — momentum-alone vs
+ensemble, both on fresh numbers, is, and momentum alone still wins.
 
 ## Dump (everything, unstructured, Sep 2026)
 
