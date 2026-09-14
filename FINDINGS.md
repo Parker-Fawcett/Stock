@@ -458,6 +458,23 @@ member, so this check cannot attribute the reversal to leakage alone. The
 defensible conclusion is that the overlay result is highly pipeline-sensitive.
 Publish both vintages and accumulate genuinely prospective observations.
 
+**What the two caches' probabilities actually look like, row for row**
+(`cache_compare.py`, common `(Date, ticker)` rows in the shared window
+above): labels and prices agree exactly, as expected — the leak is in
+training/calibration, not in the raw data. AUC is statistically identical
+on this common subset, 0.543 for both vintages, and per-date rank
+correlation is decent (Spearman 0.74 median). But the actual top-20,
+threshold-0.25 picks each month overlap by only **Jaccard ~0.38** between
+the two vintages — roughly 62% of names selected differ month to month.
+That is a concrete, separate mechanism from the window/fold confounds
+above: a model can be statistically indistinguishable on aggregate rank
+quality while still selecting a mostly different portfolio at the
+threshold, and small-cap monthly return dispersion is large enough that
+which specific ~10 names get picked swamps how good the ranking is
+overall. This narrows "pipeline-sensitive" to something more specific —
+the reversal is consistent with calibration/threshold sensitivity, not
+proof of it, since fold/window differences remain unremoved confounds.
+
 ## Rerun under corrected ledger: momentum, multi-asset, ensemble (Sep 13, 2026)
 
 `mom_run.py` and `multi_run.py` rerun after fixing the log-return-averaging
