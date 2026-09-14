@@ -84,13 +84,15 @@ which strengthens holdout results and weakens tune ones.
     no month above +25%) passed clean: tune Sharpe 0.68, DD -0.26.
     Promoted once to holdout: **CAGR +12.7%, DD -0.35, Sharpe 0.41**
     through COVID, 2022 bear, and recovery at 25bps. First ML config
-    with a clean stress-period holdout. Budget: 14/20 left.
+    with a clean stress-period holdout. Budget: 14/20 left. (SUPERSEDED
+    Sep 13, 2026: pre-fix ledger result; corrected replay is +6.3%/-0.37/0.35.)
 14. **Self-improvement round two (P7 liquidity, P8 vol scaling).**    P7: Sharpe 0.56 pass, DD -0.361 — missed the -0.35 bar by 0.011.
     Dead by the letter of the law, stated openly. P8 (per-name inverse-
     vol sizing): tune Sharpe 0.63, DD -0.27. Promoted once: holdout
     **CAGR +6.1%, DD -0.39, Sharpe 0.22**. Positive through stress,
     shrunk as honest results do (DD breached -0.35 out-of-sample, which
     is itself a finding about bar-setting). Budget: 12/20 left.
+    (SUPERSEDED Sep 13, 2026: corrected replay is -2.0%/-0.42/0.02.)
 15. **Vol-scaled monkeys (is P8 just risk parity?).** Random 20-name
     books with inverse-vol sizing, tune-half: CAGR +3.0%, DD -0.22,
     Sharpe 0.22 vs P8's 0.63/-0.27. Verdict: sizing explains ~a third
@@ -106,7 +108,8 @@ which strengthens holdout results and weakens tune ones.
     holdout **+4.3%, DD -0.40, Sharpe 0.16** — positive, weakest
     promotion yet, DD breached bar out-of-sample again. P10-gate35:
     Sharpe 0.33, dead — tighter selection concentrated without paying.
-    Budget: 10/20 left.
+    Budget: 10/20 left. (SUPERSEDED Sep 13, 2026: corrected P9 replay is
+    -2.1%/-0.42/0.01.)
 21. **Self-improvement round four (P11 short holds, P12 max breadth).**
     P11-hold10: Sharpe -0.22, dead — monthly decisions with 10d holds
     double turnover and go stale faster; direction was wrong. P12-top40:
@@ -115,6 +118,8 @@ which strengthens holdout results and weakens tune ones.
     corroborates rather than duplicates). Promoted once: holdout
     **+3.5%, DD -0.41, Sharpe 0.14**. Fourth straight decaying
     promotion (+12.7 → +6.1 → +4.3 → +3.5). Budget: 8/20 left.
+    (SUPERSEDED Sep 13, 2026: corrected P12 replay is -2.0%/-0.41/0.02;
+    the sequence quoted here is historical.)
 18. **Multi-asset trend, quarterly rebalance (Faber's turnover note).**
     Tune +5.8% (Sharpe 0.58, DD -0.13), holdout +6.9% (Sharpe 0.60,
     DD -0.27). Monthly version: tune +7.3% (0.82), holdout +7.4%
@@ -190,7 +195,7 @@ Both ML halves were bull markets, not one calm + one stress:
 tune 2013–19 SPY +12.6%/IWM +8.9%; holdout 2019–25 SPY +15.1%/IWM +7.4%
 (crashes inside, V-recoveries after). Best case for the ML config
 anywhere is a tie on risk-adjusted terms (multi-asset Sharpe 0.82 vs
-SPY ~0.8); P5's ML config (+12.7%) genuinely trails SPY's +15.1% on
+SPY ~0.8); corrected P5 (+6.3%) genuinely trails SPY's +15.1% on
 this window — that comparison is apples-to-apples and stands.
 
 Momentum's wins were assumed relative, not absolute, when this section
@@ -310,15 +315,16 @@ US equity data (AlgoSeek/QuantQuote back to 1998, delistings included)
 — the first backtest here without the survivor asterisk. Open question:
 bulk download QCC costs on a free account; sample data first.
 
-## Decay meta-analysis (loop paused, 10 trials banked)
+## Corrected promotion meta-analysis (loop paused, 8 trials banked)
 
-Promoted holdout CAGRs decline in promotion order: P5 +12.7%, P8 +6.1%,
-P9 +4.3%. Tune Sharpes decline too (0.68/0.63/0.59). Every holdout DD
-breached its tune-set bar. Reading: each promotion mines a thinner vein
-and every round is another selection bite the budget only weakly prices.
-The loop worked (three clean promotions, all documented) and is now
-frozen until genuinely new data or a new game — spending the rest on
-this universe would be the slow version of the sin it guards.
+The original decay sequence (+12.7%, +6.1%, +4.3%, +3.5%) came from the
+pre-fix ledger and is superseded by the correctness replay below. All four
+proposals still clear their original tune gate, so the selection mechanism
+behaved as specified. Holdout is harsher: P5 stays positive at +6.3%, while
+P8, P9, and P12 are all about -2%. Every holdout drawdown breaches the
+tune-set bar. The loop is frozen until genuinely new data or a new game;
+spending the remaining eight trials on this universe would add selection
+pressure without creating a new independent test.
 
 ## Second accounting correction: label leak, paper dating, value engine, momentum accounting (Sep 13, 2026)
 
@@ -384,8 +390,34 @@ validated, until rerun.**
 
 None of these were retuned or re-selected — same rules, same thresholds,
 same universes. This is the correctness-first replay REVIEW.md recommended,
-not new strategy search. Everything numbered above (11, 12, 18, 20, and the
-AUC-dependent items) needs a rerun before its number can be cited again.
+not new strategy search. The promoted loop proposals, items 11, 12, 18, 20,
+and the AUC-dependent ensemble have now been replayed below. Historical paper
+rows and unreplayed experiments retain their explicit pre-fix status.
+
+## Rerun under corrected ledger: promoted loop proposals (Sep 13, 2026)
+
+`python3 improve.py replay-promoted` re-evaluates P5, P8, P9, and P12 with
+the same cached folds, rules, thresholds, universes, 25 bps cost assumption,
+and original tune/holdout split. It does not spend trial budget, alter proposal
+status, or overwrite the historical registry. The replay fixes simple-return
+portfolio accounting, weight-based turnover, actual gap-stop exits, cash
+exposure, and starting-equity drawdown measurement. It also fixes the risk
+scaler that previously reduced the number of names while leaving the book
+fully invested, increasing concentration instead of reducing exposure.
+
+| Proposal | Tune CAGR | Tune Sharpe | Tune DD | Holdout CAGR | Holdout Sharpe | Holdout DD |
+|---|---:|---:|---:|---:|---:|---:|
+| P5 lower gate | 13.0% | 0.70 | -31.3% | **6.3%** | 0.35 | -36.9% |
+| P8 inverse-vol weights | 11.8% | 0.67 | -32.4% | **-2.0%** | 0.02 | -42.0% |
+| P9 top 30 | 12.1% | 0.68 | -32.1% | **-2.1%** | 0.01 | -41.8% |
+| P12 top 40 | 11.9% | 0.68 | -32.1% | **-2.0%** | 0.02 | -41.3% |
+
+All four still pass the original tune bar of Sharpe > 0.41 and drawdown above
+-0.35. The promotions were therefore procedurally faithful, but their old
+performance claims were not robust to correct accounting. P5 remains positive
+and still trails matched-window SPY; the other three promotions fail outright.
+The near-identical P8/P9/P12 holdouts show that breadth variants did not rescue
+the weak ML signal once exposure was represented honestly.
 
 ## Rerun under corrected ledger: momentum, multi-asset, ensemble (Sep 13, 2026)
 
@@ -618,13 +650,13 @@ insider (C-suite >$50k first-buy, 458 months) 0.5554 vs 0.5587 — buried.
 Long-short Sharpe -0.03 — hedge cuts DD, short book earns nothing.
 Ensemble ML+momentum dilutes (0.17 vs 0.40) — ML adds nothing.
 
-Improve loop (budget 20, 10 left): P5-gate25 promoted (+12.7%/-0.35/0.41
-holdout through COVID+2022). P8-volscale promoted (+6.1%/-0.39/0.22).
-P9-top30 promoted (+4.3%/-0.40/0.16). P1 lottery artifact rejected openly
-(Sharpe 2.9 from 9 biotech/crypto doubles in 1-2 name books — real prices,
-verified CLSK tick by tick, meaningless stats). P7 died by 0.011 on the DD
-bar. P10, P2-P4, P6 dead on tune. Vol-monkeys +3%/0.22: sizing is a third
-of P8, selection the rest.
+Improve loop (budget 20, 8 left): corrected promotion replay — P5
++6.3%/-0.37/0.35 holdout; P8 -2.0%/-0.42/0.02; P9 -2.1%/-0.42/0.01;
+P12 -2.0%/-0.41/0.02. All passed the original tune gate, but three fail
+holdout after correcting return and exposure accounting. The registry retains
+the old figures as historical outputs. P1 lottery artifact is retracted as a
+stop-logic bug. P7 died by 0.011 on the original DD bar; P10, P2-P4, P6 died
+on tune. Earlier vol-monkey attribution is also pre-fix evidence.
 
 Momentum (no ML): small tune +9.5%/0.41/-0.31, hold +6.2%/0.20/-0.56. Mid
 tune +3.3%/0.15, hold +11.4%/0.35/-0.37. Positive every half both universes.

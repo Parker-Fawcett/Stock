@@ -15,6 +15,7 @@ Usage:
   python3 improve.py propose         # list pending (proposals are code)
   python3 improve.py round           # evaluate pending on tune-half
   python3 improve.py promote         # holdout once for the winner (if bar)
+  python3 improve.py replay-promoted # correctness replay; registry unchanged
 """
 from __future__ import annotations
 
@@ -378,9 +379,6 @@ def p_top40(test, proba, px):
     t = test.copy()
     tpx = t.set_index(["ticker", "Date"])["Close"].unstack("ticker")
     return _risk_book(t, proba, tpx, weight_fn=trailing_vol, top_n=40)
-    t = test.copy()
-    tpx = t.set_index(["ticker", "Date"])["Close"].unstack("ticker")
-    return _risk_book(t, proba, tpx, weight_fn=trailing_vol, thresh=0.35)
 
 
 PROPOSALS = {
@@ -417,15 +415,35 @@ def main() -> None:
     sub.add_parser("status")
     sub.add_parser("round")
     sub.add_parser("promote")
+    sub.add_parser("replay-promoted")
     args = ap.parse_args()
     log = read_log()
 
     if args.cmd == "status":
         print(f"budget: {BUDGET_TOTAL - log['spent']}/{BUDGET_TOTAL} left")
+        print("registry metrics are historical pre-fix outputs; "
+              "run replay-promoted for corrected promotion metrics")
         for pid, (fn, pred) in PROPOSALS.items():
             st = log["proposals"].get(pid, {"status": "pending"})
             print(f"{pid} [{st['status']}] pred: {pred} "
                   f"tune={st.get('tune')} hold={st.get('holdout')}")
+        return
+
+    if args.cmd == "replay-promoted":
+        # Correctness replay only: do not spend budget, change statuses, or
+        # overwrite the immutable historical registry.
+        folds = load_folds()
+        mid = len(folds) // 2
+        promoted = ("P5-gate25", "P8-volscale", "P9-top30", "P12-top40")
+        for half, selected in (("tune", folds[:mid]),
+                               ("holdout", folds[mid:])):
+            tickers = sorted({tk for t, _ in selected
+                              for tk in t["ticker"].unique()})
+            px = load_px(tickers)
+            for pid in promoted:
+                fn, _ = PROPOSALS[pid]
+                result = score(stitch([fn(t, p, px) for t, p in selected]))
+                print(f"{pid} {half}: {result}")
         return
 
     if args.cmd == "round":

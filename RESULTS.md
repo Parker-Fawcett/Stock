@@ -13,6 +13,7 @@ the full history, including failed tests and superseded numbers.
 | Textbook 12-1 momentum | **SURVIVED — provisional** | Positive in every tested half. Small-cap beats matched-window SPY in both halves; mid-cap beats it in holdout. Yahoo survivor bias remains. |
 | Price-based tree ML | **WEAK / NOT USEFUL** | Ranking survives at mean AUC 0.554, but the portfolio is unstable and weaker than momentum. |
 | ML + momentum | **FAILED** | Adding ML reduces CAGR and Sharpe in both halves. |
+| Self-improvement overlays | **FAILED AFTER CORRECTION** | All four passed their original tune gate, but only P5 stayed positive in holdout; P8, P9, and P12 fell to about -2% CAGR. |
 | Insider signals | **FAILED** | Raw and conviction-filtered Form 4 features do not improve the model. |
 | Multi-asset trend | **SURVIVED — defensive** | Trails SPY on raw return, with smoother drawdowns and better measured Sharpe. |
 | Graham value, mega caps | **FAILED FOR THIS UNIVERSE** | Few or no qualifying trades; paid point-in-time small-cap fundamentals would be a different test. |
@@ -33,6 +34,10 @@ implementation; the ensemble uses the same frozen 252/21 formation rule.
 | Momentum, ensemble window | 17.3% | 0.86 | -25.3% | 20.3% | 0.71 | -37.4% |
 | 50/50 ML + momentum | 9.8% | 0.60 | -42.3% | 16.5% | 0.63 | -38.2% |
 | Multi-asset trend | 8.0% | 0.95 | -13.2% | 8.0% | 0.74 | -23.3% |
+| P5 lower probability gate | 13.0% | 0.70 | -31.3% | 6.3% | 0.35 | -36.9% |
+| P8 inverse-volatility weights | 11.8% | 0.67 | -32.4% | -2.0% | 0.02 | -42.0% |
+| P9 wider portfolio | 12.1% | 0.68 | -32.1% | -2.1% | 0.01 | -41.8% |
+| P12 widest portfolio | 11.9% | 0.68 | -32.1% | -2.0% | 0.02 | -41.3% |
 
 Matched-window buy-and-hold SPY returned 11.9% and 16.9% in the two
 momentum halves. The small-cap momentum result is ahead by 5.9 and 4.8
@@ -44,7 +49,9 @@ annualization convention.
 The defensible research claim is narrow: cross-sectional momentum appears
 stronger and more useful than the tested machine-learning, insider, value,
 and ensemble variants. The ML rank contains a small statistical signal,
-but it has not improved portfolio construction.
+but it has not improved portfolio construction. A correctness replay of all
+four proposals promoted by the self-improvement loop reinforces that verdict:
+three are negative in holdout and the remaining one trails the index.
 
 The local stock lists contain companies that survive today. QuantConnect's
 point-in-time fundamental universe and delisting-aware data provide a useful
