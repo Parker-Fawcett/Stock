@@ -195,8 +195,10 @@ Both ML halves were bull markets, not one calm + one stress:
 tune 2013–19 SPY +12.6%/IWM +8.9%; holdout 2019–25 SPY +15.1%/IWM +7.4%
 (crashes inside, V-recoveries after). Best case for the ML config
 anywhere is a tie on risk-adjusted terms (multi-asset Sharpe 0.82 vs
-SPY ~0.8); corrected P5 (+6.3%) genuinely trails SPY's +15.1% on
-this window — that comparison is apples-to-apples and stands.
+SPY ~0.8); the legacy-cache, fixed-ledger P5 replay (+6.3%) trails SPY's
++15.1% on this window. The dates are comparable, but its probabilities
+predate the leak fix, so it is a historical counterfactual rather than a
+clean current performance estimate.
 
 Momentum's wins were assumed relative, not absolute, when this section
 was first written. That assumption holds for the ML config above. It
@@ -318,13 +320,14 @@ bulk download QCC costs on a free account; sample data first.
 ## Corrected promotion meta-analysis (loop paused, 8 trials banked)
 
 The original decay sequence (+12.7%, +6.1%, +4.3%, +3.5%) came from the
-pre-fix ledger and is superseded by the correctness replay below. All four
-proposals still clear their original tune gate, so the selection mechanism
-behaved as specified. Holdout is harsher: P5 stays positive at +6.3%, while
-P8, P9, and P12 are all about -2%. Every holdout drawdown breaches the
-tune-set bar. The loop is frozen until genuinely new data or a new game;
-spending the remaining eight trials on this universe would add selection
-pressure without creating a new independent test.
+pre-fix ledger and is superseded. On the original cache and dates, all four
+still clear their original tune gate, but P5 falls to +6.3% in holdout and
+P8/P9/P12 fall to about -2%. That counterfactual is useful but retains the old
+leak-affected probabilities. The leak-fixed v2 cache reverses the holdout
+result, including on common dates, while all four fail its tune gate. The loop
+therefore remains unresolved and pipeline-sensitive rather than cleanly
+successful or failed. It stays frozen; spending the remaining eight trials on
+already inspected history would not create a new independent test.
 
 ## Second accounting correction: label leak, paper dating, value engine, momentum accounting (Sep 13, 2026)
 
@@ -394,16 +397,21 @@ not new strategy search. The promoted loop proposals, items 11, 12, 18, 20,
 and the AUC-dependent ensemble have now been replayed below. Historical paper
 rows and unreplayed experiments retain their explicit pre-fix status.
 
-## Rerun under corrected ledger: promoted loop proposals (Sep 13, 2026)
+## Two-cache replay: promoted loop proposals (Sep 13, 2026)
 
-`python3 improve.py replay-promoted` re-evaluates P5, P8, P9, and P12 with
-the same cached folds, rules, thresholds, universes, 25 bps cost assumption,
-and original tune/holdout split. It does not spend trial budget, alter proposal
-status, or overwrite the historical registry. The replay fixes simple-return
+`python3 improve.py replay-promoted --cache CACHE` re-evaluates P5, P8, P9,
+and P12. The explicit cache argument is required and every output prints its
+date range. The command does not spend trial budget, alter proposal status, or
+overwrite the historical registry. Both replays use the corrected simple-return
 portfolio accounting, weight-based turnover, actual gap-stop exits, cash
 exposure, and starting-equity drawdown measurement. It also fixes the risk
 scaler that previously reduced the number of names while leaving the book
 fully invested, increasing concentration instead of reducing exposure.
+
+**Legacy cache (`sc_full`, 24 folds).** This preserves the original selection
+period and answers the counterfactual “what would the promoted configurations
+have reported with the corrected ledger at the time?” It still uses model
+probabilities generated before the validation-leak fix.
 
 | Proposal | Tune CAGR | Tune Sharpe | Tune DD | Holdout CAGR | Holdout Sharpe | Holdout DD |
 |---|---:|---:|---:|---:|---:|---:|
@@ -412,12 +420,43 @@ fully invested, increasing concentration instead of reducing exposure.
 | P9 top 30 | 12.1% | 0.68 | -32.1% | **-2.1%** | 0.01 | -41.8% |
 | P12 top 40 | 11.9% | 0.68 | -32.1% | **-2.0%** | 0.02 | -41.3% |
 
-All four still pass the original tune bar of Sharpe > 0.41 and drawdown above
--0.35. The promotions were therefore procedurally faithful, but their old
-performance claims were not robust to correct accounting. P5 remains positive
-and still trails matched-window SPY; the other three promotions fail outright.
-The near-identical P8/P9/P12 holdouts show that breadth variants did not rescue
-the weak ML signal once exposure was represented honestly.
+All four pass the original tune bar of Sharpe > 0.41 and drawdown above -0.35.
+The promotions were procedurally faithful under that vintage. P5 remains
+positive and trails matched-window SPY; the other three fail this replay.
+
+**Leak-fixed cache (`sc_full_v2`, 26 folds, `LEG` excluded).** This applies the
+corrected probability pipeline, but its tune/holdout boundary moves six months
+and its holdout extends through July 2026. It answers whether the already chosen
+configurations look useful under the current walk-forward pipeline, not what
+would have happened at the original promotion decision.
+
+| Proposal | Tune CAGR | Tune Sharpe | Tune DD | Holdout CAGR | Holdout Sharpe | Holdout DD |
+|---|---:|---:|---:|---:|---:|---:|
+| P5 lower gate | 3.8% | 0.30 | -37.5% | **25.9%** | 0.83 | -41.6% |
+| P8 inverse-vol weights | 4.6% | 0.36 | -35.6% | **17.7%** | 0.65 | -40.8% |
+| P9 top 30 | 4.6% | 0.35 | -34.9% | **17.7%** | 0.65 | -40.8% |
+| P12 top 40 | 4.7% | 0.36 | -34.5% | **17.9%** | 0.66 | -40.8% |
+
+Every configuration fails the original tune Sharpe gate of 0.41 in v2, so none
+would be promoted if the protocol were restarted on this cache. The holdout
+results are nevertheless real supporting evidence for the frozen configurations.
+They are post-selection evidence, not a new sealed-holdout claim.
+
+**Common-date sensitivity check (February 28, 2020–July 9, 2025).** Restricting
+both holdout replays to identical dates does not remove the reversal:
+
+| Proposal | Legacy CAGR / Sharpe / DD | v2 CAGR / Sharpe / DD |
+|---|---:|---:|
+| P5 | +5.0% / 0.31 / -36.8% | +22.8% / 0.73 / -41.6% |
+| P8 | -3.1% / -0.02 / -41.9% | +14.9% / 0.56 / -40.8% |
+| P9 | -3.1% / -0.03 / -41.7% | +14.5% / 0.55 / -40.8% |
+| P12 | -3.0% / -0.02 / -41.1% | +14.8% / 0.56 / -40.8% |
+
+The added 2025–2026 period is therefore not the main explanation. The caches
+also differ in purge logic, fold construction, data vintage, and one universe
+member, so this check cannot attribute the reversal to leakage alone. The
+defensible conclusion is that the overlay result is highly pipeline-sensitive.
+Publish both vintages and accumulate genuinely prospective observations.
 
 ## Rerun under corrected ledger: momentum, multi-asset, ensemble (Sep 13, 2026)
 
@@ -650,13 +689,14 @@ insider (C-suite >$50k first-buy, 458 months) 0.5554 vs 0.5587 — buried.
 Long-short Sharpe -0.03 — hedge cuts DD, short book earns nothing.
 Ensemble ML+momentum dilutes (0.17 vs 0.40) — ML adds nothing.
 
-Improve loop (budget 20, 8 left): corrected promotion replay — P5
-+6.3%/-0.37/0.35 holdout; P8 -2.0%/-0.42/0.02; P9 -2.1%/-0.42/0.01;
-P12 -2.0%/-0.41/0.02. All passed the original tune gate, but three fail
-holdout after correcting return and exposure accounting. The registry retains
-the old figures as historical outputs. P1 lottery artifact is retracted as a
-stop-logic bug. P7 died by 0.011 on the original DD bar; P10, P2-P4, P6 died
-on tune. Earlier vol-monkey attribution is also pre-fix evidence.
+Improve loop (budget 20, 8 left): legacy-cache/fixed-ledger holdouts are P5
++6.3%, P8 -2.0%, P9 -2.1%, P12 -2.0%; leak-fixed-v2/shifted-window holdouts
+are +25.9%, +17.7%, +17.7%, +17.9%. On the common 2020-02–2025-07 window,
+the reversal remains (+5.0%/-3.1%/-3.1%/-3.0% legacy versus
++22.8%/+14.9%/+14.5%/+14.8% v2). V2's tune Sharpes are only 0.30–0.36, so
+none would pass the original promotion gate. Verdict: pipeline-sensitive,
+not a clean success or failure. Registry retains historical outputs; P1 is
+retracted as a stop-logic bug. Earlier vol-monkey attribution is pre-fix.
 
 Momentum (no ML): small tune +9.5%/0.41/-0.31, hold +6.2%/0.20/-0.56. Mid
 tune +3.3%/0.15, hold +11.4%/0.35/-0.37. Positive every half both universes.

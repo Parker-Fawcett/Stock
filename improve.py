@@ -15,7 +15,8 @@ Usage:
   python3 improve.py propose         # list pending (proposals are code)
   python3 improve.py round           # evaluate pending on tune-half
   python3 improve.py promote         # holdout once for the winner (if bar)
-  python3 improve.py replay-promoted # correctness replay; registry unchanged
+  python3 improve.py replay-promoted --cache data/cache/sc_full
+  python3 improve.py replay-promoted --cache data/cache/sc_full_v2
 """
 from __future__ import annotations
 
@@ -415,14 +416,20 @@ def main() -> None:
     sub.add_parser("status")
     sub.add_parser("round")
     sub.add_parser("promote")
-    sub.add_parser("replay-promoted")
+    replay = sub.add_parser("replay-promoted")
+    replay.add_argument("--cache", required=True,
+                        help="fold cache to replay; required so cache vintage is explicit")
+    replay.add_argument("--start", help="optional inclusive result start date")
+    replay.add_argument("--end", help="optional inclusive result end date")
+    replay.add_argument("--half", choices=("all", "tune", "holdout"),
+                        default="all", help="which original cache half to replay")
     args = ap.parse_args()
     log = read_log()
 
     if args.cmd == "status":
         print(f"budget: {BUDGET_TOTAL - log['spent']}/{BUDGET_TOTAL} left")
         print("registry metrics are historical pre-fix outputs; "
-              "run replay-promoted for corrected promotion metrics")
+              "run replay-promoted with an explicit --cache for corrected metrics")
         for pid, (fn, pred) in PROPOSALS.items():
             st = log["proposals"].get(pid, {"status": "pending"})
             print(f"{pid} [{st['status']}] pred: {pred} "
@@ -432,18 +439,30 @@ def main() -> None:
     if args.cmd == "replay-promoted":
         # Correctness replay only: do not spend budget, change statuses, or
         # overwrite the immutable historical registry.
-        folds = load_folds()
+        folds = load_folds(args.cache)
         mid = len(folds) // 2
         promoted = ("P5-gate25", "P8-volscale", "P9-top30", "P12-top40")
-        for half, selected in (("tune", folds[:mid]),
-                               ("holdout", folds[mid:])):
+        print(f"cache: {args.cache} folds: {len(folds)}")
+        halves = (("tune", folds[:mid]), ("holdout", folds[mid:]))
+        for half, selected in halves:
+            if args.half != "all" and args.half != half:
+                continue
             tickers = sorted({tk for t, _ in selected
                               for tk in t["ticker"].unique()})
             px = load_px(tickers)
             for pid in promoted:
                 fn, _ = PROPOSALS[pid]
-                result = score(stitch([fn(t, p, px) for t, p in selected]))
-                print(f"{pid} {half}: {result}")
+                nets = stitch([fn(t, p, px) for t, p in selected])
+                if args.start:
+                    nets = nets.loc[nets.index >= pd.Timestamp(args.start)]
+                if args.end:
+                    nets = nets.loc[nets.index <= pd.Timestamp(args.end)]
+                if nets.empty:
+                    raise ValueError("date filters removed every replay result")
+                result = score(nets)
+                window = (f"{pd.Timestamp(nets.index.min()).date()}.."
+                          f"{pd.Timestamp(nets.index.max()).date()}")
+                print(f"{pid} {half} [{window}]: {result}")
         return
 
     if args.cmd == "round":

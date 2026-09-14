@@ -13,7 +13,7 @@ the full history, including failed tests and superseded numbers.
 | Textbook 12-1 momentum | **SURVIVED — provisional** | Positive in every tested half. Small-cap beats matched-window SPY in both halves; mid-cap beats it in holdout. Yahoo survivor bias remains. |
 | Price-based tree ML | **WEAK / NOT USEFUL** | Ranking survives at mean AUC 0.554, but the portfolio is unstable and weaker than momentum. |
 | ML + momentum | **FAILED** | Adding ML reduces CAGR and Sharpe in both halves. |
-| Self-improvement overlays | **FAILED AFTER CORRECTION** | All four passed their original tune gate, but only P5 stayed positive in holdout; P8, P9, and P12 fell to about -2% CAGR. |
+| Self-improvement overlays | **MIXED / PIPELINE-SENSITIVE** | On original dates with the fixed ledger, only P5 stays positive. With leak-fixed probabilities and shifted folds, all four are strongly positive later—but none passes that cache's tune gate. |
 | Insider signals | **FAILED** | Raw and conviction-filtered Form 4 features do not improve the model. |
 | Multi-asset trend | **SURVIVED — defensive** | Trails SPY on raw return, with smoother drawdowns and better measured Sharpe. |
 | Graham value, mega caps | **FAILED FOR THIS UNIVERSE** | Few or no qualifying trades; paid point-in-time small-cap fundamentals would be a different test. |
@@ -34,24 +34,45 @@ implementation; the ensemble uses the same frozen 252/21 formation rule.
 | Momentum, ensemble window | 17.3% | 0.86 | -25.3% | 20.3% | 0.71 | -37.4% |
 | 50/50 ML + momentum | 9.8% | 0.60 | -42.3% | 16.5% | 0.63 | -38.2% |
 | Multi-asset trend | 8.0% | 0.95 | -13.2% | 8.0% | 0.74 | -23.3% |
-| P5 lower probability gate | 13.0% | 0.70 | -31.3% | 6.3% | 0.35 | -36.9% |
-| P8 inverse-volatility weights | 11.8% | 0.67 | -32.4% | -2.0% | 0.02 | -42.0% |
-| P9 wider portfolio | 12.1% | 0.68 | -32.1% | -2.1% | 0.01 | -41.8% |
-| P12 widest portfolio | 11.9% | 0.68 | -32.1% | -2.0% | 0.02 | -41.3% |
 
 Matched-window buy-and-hold SPY returned 11.9% and 16.9% in the two
 momentum halves. The small-cap momentum result is ahead by 5.9 and 4.8
 percentage points respectively. That comparison uses the same dates and
 annualization convention.
 
+## Self-improvement replay sensitivity
+
+The two available caches answer different questions. The legacy cache keeps
+the original promotion dates but contains pre-fix, leak-affected probabilities.
+The v2 cache has the corrected probability pipeline, 26 instead of 24 folds,
+one fewer ticker, and a shifted split. Values below are holdout CAGR; the common
+window controls for dates but cannot isolate the purge, fold, data-vintage, and
+universe changes from one another.
+
+| Proposal | Legacy, original half | v2, shifted half | Legacy, common dates | v2, common dates |
+|---|---:|---:|---:|---:|
+| P5 lower gate | +6.3% | +25.9% | +5.0% | +22.8% |
+| P8 inverse-vol weights | -2.0% | +17.7% | -3.1% | +14.9% |
+| P9 top 30 | -2.1% | +17.7% | -3.1% | +14.5% |
+| P12 top 40 | -2.0% | +17.9% | -3.0% | +14.8% |
+
+The common period is February 28, 2020 through July 9, 2025. Because the
+reversal remains on identical dates, the extra 2025–2026 market strength does
+not explain it. The result is highly sensitive to the probability/fold/data
+pipeline. In v2 tune, all four fail the original Sharpe gate, so the later
+positive holdouts are supporting post-selection evidence rather than new
+successful promotions.
+
 ## What the evidence supports
 
 The defensible research claim is narrow: cross-sectional momentum appears
 stronger and more useful than the tested machine-learning, insider, value,
 and ensemble variants. The ML rank contains a small statistical signal,
-but it has not improved portfolio construction. A correctness replay of all
-four proposals promoted by the self-improvement loop reinforces that verdict:
-three are negative in holdout and the remaining one trails the index.
+but it has not established a stable portfolio improvement. The promoted
+overlays reverse sign between the legacy and corrected probability caches even
+on common dates. That is evidence of pipeline sensitivity, while the strong v2
+period is a real positive observation that warrants continued prospective
+tracking.
 
 The local stock lists contain companies that survive today. QuantConnect's
 point-in-time fundamental universe and delisting-aware data provide a useful
