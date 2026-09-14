@@ -39,15 +39,15 @@ def mom_monthly_net(px: pd.DataFrame, months, cost_bps: float = 25.0) -> pd.Seri
     for m in months:
         d0 = px.index[pd.to_datetime(px.index.to_series()).dt.to_period("M") == m].max()
         hist = px.loc[px.index <= d0]
-        if len(hist) < 278:
+        if len(hist) < 252:
             continue
-        mom = (hist.iloc[-22] / hist.iloc[-273] - 1).dropna().sort_values(
+        mom = (hist.iloc[-21] / hist.iloc[-252] - 1).dropna().sort_values(
             ascending=False)
         if len(mom) < 10:
             continue
         cut = mom.quantile(0.90)
         picks = mom[mom >= cut].index.tolist()[: max(5, int(len(mom) * 0.1) + 1)]
-        turnover = len(set(picks) ^ set(prev)) / max(1, max(len(picks), len(prev)))
+        turnover = bt.equal_weight_turnover(prev, picks)
         cost = turnover * cost_bps / 1e4
         fut = px.loc[px.index > d0]
         rets = []

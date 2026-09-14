@@ -25,7 +25,9 @@ from value.graham import compute_iv_panel
 
 
 def max_dd(equity: pd.Series) -> float:
-    return float((equity / equity.cummax() - 1).min())
+    curve = pd.concat([pd.Series([1.0]), equity.reset_index(drop=True)],
+                      ignore_index=True)
+    return float((curve / curve.cummax() - 1).min())
 
 
 def report(eq: pd.DataFrame, bench: pd.DataFrame, tag: str) -> dict:

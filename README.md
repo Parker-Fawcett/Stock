@@ -6,9 +6,13 @@ costs from day one, and a trial budget; every failure gets a death
 record in FINDINGS.md. Two frozen models trade on paper monthly and get
 graded in public, green or red.
 
+**[Current results and evidence status](RESULTS.md)** — the short,
+maintained view. `FINDINGS.md` remains the full chronological record.
+
 Live scoreboard (see `paper.py grade`, `data/paper/log.csv):
 - `wide-seed0-v1` (ML rank): 30 picks, 37% hit, -2.7% excess vs IWM.
-- `mom12-1-v1` (textbook momentum): logging, backtest says +6–11% halves.
+- `mom12-1-v1` (textbook momentum): logging; corrected survivor-universe
+  backtest says +17.8%/+21.7% in the two small-cap halves.
 
 Origin: independent rebuild of a community-documented AI stock predictor,
 starting from 29 published video transcripts (`sources-channel-predictor/`
@@ -27,14 +31,17 @@ all code, tests, and findings here are original work.
 | Forced daily buy | Cash default, max 10 names, proba gate (`backtest.py`) |
 | No costs, impossible fills | `COST_BPS` on every change, monthly closes |
 | Single backtest luck | Monkey baseline + mean over seeds (`run_monkeys`) |
-| Survivors-only list | **Not fixed here** — free Stooq has the same bias. See below. |
+| Survivors-only list | Local runs retain the bias; the QuantConnect replication adds a point-in-time check. |
 
 ## The bias warning (read this)
 
 His finale (`noK0IwZAnyE`): alphabetical survivors-only list made the
 model look like a genius. This scaffold uses free Stooq data with the
-**same flaw**. Any CAGR here is a plumbing check. For real numbers you
-need point-in-time membership + delisted prices (Massive/CRSP/Quiver).
+**same flaw**. The guarded QuantConnect 252/21 replication remained strongly
+positive with point-in-time membership and delisting-aware data (+3,455.56%
+total return, 53.70% max drawdown, 0.695 Sharpe), which supports the direction
+of the finding. Its dynamic top-200 liquid universe is different from these
+small- and mid-cap lists, so local CAGR magnitudes remain provisional.
 
 ## Run
 
@@ -88,13 +95,15 @@ French 2015-2026: RMW (profitability) +2.4%/yr and MOM +2.0%/yr alive;
 SMB/HML/CMA all negative. Our small-cap pain = SMB headwind; value
 failure = HML headwind. 4chan sentiment dead both directions (his newest
 video agrees). FINRA/Nasdaq short data reachable but heavy.
-Textbook 12-1 momentum, small caps, 25bps, 188 months, no ML, no tuning:
-tune +9.5% (Sharpe 0.41, DD -0.31), holdout +16.3% (Sharpe 0.20, DD
--0.56). Beats every ML config in both halves. Mid-cap replication:
-tune +3.3% (Sharpe 0.15), holdout +15.1% (Sharpe 0.35) — positive both
-halves, both universes. The model never beat the textbook. Momentum
-sleeve now logs alongside ML in paper.py (mom12-1-v1) with per-model
-grading.
+Textbook 12-1 momentum, small caps, 25bps, 188 months, no ML, no tuning,
+under the corrected common accounting convention: tune +17.8% (Sharpe
+0.84, DD -0.26), holdout +21.7% (Sharpe 0.78, DD -0.37). Mid-cap
+replication: tune +9.8% (Sharpe 0.54), holdout +24.7% (Sharpe 0.81).
+These Yahoo universes contain today's survivors, so the magnitude remains
+provisional. A point-in-time QuantConnect run confirms that momentum survives
+on a different liquid-equity universe, but is not a matched estimate of these
+returns. The model never beat the textbook. Momentum logs alongside ML in
+paper.py (`mom12-1-v1`) with per-model grading.
 
 ## Value lane (in progress)
 

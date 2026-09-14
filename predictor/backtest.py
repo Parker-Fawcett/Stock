@@ -54,6 +54,22 @@ def _check_stop(stop_frac: float | None) -> None:
         raise ValueError(f"stop_frac must be in (0,1) or None, got {stop_frac}")
 
 
+def weight_turnover(previous: dict[str, float], current: dict[str, float]) -> float:
+    """Portfolio turnover under the repository's half-L1 convention."""
+    keys = set(previous) | set(current)
+    return 0.5 * sum(abs(current.get(k, 0.0) - previous.get(k, 0.0))
+                     for k in keys)
+
+
+def equal_weight_turnover(previous, current) -> float:
+    """Turnover between two equally weighted security lists."""
+    old = list(dict.fromkeys(previous))
+    new = list(dict.fromkeys(current))
+    old_w = {tk: 1.0 / len(old) for tk in old} if old else {}
+    new_w = {tk: 1.0 / len(new) for tk in new} if new else {}
+    return weight_turnover(old_w, new_w)
+
+
 def leg_simple(px_col, d0, horizon: int, short: bool,
                stop_frac: float | None) -> float:
     """Simple return of one position held up to `horizon` trading days.
@@ -102,8 +118,7 @@ def _run_book(test: pd.DataFrame, schedule, cost_bps: float = COST_BPS,
         longs, shorts = schedule(d0, cands, state)
         w = {tk: wt for tk, wt in longs.items()}
         w.update({tk: -wt for tk, wt in shorts.items()})
-        keys = set(w) | set(prev_w)
-        turnover = 0.5 * sum(abs(w.get(k, 0.0) - prev_w.get(k, 0.0)) for k in keys)
+        turnover = weight_turnover(prev_w, w)
         cost = turnover * cost_bps / 1e4
         borrow = sum(shorts.values()) * borrow_apr / 12 if shorts else 0.0
         gross = 0.0
@@ -165,7 +180,7 @@ def run_backtest_risk(
     _check_stop(stop_frac)
     t = _prepared(test, proba)
     px = t.set_index(["ticker", "Date"])["Close"].unstack("ticker")
-    uret = px.pct_change().mean(axis=1).dropna()
+    uret = px.pct_change(fill_method=None).mean(axis=1).dropna()
     vol = uret.rolling(60, min_periods=20).std() * np.sqrt(252)
 
     def schedule(d0, cands, state):

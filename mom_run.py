@@ -58,7 +58,7 @@ def run_momentum(panel: pd.DataFrame, cost_bps: float = 25.0,
             continue
         cut = mom.quantile(1 - decile)
         picks = mom[mom >= cut].index.tolist()[: max(5, int(len(mom) * decile) + 1)]
-        turnover = len(set(picks) ^ set(prev)) / max(1, max(len(picks), len(prev)))
+        turnover = bt.equal_weight_turnover(prev, picks)
         cost = turnover * cost_bps / 1e4
         fut = px.loc[px.index > d0]
         rets = []

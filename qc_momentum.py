@@ -1,7 +1,9 @@
-# Momentum sleeve for QuantConnect cloud (UNTESTED locally — paste and run).
+# Momentum sleeve for QuantConnect cloud (cloud-validated Sep 13, 2026).
 # Purpose: survivor-free validation of mom12-1-v1 on QC's delisting-aware
 # data. Compare vs our Yahoo run on overlap first; if they match, the
-# survivor-free result is credible.
+# survivor-free result is credible. Guarded 252/21 run: +3,455.564% total
+# return, 53.700% max drawdown, 0.695 Sharpe (dynamic top-200 liquid universe;
+# direction check, not a like-for-like estimate of the local small-cap CAGR).
 # Framework: coarse universe (dollar-volume filtered = our P7 idea built
 # in) + 12-1 momentum rank + monthly rebalance + IB fee model.
 # Free tier: cloud backtests included with limits.

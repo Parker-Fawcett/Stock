@@ -224,7 +224,7 @@ What survived: a ~0.55 AUC rank signal that replicates on untouched
 data but never survives risk on its own; textbook 12-1 momentum,
 positive in all four halves tested across two universes and, under
 corrected accounting, outright beating SPY buy-and-hold in small caps
-(both halves, +16.7%/+20.7%) and mid-cap's stress half (+23.6%) — not
+(both halves, +17.8%/+21.7%) and mid-cap's stress half (+24.7%) — not
 just calmer than the index, actually ahead of it; plus multi-asset
 trend (+7.9%/+8.0% halves, Sharpe 0.94/0.73 — still the best
 risk-adjusted line, though no longer the only thing beating the index
@@ -258,8 +258,8 @@ backtests. What's no longer closed: small-cap momentum's SPY-beating
 result held up under an isolated recheck (Sep 2026) — that's the
 corrected number, not the bug talking. ML, insider data, and
 hand-tuned risk overlays are still closed cases; the index fund still
-wins there. Textbook momentum on small caps is open again, pending live
-confirmation and a survivorship-free (QC/LEAN) replication.
+wins there. Textbook momentum is open, with a positive point-in-time
+QuantConnect replication now complete and live confirmation still pending.
 
 ## Who does this better (research waves)
 
@@ -281,8 +281,8 @@ deciles at scale.
 
 **QuantConnect/LEAN (the infrastructure better).** 21k stars,
 survivorship-free data with delistings, built-in slippage/fees.
-Our weakest links (hand execution realism, survivor universes) fixed
-free — migration candidate.
+Its cloud data and brokerage models directly test our weakest links:
+execution realism and survivor universes.
 
 **The honest minority.** Quantopian: 888 strategies, backtest-live
 Sharpe correlation zero. Stanford 2025: 58% of retail algos die in 3
@@ -397,6 +397,14 @@ requested range, last print 2026-08-27 volume 0, consistent with a
 delisting or trading halt. Everything else in both universes is same-day
 fresh (verified before running, not just trusted).
 
+**Same-day reconciliation:** the standalone runners still calculated
+membership turnover independently from the central ledger, and
+`ens_test.py` still formed momentum with 273/22 observations despite the
+frozen 252/21 specification. Turnover now comes from the shared weight-based
+function, the ensemble uses 252/21, and the tables below contain the replayed
+figures. The direction of every verdict is unchanged; momentum improves
+slightly and still dominates the ensemble.
+
 **Isolated the fix's effect directly**: reran the identical window and
 ticker set through the old log-averaging formula side by side with the
 fix. The old formula reproduced the original item-11 numbers almost
@@ -409,9 +417,9 @@ market data.
 | | tune CAGR | tune Sharpe | tune DD | hold CAGR | hold Sharpe | hold DD |
 |---|---:|---:|---:|---:|---:|---:|
 | Small, old (log-avg) | +9.5% | 0.41 | -0.31 | +6.2% | 0.20 | -0.56 |
-| Small, fixed | **+16.7%** | **0.80** | -0.26 | **+20.7%** | **0.75** | -0.39 |
+| Small, fixed | **+17.8%** | **0.84** | -0.26 | **+21.7%** | **0.78** | -0.37 |
 | Mid, old (log-avg) | +3.3% | 0.15 | -0.32 | +11.4% | 0.35 | -0.37 |
-| Mid, fixed | **+8.9%** | **0.50** | -0.28 | **+23.6%** | **0.79** | -0.32 |
+| Mid, fixed | **+9.8%** | **0.54** | -0.28 | **+24.7%** | **0.81** | -0.31 |
 
 Not a small correction — Sharpe roughly doubled and holdout CAGR roughly
 tripled in both universes. Direction makes sense: log-averaging a monthly
@@ -435,14 +443,14 @@ log-vs-simple gap is smaller. Conclusion is unchanged: still trails SPY
 buy-hold on raw return, still wins on risk-adjusted terms, now by a wider
 margin (Sharpe 0.94 tune vs the old 0.82).
 
-**International sleeve (supersedes #20):** tune +2.7% (Sharpe 0.26,
-DD -0.24), holdout +10.0% (Sharpe 0.78, DD -0.22) — close to the old
+**International sleeve (supersedes #20):** tune +3.3% (Sharpe 0.32,
+DD -0.26), holdout +11.7% (Sharpe 0.98, DD -0.16) — close to the old
 +2.9%/+11.2% print; low-dispersion ETF basket again limits the gap.
 Still positive both halves.
 
 **Open question, not resolved here:** the "regime correction" section
 above claims no long-only config beat SPY buy-and-hold on return in
-either half. Small-cap momentum's new holdout CAGR (+20.7%) is close to
+either half. Small-cap momentum's new holdout CAGR (+21.7%) is close to
 or above the SPY holdout figure cited there (+15.1%), which would
 overturn that claim if the windows line up — but that comparison used a
 different price series (SPY vs this rerun's IWM-relative momentum) and
@@ -471,8 +479,8 @@ is still worth having fixed for any future retuning.
 | | tune CAGR | tune Sharpe | tune DD | hold CAGR | hold Sharpe | hold DD |
 |---|---:|---:|---:|---:|---:|---:|
 | ML alone | -0.1% | 0.13 | -0.62 | +8.9% | 0.38 | -0.43 |
-| Momentum alone | +14.8% | 0.76 | -0.24 | +17.9% | 0.64 | -0.41 |
-| 50/50 ensemble | +8.6% | 0.54 | -0.41 | +15.4% | 0.60 | -0.41 |
+| Momentum alone | +17.3% | 0.86 | -0.25 | +20.3% | 0.71 | -0.37 |
+| 50/50 ensemble | +9.8% | 0.60 | -0.42 | +16.5% | 0.63 | -0.38 |
 
 Conclusion unchanged, on corrected numbers: the ensemble underperforms
 momentum alone on both CAGR and Sharpe in both halves — averaging in a
@@ -505,7 +513,7 @@ months), split at 2018-11-30/2018-12-31 (94/94):**
 |---|---:|---:|
 | SPY buy-hold | +11.9% | +16.9% |
 | IWM buy-hold | +9.8% | +11.6% |
-| Small-cap momentum (fixed ledger) | **+16.7%** | **+20.7%** |
+| Small-cap momentum (fixed ledger) | **+17.8%** | **+21.7%** |
 
 Small-cap momentum beats SPY buy-and-hold on raw return in **both**
 halves, not zero. That directly overturns the regime-correction
@@ -517,7 +525,7 @@ this one configuration.
 | | tune CAGR | hold CAGR |
 |---|---:|---:|
 | SPY buy-hold | +11.9% | +16.9% |
-| Mid-cap momentum (fixed ledger) | +8.9% | **+23.6%** |
+| Mid-cap momentum (fixed ledger) | +9.8% | **+24.7%** |
 
 Mixed: mid-cap trails SPY in tune, beats it clearly in holdout — the
 stress-period result (COVID, 2022 bear, recovery) is the one that
@@ -571,13 +579,31 @@ QuantConnect reported: total return **+1,647.489%**, end equity **$1,747,488.78*
 maximum drawdown **59.400%**, Sharpe **0.58**, annualized return **20.319%**,
 and **$5,224.28** in fees across 3,435 orders.
 
-This is not a clean survivorship-effect estimate. The completed run produced
+That first run is not a clean survivorship-effect estimate. It produced
 repeated handled order errors for newly selected securities that had not yet
-received a price bar. The order guard is now saved both in the cloud project
-and `qc_momentum.py`, but that corrected version has not been rerun. The large
-return and 59.4% drawdown therefore document the first cloud diagnostic only;
-they must not be compared directly with the Yahoo momentum results until the
-guarded run completes.
+received a price bar. Its large return and 59.4% drawdown document the first
+cloud diagnostic only.
+
+The guarded, frozen-spec rerun was completed September 13, 2026 as **Creative
+Yellow Antelope**. It used 252 trading observations with a 21-day skip and the
+same project, universe construction, starting equity, brokerage model, and
+monthly rebalance design. The result page covered January 2011 through June 17,
+2026 and reported total return **+3,455.564%**, end equity **$3,555,563.81**,
+maximum drawdown **53.700%**, Sharpe **0.695**, annualized return **25.969%**,
+and **$7,940.17** in fees across 3,793 orders. The prior missing-price order
+errors did not recur. QuantConnect warned about automatic SPY benchmark
+subscription, conversion of daily-data market orders to open/close orders, one
+sub-minimum single-share rebalance, and overlapping History calls; these do not
+invalidate the completed run, though the order timing belongs in any future
+matched implementation.
+
+This materially strengthens the direction of the momentum finding: including
+point-in-time membership and delistings did not destroy it. It does not validate
+the local CAGR magnitude. QuantConnect dynamically selects the top 200 liquid
+US equities, while the Yahoo tests use today's small- and mid-cap survivors, and
+the periods and execution details differ. The next clean comparison is a common
+date range and comparable universe; forward paper observations remain the gate
+for deployment claims.
 
 Started from 29 transcripts of a finance YouTuber building an AI stock
 predictor. Rebuilt it clean-room: trees not LSTM, 20-day excess-vs-market
@@ -627,10 +653,11 @@ ensemble failed on two correlated legs); AlphaEvolve/AIDE/DGM taxonomy
 built our loop; 4chan sentiment dead both directions (his newest video).
 
 Live: wide-seed0-v1 30 picks -2.7% excess; mom12-1-v1 logging from Sep 30
-month-end. QC cloud algorithm written (qc_momentum.py, UNTESTED) for
-survivor-free validation — paste into free QuantConnect account, compare
-overlap first. LEAN local bulk costs thousands; Docker ready if ever needed.
+month-end. QC cloud 252/21 replication completed at +3,455.564% total return,
+53.700% max drawdown, and 0.695 Sharpe on its dynamic liquid universe. Compare
+a matched period/universe next. LEAN local bulk costs thousands; Docker ready
+if ever needed.
 
 Open: paper accumulation, value on paid small-cap data, quality expansion,
-LEAN/QC migration results, 10 loop trials banked. File stays open, loop
+matched-universe QC comparison, 10 loop trials banked. File stays open, loop
 frozen, index fund winning.

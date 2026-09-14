@@ -69,7 +69,7 @@ def main() -> None:
             nets.append(b.set_index("date")["net"])
             s = ev.summarize(b)
             stats.append(s)
-        equity = np.exp(pd.concat(nets).sort_index().cumsum())
+        equity = (1 + pd.concat(nets).sort_index()).cumprod()
         years = len(equity) / 12
         mk = [float(bt.run_monkeys(t, cost_bps=c)["monkey_mean"].iloc[0])
               for t in tests]

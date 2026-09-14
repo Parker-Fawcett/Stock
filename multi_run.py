@@ -15,6 +15,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parent))
 import numpy as np
 import pandas as pd
 
+from predictor import backtest as bt
 from predictor import evaluate as ev
 from predictor.data import download_universe, assert_vintage
 
@@ -45,7 +46,7 @@ def main() -> None:
     px = pd.DataFrame(px).sort_index().dropna(how="all")
     months = pd.to_datetime(px.index.to_series()).dt.to_period("M").drop_duplicates().sort_values()
     rows, prev = [], []
-    trade_months = set(months[i] for i in range(0, len(months), args.stride))
+    trade_months = set(months.iloc[i] for i in range(0, len(months), args.stride))
     for m in months:
         d0 = px.index[pd.to_datetime(px.index.to_series()).dt.to_period("M") == m].max()
         hist = px.loc[px.index <= d0]
@@ -56,7 +57,7 @@ def main() -> None:
                 and hist[a].loc[d0] > sma[a]]
         if m not in trade_months:
             held = prev  # hold between rebalances, no turnover
-        turnover = len(set(held) ^ set(prev)) / max(1, max(len(held), len(prev)))
+        turnover = bt.equal_weight_turnover(prev, held)
         cost = turnover * args.cost / 1e4
         fut = px.loc[px.index > d0]
         if held:

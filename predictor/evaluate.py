@@ -18,8 +18,11 @@ def auc_score(y: np.ndarray, p: np.ndarray) -> float:
 
 
 def max_drawdown(equity: pd.Series) -> float:
-    peak = equity.cummax()
-    dd = equity / peak - 1.0
+    # Include starting equity so a loss in the first measured period is visible.
+    curve = pd.concat([pd.Series([1.0]), equity.reset_index(drop=True)],
+                      ignore_index=True)
+    peak = curve.cummax()
+    dd = curve / peak - 1.0
     return float(dd.min())
 
 
