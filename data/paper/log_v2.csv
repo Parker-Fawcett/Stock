@@ -1,0 +1,1 @@
+series,run_id,created_at_utc,decision_date,ticker,signal_value,signal_close,stop_frac,entry_rule,model,universe,market,code_commit,manifest_sha256

@@ -17,7 +17,7 @@ the full history, including failed tests and superseded numbers.
 | Insider signals | **FAILED** | Raw and conviction-filtered Form 4 features do not improve the model. |
 | Multi-asset trend | **SURVIVED — defensive** | Trails SPY on raw return, with smoother drawdowns and better measured Sharpe. |
 | Graham value, mega caps | **FAILED FOR THIS UNIVERSE** | Few or no qualifying trades; paid point-in-time small-cap fundamentals would be a different test. |
-| Paper portfolios | **LIVE / EARLY** | Logging is implemented; there are not enough clean forward observations to judge performance. |
+| Paper portfolios | **LOCKED / AWAITING FIRST RUN** | The provenance-locked `prospective-v2` series starts at the next month end. Existing rows remain historical and separate. |
 | QuantConnect replication | **SURVIVED — different universe** | The guarded 252/21 cloud run completed without the prior missing-price order errors: +3,455.56% total return, 25.97% CAGR, 53.70% max drawdown, and 0.695 Sharpe. |
 
 ## Current numbers
@@ -108,3 +108,18 @@ Momentum can move from **provisional** to **validated for deployment** only afte
 
 Until those pass, this repository is a research product and audit trail,
 not investment advice or a deployable trading system.
+
+## Prospective protocol
+
+`paper.py predict` accepts completed month-end data and clean pipeline code.
+Each run writes a unique manifest containing its UTC creation time, git state,
+input-file hashes, model backend, feature list, train/validation dates,
+parameters, and complete signal set. Paper rows store the manifest hash;
+grading verifies both the hash and each signal before use.
+
+The clean series implements the documented execution rule: enter at the next
+session's open, observe 20 trading sessions, exit at the first actual close at
+or below the 15% stop or at the final close, and charge round-trip costs.
+Results persist separately in `data/paper/log_v2.csv` and
+`data/paper/grades_v2.csv`. No off-cycle September observation was inserted
+while testing this change.

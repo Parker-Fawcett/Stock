@@ -8,9 +8,7 @@ a plumbing check, not a claim.
 from __future__ import annotations
 
 import argparse
-import hashlib
 import json
-import subprocess
 import sys
 from datetime import datetime, timezone
 from pathlib import Path
@@ -26,32 +24,7 @@ from predictor import evaluate as ev
 from predictor.data import download_universe, assert_vintage
 from predictor.features import build_panel, model_cols
 from predictor.model_lgbm import fit_fold, walk_forward
-
-
-def file_sha256(path: str) -> str:
-    digest = hashlib.sha256()
-    with open(path, "rb") as handle:
-        for chunk in iter(lambda: handle.read(1024 * 1024), b""):
-            digest.update(chunk)
-    return digest.hexdigest()
-
-
-def git_state() -> dict:
-    try:
-        commit = subprocess.check_output(
-            ["git", "rev-parse", "HEAD"], text=True).strip()
-        dirty = bool(subprocess.check_output(
-            ["git", "status", "--porcelain"], text=True).strip())
-        working = subprocess.check_output(
-            ["git", "diff", "HEAD", "--", "predictor", "run.py"], text=True)
-        return {
-            "commit": commit,
-            "dirty": dirty,
-            "pipeline_diff_sha256": hashlib.sha256(
-                working.encode("utf-8")).hexdigest(),
-        }
-    except Exception as exc:  # noqa: BLE001
-        return {"error": str(exc)}
+from predictor.provenance import file_sha256, git_state
 
 
 def main() -> None:

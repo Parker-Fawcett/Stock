@@ -3,16 +3,15 @@
 Retail quant sells winners. This repo audits losers — with methodology
 intact. Every strategy here runs through monkeys, sealed holdouts,
 costs from day one, and a trial budget; every failure gets a death
-record in FINDINGS.md. Two frozen models trade on paper monthly and get
-graded in public, green or red.
+record in FINDINGS.md. Two frozen models enter a provenance-locked monthly
+paper series and get graded in public, green or red.
 
 **[Current results and evidence status](RESULTS.md)** — the short,
 maintained view. `FINDINGS.md` remains the full chronological record.
 
-Live scoreboard (see `paper.py grade`, `data/paper/log.csv):
-- `wide-seed0-v1` (ML rank): 30 picks, 37% hit, -2.7% excess vs IWM.
-- `mom12-1-v1` (textbook momentum): logging; corrected survivor-universe
-  backtest says +17.8%/+21.7% in the two small-cap halves.
+The 30 rows in `data/paper/log.csv` are retained as historical records, not
+forward evidence. The clean `prospective-v2` scoreboard starts at the next
+month end with `wide-seed0-v1` and `mom12-1-v1`.
 
 Origin: independent rebuild of a community-documented AI stock predictor,
 starting from 29 published video transcripts (`sources-channel-predictor/`
@@ -64,19 +63,24 @@ python3 run.py --tickers AAPL,MSFT,JNJ,PG,XOM,CVX,KO,MRK,WMT,IBM --start 2015010
 - `cache_compare.py` — row-level probability, rank, and selected-name comparison
 - `purge_ablation.py` — controlled legacy-vs-corrected purge refit
 - `sweep.py` — cost sweeps with tune/holdout splits
-- `paper.py` — FROZEN forward paper trading (wide-seed0-v1)
+- `paper.py` — provenance-locked prospective ML and momentum ledger
 
-## Paper trading (the only test that matters now)
+## Prospective paper trading (the only test that matters now)
 
 ```
 # monthly, after month-end close:
 python3 paper.py predict --universe smallcap --market IWM --refresh
 # anytime (scores picks 20 trading days old vs IWM):
-python3 paper.py grade
+python3 paper.py grade --refresh
 ```
 
-Picks append to `data/paper/log.csv` with model version. No tuning on
-results — the market grades, we read.
+The clean `prospective-v2` series begins with the next month-end run. Each run
+records its UTC creation time, code commit, input hashes, model backend,
+train/validation dates, parameters, and signals in a verified manifest. Picks
+enter at the next session's open and are graded after 20 sessions with actual
+close-based stop exits and costs. Off-cycle runs and modified pipeline code are
+rejected. The old `data/paper/log.csv` remains historical and separate. No
+tuning on results — the market grades, we read.
 
 ## Insider verdict (buried)
 

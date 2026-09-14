@@ -770,5 +770,28 @@ a matched period/universe next. LEAN local bulk costs thousands; Docker ready
 if ever needed.
 
 Open: paper accumulation, value on paid small-cap data, quality expansion,
-matched-universe QC comparison, 10 loop trials banked. File stays open, loop
+matched-universe QC comparison, 8 loop trials banked. File stays open, loop
 frozen, index fund winning.
+
+## Prospective paper protocol locked (Sep 14, 2026)
+
+The original `data/paper/log.csv` remains historical. It has no trustworthy
+creation timestamps or input/code fingerprints, and its documented next-open
+entry rule was not implemented by its grader. It is available through
+`paper.py grade --legacy` and is never pooled with forward evidence.
+
+The new `prospective-v2` series starts empty in `data/paper/log_v2.csv`.
+Predictions require completed month-end data and clean pipeline code. Each run
+writes an exclusive-create JSON manifest with UTC creation time, git state,
+raw-input hashes, data date, model backend and versions, feature list,
+train/validation ranges, frozen parameters, and every ML and momentum signal.
+Log rows carry the manifest hash. Grading verifies the hash and signal fields,
+then appends an idempotent result to `grades_v2.csv`.
+
+Execution now matches the stated protocol: entry is the first subsequent
+session's open; a stop exits at the first actual close at or below 85% of entry,
+including gaps; otherwise the twentieth close exits; and round-trip costs are
+charged. IWM uses the same next-open comparison. A full development run in a
+temporary ledger produced 14 signals (4 ML, 10 momentum) and passed manifest
+verification. The production guard rejected Sep 10 data on Sep 14, so the clean
+series still has zero observations.
