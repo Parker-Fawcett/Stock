@@ -170,31 +170,43 @@ FFT features, MACD/candlesticks.
 
 ## Bottom line (current)
 
-Public-data cross-sectional rank predicts weakly (AUC ~0.56) and profits
-~never after risk. The only strategy positive in every half tested is
-textbook momentum with no ML. Independent convergence with the source
-project's verdict, tighter bounds, three universes.
+Public-data cross-sectional rank predicts weakly (AUC ~0.55) and adds
+nothing blended with momentum — the ensemble dilutes rather than helps,
+before and after the accounting fixes. The only strategy positive in
+every half tested, across three universes, is textbook 12-1 momentum
+with no ML. Under corrected portfolio accounting (Sep 2026), that
+result is stronger than this file claimed for most of its life:
+small-cap momentum beats SPY buy-and-hold outright in both halves, not
+just on a risk-adjusted basis, and mid-cap does the same in the stress
+half. The reversal came from fixing a return-accounting bug, not from a
+new signal or new data. Independent convergence with the source
+project's verdict on everything else — insider data, neural nets,
+sentiment, long-short — all still fail, for the same structural
+reasons, on the same corrected accounting.
 
 ## Regime correction (the nessessary uncomfortable table)
 
 Both ML halves were bull markets, not one calm + one stress:
 tune 2013–19 SPY +12.6%/IWM +8.9%; holdout 2019–25 SPY +15.1%/IWM +7.4%
-(crashes inside, V-recoveries after). Consequence: NO long-only config
-in this project beat buy-and-hold SPY on return in either half. P5's
-+12.7% trails SPY's +15.1% on the same window. Best case anywhere is a
-tie on risk-adjusted terms (multi-asset Sharpe 0.82 vs SPY ~0.8).
-Momentum's wins are real but relative, not absolute. The file's claim
-is hereby downgraded from 'weak signal, unharvestable risk' to 'weak
-signal that trails the index, with calmer variants'.
+(crashes inside, V-recoveries after). Best case for the ML config
+anywhere is a tie on risk-adjusted terms (multi-asset Sharpe 0.82 vs
+SPY ~0.8); P5's ML config (+12.7%) genuinely trails SPY's +15.1% on
+this window — that comparison is apples-to-apples and stands.
 
-(PARTIALLY OVERTURNED Sep 13, 2026: this section's SPY/IWM figures came
-from a different dataset's tune/holdout window than the momentum
-backtest they were compared against — not apples-to-apples, and on top
-of momentum numbers since revised upward by the log-return-averaging
-fix. A same-window, same-ledger recheck below finds small-cap momentum
-does beat SPY buy-and-hold on raw return, in both halves. "No long-only
-config beat SPY in either half" is false for at least this one config.
-See "Momentum vs. SPY, closed out" below.)
+Momentum's wins were assumed relative, not absolute, when this section
+was first written. That assumption holds for the ML config above. It
+does not hold for momentum. (REVISED Sep 13, 2026: the claim that
+followed this paragraph — "no long-only config beat SPY in either
+half," downgrading momentum to "weak signal that trails the index" —
+compared momentum's CAGR against this section's SPY/IWM figures, which
+come from the *ML panel's* window above, not momentum's own dates. Not
+apples-to-apples, and on top of a return-accounting bug, fixed later,
+that had specifically been understating momentum. Repriced on
+momentum's own window with the corrected ledger: small-cap momentum
+beats SPY buy-and-hold in both halves; mid-cap beats it in the stress
+half. Full numbers in "Momentum vs. SPY, closed out" below. This
+correction is scoped to momentum — the ML/multi-asset comparisons above
+were valid on their own terms.)
 
 ## After everything
 
@@ -208,12 +220,15 @@ momentum, Graham value on real financials, French factor regimes, live
 paper trading. Twelve numbered experiments, each with a pre-committed
 bar where selection was involved.
 
-What survived: a 0.56 AUC rank signal that replicates on untouched data
-but never survives risk; textbook 12-1 momentum, positive in all four
-halves tested across two universes (small hold +6.2%, mid hold +11.4%),
-plus multi-asset trend (+6.3%/+7.3% halves, Sharpe 0.82/0.54, DD under
--0.24 — best risk-adjusted in the project); a live paper log grading
-both monthly.
+What survived: a ~0.55 AUC rank signal that replicates on untouched
+data but never survives risk on its own; textbook 12-1 momentum,
+positive in all four halves tested across two universes and, under
+corrected accounting, outright beating SPY buy-and-hold in small caps
+(both halves, +16.7%/+20.7%) and mid-cap's stress half (+23.6%) — not
+just calmer than the index, actually ahead of it; plus multi-asset
+trend (+7.9%/+8.0% halves, Sharpe 0.94/0.73 — still the best
+risk-adjusted line, though no longer the only thing beating the index
+outright); a live paper log grading both monthly.
 
 What died: everything with a neural net, everything with insider data
 (three formulations), everything with social sentiment (both directions,
@@ -227,14 +242,24 @@ strange signals are sparse where they're free and paywalled where they'd
 matter, and small-cap friction eats paper edges. His channel banner says
 it in net-worth font; this repo says it in 70 folds.
 
+Momentum's win isn't the same kind of finding as the things above it —
+it held up under an isolated same-window, same-ledger recheck against
+the old buggy version, which is closer to a controlled experiment than
+a hope.
+
 What runs on its own now: monthly paper log (ML + momentum sleeves),
 monthly momentum sleeve, and the value engine waiting on small-cap data
 that costs money everywhere checked.
 
-What would reopen the case: paid point-in-time fundamentals on small
-caps, a new data regime (satellite/credit-card class, with budget), or
-months of live log contradicting the backtests. Until one arrives, the
-file is closed and the index fund wins.
+What would reopen the case on the parts still dead: paid point-in-time
+fundamentals on small caps, a new data regime (satellite/credit-card
+class, with budget), or months of live log contradicting the
+backtests. What's no longer closed: small-cap momentum's SPY-beating
+result held up under an isolated recheck (Sep 2026) — that's the
+corrected number, not the bug talking. ML, insider data, and
+hand-tuned risk overlays are still closed cases; the index fund still
+wins there. Textbook momentum on small caps is open again, pending live
+confirmation and a survivorship-free (QC/LEAN) replication.
 
 ## Who does this better (research waves)
 
