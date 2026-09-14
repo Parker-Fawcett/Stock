@@ -187,6 +187,15 @@ Momentum's wins are real but relative, not absolute. The file's claim
 is hereby downgraded from 'weak signal, unharvestable risk' to 'weak
 signal that trails the index, with calmer variants'.
 
+(PARTIALLY OVERTURNED Sep 13, 2026: this section's SPY/IWM figures came
+from a different dataset's tune/holdout window than the momentum
+backtest they were compared against — not apples-to-apples, and on top
+of momentum numbers since revised upward by the log-return-averaging
+fix. A same-window, same-ledger recheck below finds small-cap momentum
+does beat SPY buy-and-hold on raw return, in both halves. "No long-only
+config beat SPY in either half" is false for at least this one config.
+See "Momentum vs. SPY, closed out" below.)
+
 ## After everything
 
 Started from 29 of his videos and one question: can his AI stock
@@ -448,6 +457,59 @@ from the momentum figures this session has since revised upward
 (item 11 rerun above); fresh momentum alone clears that bar easily now,
 so the bar is no longer the meaningful comparison — momentum-alone vs
 ensemble, both on fresh numbers, is, and momentum alone still wins.
+
+## Momentum vs. SPY, closed out (Sep 13, 2026)
+
+Closes the open question left above: does corrected small-cap momentum
+actually beat SPY buy-and-hold, given the two numbers looked close?
+
+The "regime correction" section's SPY/IWM figures came from the ML
+panel's tune/holdout split (2013–19 / 2019–25) — a different dataset
+with its own date range, not the momentum backtest's own window. Comparing
+across two different windows is not a valid test. Fixed properly this
+time: pulled the momentum backtest's own decision dates and priced SPY
+and IWM at exactly those dates, same month-count annualization
+(`years = months/12`) used everywhere else in this file, so the
+benchmark and the strategy are measured over the identical calendar
+window with the identical CAGR convention.
+
+**Small-cap momentum's own window: 2011-02-28 to 2026-09-10 (188
+months), split at 2018-11-30/2018-12-31 (94/94):**
+
+| | tune CAGR | hold CAGR |
+|---|---:|---:|
+| SPY buy-hold | +11.9% | +16.9% |
+| IWM buy-hold | +9.8% | +11.6% |
+| Small-cap momentum (fixed ledger) | **+16.7%** | **+20.7%** |
+
+Small-cap momentum beats SPY buy-and-hold on raw return in **both**
+halves, not zero. That directly overturns the regime-correction
+section's "no long-only config beat SPY in either half" for at least
+this one configuration.
+
+**Mid-cap momentum, same window (188 months, same split):**
+
+| | tune CAGR | hold CAGR |
+|---|---:|---:|
+| SPY buy-hold | +11.9% | +16.9% |
+| Mid-cap momentum (fixed ledger) | +8.9% | **+23.6%** |
+
+Mixed: mid-cap trails SPY in tune, beats it clearly in holdout — the
+stress-period result (COVID, 2022 bear, recovery) is the one that
+matters more for "does this survive when it's needed," and it clears
+SPY by a wide margin there.
+
+Reading: the file's "index fund wins" bottom line was never wrong about
+risk-adjusted terms or about the ML/insider/long-short lines that
+actually died. But the specific claim that momentum never beats SPY on
+raw return was an artifact of comparing the wrong two windows on top of
+an accounting bug that was independently understating momentum's
+return — fix either one and the claim gets shakier; fixing both breaks
+it for small caps outright. The "Bottom line" and "After everything"
+sections above still describe the pre-fix picture and should be read
+as historical until rewritten; not rewritten here to avoid changing two
+narrative sections in the same pass as the numbers that justify the
+change.
 
 ## Dump (everything, unstructured, Sep 2026)
 
