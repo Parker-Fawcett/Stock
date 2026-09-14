@@ -62,7 +62,11 @@ which strengthens holdout results and weakens tune ones.
     raw result in the project. (CORRECTION: holdout CAGRs were first
     misreported higher — shared running equity curve wasn't reset per
     slice. Caught by reconciliation check, fixed, rerun. Sharpe/DD were
-    always correct.)
+    always correct.) (SUPERSEDED Sep 13, 2026: these numbers came from
+    a log-return-averaging bug that understated equal-weight portfolio
+    returns. Rerun under the corrected ledger is meaningfully stronger
+    in every half, both universes — see "Rerun under corrected ledger"
+    below.)
 12. **Ensemble (50% ML-wide + 50% momentum, zero new params).** Tune:
     ml -2.2% (Sharpe -0.10), mom +8.7% (+0.40), ens +3.1% (+0.17). Bar
     was Sharpe > 0.41 with DD > -0.31. Failed — averaging dilutes.
@@ -114,6 +118,8 @@ which strengthens holdout results and weakens tune ones.
     (0.62). SPY buy-hold same window +14.5% — strategy trails on
     return, wins on risk-adjusted calm. (Also fixed a slice-CAGR bug
     that had inflated momentum holdout prints; Sharpe/DD unaffected.)
+    (SUPERSEDED Sep 13, 2026: same log-return-averaging bug as #11 —
+    see "Rerun under corrected ledger" below.)
 19. **Data-hygiene incident (Sep 2026).** Found 105 stale large-cap
     files (Dec 2025) mixed with fresh ones — universe-scoped refreshes
     never re-requested them, and SPY silently dropped out of
@@ -126,6 +132,8 @@ which strengthens holdout results and weakens tune ones.
     DD -0.16). Both positive, divergent by regime like everything else.
     Holdout Sharpe 0.88 is the best single-half risk-adjusted print in
     the project. No loop budget spent (new sleeve, descriptive).
+    (SUPERSEDED Sep 13, 2026: same log-return-averaging bug as #11 —
+    see "Rerun under corrected ledger" below.)
 12. **Value lane, real data (12 mega caps, FMP annuals).** Median
     price/IV 2.77 — mega caps never near Graham value. d0.5: zero trades.
     d0.0: +2.7% vs +8.1% fair benchmark, avg 0.4 names. Free FMP caps
@@ -341,6 +349,73 @@ None of these were retuned or re-selected — same rules, same thresholds,
 same universes. This is the correctness-first replay REVIEW.md recommended,
 not new strategy search. Everything numbered above (11, 12, 18, 20, and the
 AUC-dependent items) needs a rerun before its number can be cited again.
+
+## Rerun under corrected ledger: momentum and multi-asset (Sep 13, 2026)
+
+`mom_run.py` and `multi_run.py` rerun after fixing the log-return-averaging
+bug (#4 above), same rules/thresholds/universes/costs, no retuning. One
+data-hygiene drop: `LEG` (Leggett & Platt, in the smallcap universe) is
+excluded — Yahoo's chart API now returns only 6 rows for it regardless of
+requested range, last print 2026-08-27 volume 0, consistent with a
+delisting or trading halt. Everything else in both universes is same-day
+fresh (verified before running, not just trusted).
+
+**Isolated the fix's effect directly**: reran the identical window and
+ticker set through the old log-averaging formula side by side with the
+fix. The old formula reproduced the original item-11 numbers almost
+exactly (small tune 9.47%/0.414/-0.313 vs the recorded 9.5%/0.41/-0.31;
+mid tune 3.29%/0.151 vs 3.3%/0.15) — confirming the jump below is the
+accounting fix, not a different window, different tickers, or new
+market data.
+
+**Textbook 12-1 momentum (supersedes #11):**
+| | tune CAGR | tune Sharpe | tune DD | hold CAGR | hold Sharpe | hold DD |
+|---|---:|---:|---:|---:|---:|---:|
+| Small, old (log-avg) | +9.5% | 0.41 | -0.31 | +6.2% | 0.20 | -0.56 |
+| Small, fixed | **+16.7%** | **0.80** | -0.26 | **+20.7%** | **0.75** | -0.39 |
+| Mid, old (log-avg) | +3.3% | 0.15 | -0.32 | +11.4% | 0.35 | -0.37 |
+| Mid, fixed | **+8.9%** | **0.50** | -0.28 | **+23.6%** | **0.79** | -0.32 |
+
+Not a small correction — Sharpe roughly doubled and holdout CAGR roughly
+tripled in both universes. Direction makes sense: log-averaging a monthly
+equal-weight book of ~8 high-dispersion small/mid-cap movers systematically
+understates the true portfolio return (Jensen's gap runs the other way
+here than in the P1 bug above, which *inflated* a return). The corrected
+number says the momentum signal was stronger than this file has claimed
+for months, not weaker.
+
+**Multi-asset trend (supersedes #18 domestic legs), same window:**
+| | tune CAGR | tune Sharpe | tune DD | hold CAGR | hold Sharpe | hold DD |
+|---|---:|---:|---:|---:|---:|---:|
+| Monthly, old | +7.3% | 0.82 | -0.13 | +7.4% | 0.62 | -0.24 |
+| Monthly, fixed | **+7.9%** | **0.94** | -0.13 | **+8.0%** | **0.73** | -0.23 |
+| Quarterly, fixed | +6.4% | 0.70 | -0.13 | +7.6% | 0.72 | -0.27 |
+| SPY buy-hold, same window | +14.5% | — | — | — | — | — |
+
+Smaller uplift than momentum, as expected — a 4-asset ETF book has far
+less cross-sectional dispersion than an 8-name small-cap basket, so the
+log-vs-simple gap is smaller. Conclusion is unchanged: still trails SPY
+buy-hold on raw return, still wins on risk-adjusted terms, now by a wider
+margin (Sharpe 0.94 tune vs the old 0.82).
+
+**International sleeve (supersedes #20):** tune +2.7% (Sharpe 0.26,
+DD -0.24), holdout +10.0% (Sharpe 0.78, DD -0.22) — close to the old
++2.9%/+11.2% print; low-dispersion ETF basket again limits the gap.
+Still positive both halves.
+
+**Open question, not resolved here:** the "regime correction" section
+above claims no long-only config beat SPY buy-and-hold on return in
+either half. Small-cap momentum's new holdout CAGR (+20.7%) is close to
+or above the SPY holdout figure cited there (+15.1%), which would
+overturn that claim if the windows line up — but that comparison used a
+different price series (SPY vs this rerun's IWM-relative momentum) and
+hasn't been checked apples-to-apples yet. Needs a direct SPY-benchmarked
+rerun before the regime-correction verdict is revised either way.
+
+`ens_test.py` (the ML/momentum ensemble) was not rerun here — it needs
+fresh probabilities from the walk-forward leak fix first, and averaging
+a fresh ML leg with these new momentum numbers before that regeneration
+would just manufacture a different wrong number.
 
 ## Dump (everything, unstructured, Sep 2026)
 
