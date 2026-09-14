@@ -157,8 +157,11 @@ cached by ticker. The small-cap sample contains 100 names sampled from the
 September 2026 S&P SmallCap 600 constituent list, with `LEG` subsequently
 excluded because the endpoint returned only six stale observations. The
 mid-cap replication contains 100 names sampled from the September 2026 S&P
-MidCap 400 list. IWM supplies the market-relative label for the small-cap model;
-MDY is used for the mid-cap generalization. SPY is used for matched-window
+MidCap 400 list. IWM supplies the market-relative label and benchmark for both
+the small-cap model and the mid-cap momentum results reported in Table 3. An
+earlier, separate mid-cap machine-learning generalization test (documented in
+`FINDINGS.md`, not reported in this paper) used MDY as its market-relative
+label; it is not the source of any table here. SPY is used for matched-window
 buy-and-hold comparisons.
 
 These lists are known today and therefore contain survivorship and membership
