@@ -8,19 +8,50 @@ a plumbing check, not a claim.
 from __future__ import annotations
 
 import argparse
+import hashlib
+import json
+import subprocess
 import sys
+from datetime import datetime, timezone
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 
 import numpy as np
 import pandas as pd
+import sklearn
 
 from predictor import backtest as bt
 from predictor import evaluate as ev
 from predictor.data import download_universe, assert_vintage
 from predictor.features import build_panel, model_cols
 from predictor.model_lgbm import fit_fold, walk_forward
+
+
+def file_sha256(path: str) -> str:
+    digest = hashlib.sha256()
+    with open(path, "rb") as handle:
+        for chunk in iter(lambda: handle.read(1024 * 1024), b""):
+            digest.update(chunk)
+    return digest.hexdigest()
+
+
+def git_state() -> dict:
+    try:
+        commit = subprocess.check_output(
+            ["git", "rev-parse", "HEAD"], text=True).strip()
+        dirty = bool(subprocess.check_output(
+            ["git", "status", "--porcelain"], text=True).strip())
+        working = subprocess.check_output(
+            ["git", "diff", "HEAD", "--", "predictor", "run.py"], text=True)
+        return {
+            "commit": commit,
+            "dirty": dirty,
+            "pipeline_diff_sha256": hashlib.sha256(
+                working.encode("utf-8")).hexdigest(),
+        }
+    except Exception as exc:  # noqa: BLE001
+        return {"error": str(exc)}
 
 
 def main() -> None:
@@ -71,15 +102,20 @@ def main() -> None:
     if not folds:
         print("not enough history for walk-forward; add tickers/years")
         return
-    aucs, summaries = [], []
+    aucs, summaries, backends = [], [], set()
     cols = model_cols(panel)
     cache = None
     if args.save_proba:
         cache = Path(args.save_proba)
         cache.mkdir(parents=True, exist_ok=True)
+        existing = list(cache.glob("fold*.csv")) + list(cache.glob("manifest.json"))
+        if existing:
+            raise FileExistsError(
+                f"cache destination is not empty: {cache}; use a new directory")
     for fi, f in enumerate(folds):
         for seed in range(args.seeds):
             model = fit_fold(f.train, f.val, seed=seed)
+            backends.add(f"{type(model).__module__}.{type(model).__name__}")
             p = model.predict_proba(f.test[cols].values)[:, 1]
             aucs.append(ev.auc_score(f.test["label"].values, p))
             if seed == 0:  # backtest first seed only per fold (speed)
@@ -93,6 +129,43 @@ def main() -> None:
                 summaries.append(s)
                 mk = bt.run_monkeys(f.test)
                 s["monkey_mean"] = float(mk["monkey_mean"].iloc[0])
+    if cache is not None:
+        manifest = {
+            "schema_version": 1,
+            "created_at_utc": datetime.now(timezone.utc).isoformat(),
+            "git": git_state(),
+            "arguments": vars(args),
+            "pipeline": {
+                "horizon_trading_days": bt.HORIZON,
+                "model_columns": cols,
+                "saved_seed": 0,
+                "fold_count": len(folds),
+                "model_backends": sorted(backends),
+            },
+            "panel": {
+                "rows": len(panel),
+                "dates": int(panel["Date"].nunique()),
+                "start": str(pd.Timestamp(panel["Date"].min()).date()),
+                "end": str(pd.Timestamp(panel["Date"].max()).date()),
+                "tickers": sorted(panel["ticker"].unique().tolist()),
+            },
+            "folds": [{
+                "number": number,
+                "test_start": str(pd.Timestamp(fold.test["Date"].min()).date()),
+                "test_end": str(pd.Timestamp(fold.test["Date"].max()).date()),
+                "test_rows": len(fold.test),
+            } for number, fold in enumerate(folds)],
+            "input_sha256": {
+                ticker: file_sha256(path) for ticker, path in sorted(price_paths.items())
+            },
+            "versions": {
+                "numpy": np.__version__,
+                "pandas": pd.__version__,
+                "python": sys.version,
+                "scikit_learn": sklearn.__version__,
+            },
+        }
+        (cache / "manifest.json").write_text(json.dumps(manifest, indent=2) + "\n")
     print(f"mean AUC over {len(aucs)} fits: {np.nanmean(aucs):.3f}")
     print(pd.DataFrame(summaries).to_string(index=False))
 

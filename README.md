@@ -60,7 +60,9 @@ python3 run.py --tickers AAPL,MSFT,JNJ,PG,XOM,CVX,KO,MRK,WMT,IBM --start 2015010
 - `predictor/evaluate.py` — AUC + CAGR/Sharpe/maxDD/turnover/cost sweep
 - `predictor/insider.py` — Form 4 features via OpenInsider (rejected twice)
 - `predictor/universe.py` — SP100 + S&P 600 sample
-- `run.py` — backtests, `--save-proba` for sweeps
+- `run.py` — backtests; new probability caches include an input/code manifest
+- `cache_compare.py` — row-level probability, rank, and selected-name comparison
+- `purge_ablation.py` — controlled legacy-vs-corrected purge refit
 - `sweep.py` — cost sweeps with tune/holdout splits
 - `paper.py` — FROZEN forward paper trading (wide-seed0-v1)
 

@@ -58,10 +58,21 @@ universe changes from one another.
 
 The common period is February 28, 2020 through July 9, 2025. Because the
 reversal remains on identical dates, the extra 2025–2026 market strength does
-not explain it. The result is highly sensitive to the probability/fold/data
-pipeline. In v2 tune, all four fail the original Sharpe gate, so the later
-positive holdouts are supporting post-selection evidence rather than new
-successful promotions.
+not explain it. A controlled refit on one current data snapshot then held the
+folds, test rows, model, and seed constant and changed only purge logic:
+
+| Proposal | Legacy purge holdout | Corrected purge holdout |
+|---|---:|---:|
+| P5 | +11.9% | +25.9% |
+| P8 | +6.7% | +17.7% |
+| P9 | +6.6% | +17.7% |
+| P12 | +6.4% | +17.9% |
+
+The purge repair itself causes a large positive shift, even though aggregate
+AUC barely changes (0.553 to 0.551). Monthly selected-name overlap is only
+about 39%. Neither ablation passes the original tune gate, so these are
+diagnostics rather than promotions. The original legacy cache cannot be fully
+reconstructed because it has no data/code manifest; new caches now record one.
 
 ## What the evidence supports
 

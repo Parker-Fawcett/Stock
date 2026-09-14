@@ -458,22 +458,44 @@ member, so this check cannot attribute the reversal to leakage alone. The
 defensible conclusion is that the overlay result is highly pipeline-sensitive.
 Publish both vintages and accumulate genuinely prospective observations.
 
-**What the two caches' probabilities actually look like, row for row**
-(`cache_compare.py`, common `(Date, ticker)` rows in the shared window
-above): labels and prices agree exactly, as expected — the leak is in
-training/calibration, not in the raw data. AUC is statistically identical
-on this common subset, 0.543 for both vintages, and per-date rank
-correlation is decent (Spearman 0.74 median). But the actual top-20,
-threshold-0.25 picks each month overlap by only **Jaccard ~0.38** between
-the two vintages — roughly 62% of names selected differ month to month.
-That is a concrete, separate mechanism from the window/fold confounds
-above: a model can be statistically indistinguishable on aggregate rank
-quality while still selecting a mostly different portfolio at the
-threshold, and small-cap monthly return dispersion is large enough that
-which specific ~10 names get picked swamps how good the ranking is
-overall. This narrows "pipeline-sensitive" to something more specific —
-the reversal is consistent with calibration/threshold sensitivity, not
-proof of it, since fold/window differences remain unremoved confounds.
+**What the two original caches' probabilities look like, row for row.**
+`cache_compare.py` finds 246,003 common `(Date, ticker)` rows through July
+2025. Labels agree 100%; median close difference is zero and maximum absolute
+close difference is 0.676%. AUC is effectively identical (0.550 legacy,
+0.549 v2 overall; 0.544 each on the shared holdout dates), and per-date rank
+correlation is respectable at 0.74 median. But their top-20, threshold-0.25
+picks overlap by only **Jaccard 0.38**. Roughly 62% of selected names differ
+month to month. Aggregate AUC is therefore hiding economically large
+instability at the portfolio cutoff.
+
+**Controlled purge ablation.** `purge_ablation.py` rebuilt both probability
+sets on one current price snapshot. It held all 26 fold boundaries, test rows,
+labels, closes, universe, model code, and seed zero constant. One side exactly
+reproduced the pre-fix split logic from `091b80f^`; the other used the current
+trading-day label endpoints and train/validation purge. The fixed side exactly
+reproduced `sc_full_v2` (probability correlation 1.000). Only purge logic varied:
+
+| Proposal | Legacy-purge tune | Legacy-purge hold | Fixed-purge tune | Fixed-purge hold |
+|---|---:|---:|---:|---:|
+| P5 | -1.5% / 0.03 / -52.2% | +11.9% / 0.57 / -35.6% | +3.8% / 0.30 / -37.5% | +25.9% / 0.83 / -41.6% |
+| P8 | +1.1% / 0.16 / -50.6% | +6.7% / 0.40 / -39.4% | +4.6% / 0.36 / -35.6% | +17.7% / 0.65 / -40.8% |
+| P9 | +1.2% / 0.16 / -50.4% | +6.6% / 0.40 / -39.7% | +4.6% / 0.35 / -34.9% | +17.7% / 0.65 / -40.8% |
+| P12 | +1.2% / 0.16 / -50.4% | +6.4% / 0.39 / -39.7% | +4.7% / 0.36 / -34.5% | +17.9% / 0.66 / -40.8% |
+
+Format is CAGR / Sharpe / maximum drawdown. The purge repair alone produces a
+large positive holdout shift while slightly lowering aggregate common-row AUC
+(0.553 to 0.551). Probability rank correlation is 0.762, but selected-name
+Jaccard is only 0.392. Neither side passes the original tune gate, so this is a
+mechanism diagnostic, not a retroactive promotion.
+
+The old `sc_full` cache still cannot be fully reconstructed: refitting its
+legacy purge against today's inputs reaches only 0.855 rank correlation and
+0.498 pick overlap with the saved artifact. Its fold CSVs contain no feature,
+raw-data, code, or environment fingerprint. That missing provenance prevents
+attributing the remaining difference. `run.py --save-proba` now refuses to
+overwrite a cache and writes `manifest.json` with arguments, git state,
+pipeline settings, model backend, versions, fold dates, panel coverage, and a
+SHA-256 hash for every price input.
 
 ## Rerun under corrected ledger: momentum, multi-asset, ensemble (Sep 13, 2026)
 
