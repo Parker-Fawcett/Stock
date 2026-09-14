@@ -795,3 +795,19 @@ charged. IWM uses the same next-open comparison. A full development run in a
 temporary ledger produced 14 signals (4 ML, 10 momentum) and passed manifest
 verification. The production guard rejected Sep 10 data on Sep 14, so the clean
 series still has zero observations.
+
+## Working paper drafted (Sep 14, 2026)
+
+`PAPER.md` turns the audit trail into a manuscript with one narrow central
+claim: aggregate predictive accuracy can survive a pipeline correction while
+the investable decisions do not. The controlled purge ablation is the primary
+result (AUC 0.553 vs 0.551; probability Spearman 0.762; mean selected-name
+Jaccard 0.392). Corrected momentum and the QuantConnect run are comparisons and
+robustness evidence, not claims of a newly discovered anomaly or matched return
+estimates.
+
+The draft declares the work still required before journal submission:
+block-bootstrap uncertainty, factor regressions, multiple-testing adjustment,
+a matched QuantConnect comparison, selection-stability figures, artifact-level
+provenance, and prospective observations. The eight remaining improvement-loop
+trials stay banked while this measurement work is open.

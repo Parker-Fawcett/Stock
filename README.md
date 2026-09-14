@@ -9,6 +9,10 @@ paper series and get graded in public, green or red.
 **[Current results and evidence status](RESULTS.md)** — the short,
 maintained view. `FINDINGS.md` remains the full chronological record.
 
+**[Working paper](PAPER.md)** — manuscript draft centered on the controlled
+finding that near-identical aggregate AUC can conceal unstable portfolio
+selection. Open statistical and matched-universe work is declared in the draft.
+
 The 30 rows in `data/paper/log.csv` are retained as historical records, not
 forward evidence. The clean `prospective-v2` scoreboard starts at the next
 month end with `wide-seed0-v1` and `mom12-1-v1`.

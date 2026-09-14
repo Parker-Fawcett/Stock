@@ -123,3 +123,12 @@ or below the 15% stop or at the final close, and charge round-trip costs.
 Results persist separately in `data/paper/log_v2.csv` and
 `data/paper/grades_v2.csv`. No off-cycle September observation was inserted
 while testing this change.
+
+## Publication status
+
+`PAPER.md` is the first complete working-paper draft. Its central claim is the
+controlled result, not a claim of new alpha: correcting the purge changes AUC
+from 0.553 to 0.551 while mean selected-name overlap is only 0.392. The draft
+labels the local momentum magnitudes as provisional, treats QuantConnect as a
+directional replication, and prespecifies the remaining inference, matched
+cloud comparison, and prospective evidence needed before journal submission.
