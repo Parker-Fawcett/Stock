@@ -465,25 +465,35 @@ reflect those differences.
 #### 6.4.1 Fixed-universe comparison
 
 The fixed 99-name QuantConnect run reports 2,557.48% total return, 23.617%
-compound annual return, 48.10% maximum drawdown, and a 0.690 Sharpe ratio. End
+compound annual return, 48.10% daily-path maximum drawdown, and a 0.690
+daily-path Sharpe ratio. End
 equity is $2,657,483.15 from $100,000, with $18,335.09 in reported fees across
 1,733 orders. The local reference on the comparable survivor list and window is
 21.65% CAGR, 37.15% maximum drawdown, and 0.85 Sharpe.
 
-**Table 5. Fixed-survivor implementation comparison**
+**Table 5. Fixed-survivor implementation comparison by sampling frequency**
 
-| Implementation | CAGR | Sharpe | Maximum drawdown |
+| Implementation and sampling | CAGR | Sharpe | Maximum drawdown |
 |---|---:|---:|---:|
-| Local Yahoo ledger | 21.65% | 0.85 | -37.15% |
-| QuantConnect fixed 99-name universe | 23.62% | 0.69 | -48.10% |
+| Local Yahoo, 183 common 21-session legs | 20.86% | 0.83 | -37.15% |
+| QuantConnect, 183 common calendar months | 23.75% | 0.93 | -39.30% |
+| QuantConnect, official daily path | 23.62% | 0.69 | -48.10% |
 
-The 1.97-percentage-point CAGR difference is small relative to the return
-magnitude, which is encouraging evidence that the local result is not solely a
-Yahoo pricing artifact. Risk does not match: the cloud drawdown is 10.95 points
-worse and Sharpe is 0.16 lower. Because fill timing, fees, symbol start dates,
-and the final interval remain different, Table 5 establishes broad convergence,
-not numerical equivalence. It also says nothing new about survivorship because
-both rows use the same current-constituent list.
+The official full-span 1.97-percentage-point CAGR difference is small relative
+to the return magnitude, which is encouraging evidence that the local result
+is not solely a Yahoo pricing artifact. The apparent 10.95-point drawdown gap in the original
+comparison was mostly a frequency mismatch. At month-end, the gap is 2.15
+points and QuantConnect's Sharpe is higher by 0.11. Across 183 complete months
+from March 2011 through May 2026, the two return paths correlate 0.933
+(R-squared 0.871), with 2.15 percentage points mean absolute monthly difference.
+
+The free-tier log cap preserves 142 comparable pick records through December
+2022. After mapping historical tickers to their current companies, mean
+pick-set Jaccard overlap is 0.866 and 61 months match exactly. Exact-pick months
+still have 1.83 points mean absolute return difference, consistent with the
+remaining price-history, fill-timing, and fee differences. This establishes
+close path-level replication but says nothing new about survivorship because
+both implementations use the same current-constituent list.
 
 ### 6.5 Factor exposure and resampling uncertainty
 
@@ -645,9 +655,10 @@ Five limitations constrain the current evidence.
 1. **Current-constituent local universes.** The local small- and mid-cap lists
    are sampled from September 2026 membership. Delisted and removed securities
    are absent from earlier years.
-2. **Imperfect external matching.** The fixed-universe QuantConnect result
-   controls the names and broad period, but fill timing, fees, mapping start
-   dates, and the final partial holding interval still differ. The dynamic run
+2. **Residual external implementation differences.** The fixed-universe
+   QuantConnect result controls the names and broad period, and monthly returns
+   correlate 0.933, but fill timing, fees, mapping start dates, and the final
+   partial holding interval still differ. The dynamic run
    validates direction without current-constituent selection; the fixed run
    compares magnitude without removing survivorship bias.
 3. **Research-path dependence.** Many ideas were evaluated during the wider
@@ -678,10 +689,10 @@ or machine-learning decision rules.
 3. **Done (Section 6.6).** Deflated Sharpe Ratio using the documented
    research-trial count and return skewness and kurtosis, with a sensitivity
    range extending to informal trials.
-4. **Executed; reconciliation remains.** `qc_momentum_matched.py` fixes the
-   cloud universe to the local 99-ticker list and broad 2011-2026 window. The
-   23.62% cloud CAGR is close to the 21.65% local reference. Reconcile monthly
-   returns after aligning fill timing, fees, and the final holding interval.
+4. **Done (Section 6.4.1).** `qc_momentum_matched.py` fixes the cloud universe
+   to the local 99-ticker list and broad 2011-2026 window. `qc_reconcile.py`
+   extracts and aligns the result: 183 complete monthly returns correlate 0.933,
+   and 142 logged monthly pick sets have mean Jaccard overlap of 0.866.
 5. Add selection-stability plots by month and by probability distance from the
    cutoff.
 6. Publish environment-lock information and immutable hashes for every table's
@@ -727,8 +738,9 @@ stops, and initial-equity drawdown are enforced, a frozen 12-minus-1-month
 momentum baseline dominates the tested machine-learning portfolio and its
 ensemble. A dynamic-universe cloud implementation preserves the positive
 direction, and a fixed-universe cloud run produces a similar CAGR with worse
-risk statistics. Monthly execution reconciliation and prospective outcomes
-remain necessary. Momentum's advantage over matched-window SPY buy-and-hold,
+risk statistics. Comparable month-end sampling narrows the risk difference,
+and the monthly paths correlate 0.933. Prospective outcomes remain necessary.
+Momentum's advantage over matched-window SPY buy-and-hold,
 however, is directional rather than statistically distinguishable from zero
 under a moving-block bootstrap, and the self-improvement loop's best observed
 Sharpe ratio is not distinguishable from the expected maximum of a 12-trial
@@ -820,6 +832,7 @@ https://www.preprints.org/manuscript/202608.2127
 | Factor regressions and bootstrap CIs | `factor_analysis.py` | Ken French factor cache (`predictor/factors.py`), console summary recorded in `FINDINGS.md` |
 | Deflated Sharpe Ratio | `deflated_sharpe.py` | `data/cache/sc_full/` (legacy, pre-registered dates), console summary recorded in `FINDINGS.md` |
 | Fixed-universe QuantConnect comparison | `qc_momentum_matched.py` | Cloud backtest `Determined Black Cow`; result recorded in `FINDINGS.md` and `RESULTS.md` |
+| QuantConnect path and pick reconciliation | `qc_reconcile.py` | `data/qc_reconciliation/summary.json` plus derived daily, monthly-return, and monthly-pick CSVs |
 
 ## Appendix B. Evidence-status vocabulary
 

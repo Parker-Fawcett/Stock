@@ -111,8 +111,10 @@ under the corrected common accounting convention: tune +17.8% (Sharpe
 replication: tune +9.8% (Sharpe 0.54), holdout +24.7% (Sharpe 0.81).
 These Yahoo universes contain today's survivors, so the magnitude remains
 provisional. A point-in-time QuantConnect run confirms that momentum survives
-on a different liquid-equity universe, but is not a matched estimate of these
-returns. The model never beat the textbook. Momentum logs alongside ML in
+on a different liquid-equity universe. A fixed-universe cloud run then produced
+a 0.933 correlation with the local monthly return path; on common month-end
+sampling its Sharpe/DD are 0.93/-39.3% versus 0.83/-37.1% locally. The model
+never beat the textbook. Momentum logs alongside ML in
 paper.py (`mom12-1-v1`) with per-model grading.
 
 ## Value lane (in progress)

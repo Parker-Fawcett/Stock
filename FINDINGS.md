@@ -823,7 +823,7 @@ CAGR, 48.100% max drawdown, and 0.690 Sharpe versus 21.65%/37.15%/0.85 locally.
 LEAN local bulk costs thousands; Docker ready if ever needed.
 
 Open: paper accumulation, value on paid small-cap data, quality expansion,
-monthly QC/Yahoo return-path reconciliation, 8 loop trials banked. File stays
+fine-grained QC/Yahoo fill attribution, 8 loop trials banked. File stays
 open, loop frozen, index fund winning.
 
 ## Prospective paper protocol locked (Sep 14, 2026)
@@ -1000,9 +1000,10 @@ Black Cow**, completed on a Community B-MICRO node in 76.39 seconds over
 - fees **$18,335.09** across 1,733 orders.
 
 Against the local reference, cloud CAGR is only 1.97 percentage points higher
-(23.62% vs 21.65%). Risk does not match: cloud Sharpe is 0.16 lower and maximum
-drawdown is 10.95 points worse. This is useful convergence on return magnitude,
-but not numerical equivalence.
+(23.62% vs 21.65%). The initial read found cloud Sharpe 0.16 lower and maximum
+drawdown 10.95 points worse, before recognizing that cloud risk used daily
+observations while local risk used monthly endpoints. The reconciliation below
+corrects that comparison.
 
 The engine warnings identify remaining differences that must be reconciled
 before calling the implementations exactly matched. Daily-resolution market
@@ -1017,8 +1018,54 @@ QuantConnect applies its IB fee model while local returns charge a fixed 25 bps.
 The honest three-way reading is now available. The dynamic-universe run removes
 the current-survivor restriction and confirms direction at 25.97% CAGR. The
 fixed-universe run retains survivor bias on both sides and broadly reproduces
-the local Yahoo magnitude at 23.62% versus 21.65%. Neither establishes exact
-monthly equality; return-path reconciliation is the next step.
+the local Yahoo magnitude at 23.62% versus 21.65%.
+
+## Fixed-universe QuantConnect path reconciled (Sep 14, 2026)
+
+The full `Determined Black Cow` result download was parsed by
+`qc_reconcile.py`. Its raw JSON SHA-256 is
+`15bfa4eea11cb674999df7994ae53265000d9c10f54e7c202192c1967aa5426a`;
+the 10 KB-capped log export SHA-256 is
+`67c461d5418006142c400e246ae577f0d15627b173fb7f150067ca0a6464f7aa`.
+The script also records an aggregate hash of all 99 local price inputs and
+hashes of the local momentum and universe source files. Derived daily equity,
+monthly returns, monthly picks, and a machine-readable summary are committed
+under `data/qc_reconciliation/`.
+
+After assigning each local 21-session leg to the following realization month
+and excluding QuantConnect's partial June 2026 interval, **183 complete monthly
+returns from March 2011 through May 2026 correlate 0.933 (R-squared 0.871)**.
+QuantConnect averages 0.184 percentage point more per month; mean absolute
+difference is 2.146 points and RMSE is 2.867 points. This is close path-level
+replication, not merely similar terminal wealth.
+
+The earlier risk comparison mixed frequencies. QuantConnect's reported 0.690
+Sharpe and -48.10% maximum drawdown use its daily equity path; the local 0.85
+and -37.15% figures use monthly 21-session endpoints. On comparable month-end
+sampling over the 183 common complete months, QuantConnect is **0.93 Sharpe and
+-39.30% maximum drawdown**, versus **0.83 and -37.15%** locally. Thus about
+8.80 percentage points of the apparent
+10.95-point drawdown gap came from sampling frequency; the comparable residual
+is 2.15 points. On those same complete months, CAGR is 23.75% in QuantConnect
+and 20.86% locally. The broader, slightly different spans retain the official
+23.62% cloud CAGR and 21.65% local 21-session-leg CAGR.
+
+The capped cloud log covers 142 comparable selection months, March 2011 through
+December 2022. QuantConnect historical tickers were normalized through the
+result's permanent security identifiers, plus the documented BSIG-to-AAMI and
+NYMT-to-ADAM intermediate changes. Mean pick-set Jaccard overlap is **0.866**,
+median overlap is 0.875, and 61 months match exactly. Mean absolute return
+difference is 1.83 points in exact-pick months and 2.59 points otherwise; the
+correlation between pick mismatch and absolute return difference is only 0.235.
+The residual therefore reflects both occasional rank differences and material
+price/fill/fee differences even when the selected companies are identical.
+
+The fixed-survivor replication is now reconciled at the level needed for the
+paper's main external check: the engines mostly choose the same companies and
+produce closely aligned monthly returns. It still does not remove survivor
+bias; that role belongs to the separate dynamic-universe run. Exact trade-level
+attribution would require uncapped logs or another instrumented cloud rerun and
+is a refinement rather than a blocker for the current methodological claim.
 
 ## Novelty audit and closest prior work (Sep 14, 2026)
 

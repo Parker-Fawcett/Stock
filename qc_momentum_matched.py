@@ -3,8 +3,9 @@
 # QuantConnect project: Calculating Fluorescent Yellow Owl
 # Backtest: Determined Black Cow
 # Result: +2,557.483% total return, 23.617% CAGR, 48.100% max drawdown,
-# 0.690 Sharpe, $18,335.09 fees, 1,733 orders. This closely reproduces the
-# local +21.65% CAGR on the fixed survivor universe, while risk differs.
+# 0.690 daily-path Sharpe, $18,335.09 fees, 1,733 orders. On comparable
+# common-month sampling, QC is 23.75% CAGR / 0.93 Sharpe / -39.30% maxDD
+# versus 20.86% / 0.83 / -37.15% locally; returns correlate 0.933.
 #
 # Purpose: qc_momentum.py already validated DIRECTION on a dynamic top-200
 # liquid-equity universe (survivor-free, but a different universe and period
@@ -25,8 +26,8 @@
 # the actual trading dates that fall inside this file's start/end below):
 #   CAGR +21.65%, Sharpe 0.85, maxDD -37.15%.
 #   Matched-window buy-hold: SPY +14.0%, IWM +10.1% (same 184 months).
-# QC's June 17 end leaves its final monthly position incomplete; reconcile
-# monthly paths before treating the two implementations as exactly matched.
+# QC's June 17 end leaves its final monthly position incomplete. The committed
+# qc_reconcile.py artifact excludes that partial month from path comparison.
 #
 # Framework: fixed symbol list (AddEquity, no coarse/dynamic universe) +
 # 12-1 momentum rank (lookback=252, skip=21, same as mom_run.py) + top

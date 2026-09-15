@@ -1,0 +1,106 @@
+{
+  "source": {
+    "file": "Determined Black Cow.json",
+    "sha256": "15bfa4eea11cb674999df7994ae53265000d9c10f54e7c202192c1967aa5426a",
+    "backtest": "Determined Black Cow",
+    "algorithm_id": "a79aa0eac1df72c1632c5b0a5c1868cf",
+    "local_raw_files": 99,
+    "local_raw_aggregate_sha256": "23ca6210923bb73701c65ce8e9a7b162b679c54d738ab5171056c383937a7ca0",
+    "mom_run_sha256": "f390f5948803a190220f9478b6f7b4ae4358c42d7633d9ad40483d23049ca9d8",
+    "universe_sha256": "4ca53d012a12550f1ccb82cda3204a6fa17d5d97baddab36f416afd7e54b6349",
+    "reconciler_sha256": "8f1c9c1a8f4489c2f44cb31df0766d66a7d1420e12a13bd9129f3d7507891ba5",
+    "log_file": "Determined Black Cow_logs.txt",
+    "log_sha256": "67c461d5418006142c400e246ae577f0d15627b173fb7f150067ca0a6464f7aa"
+  },
+  "reported_quantconnect": {
+    "Total Orders": "1733",
+    "Average Win": "1.10%",
+    "Average Loss": "-1.33%",
+    "Compounding Annual Return": "23.617%",
+    "Drawdown": "48.100%",
+    "Expectancy": "0.282",
+    "Start Equity": "100000",
+    "End Equity": "2657483.15",
+    "Net Profit": "2557.483%",
+    "Sharpe Ratio": "0.69",
+    "Sortino Ratio": "0.823",
+    "Probabilistic Sharpe Ratio": "3.680%",
+    "Loss Rate": "30%",
+    "Win Rate": "70%",
+    "Profit-Loss Ratio": "0.83",
+    "Alpha": "0.069",
+    "Beta": "1.223",
+    "Annual Standard Deviation": "0.251",
+    "Annual Variance": "0.063",
+    "Information Ratio": "0.477",
+    "Tracking Error": "0.185",
+    "Treynor Ratio": "0.142",
+    "Total Fees": "$18335.09",
+    "Estimated Strategy Capacity": "$6400000.00",
+    "Lowest Capacity Asset": "NGVT WAL3Y2OO9011",
+    "Portfolio Turnover": "2.06%",
+    "Drawdown Recovery": "1564"
+  },
+  "matched_complete_months": {
+    "start": "2011-03",
+    "end": "2026-05",
+    "months": 183,
+    "return_correlation": 0.933240542392828,
+    "return_r_squared": 0.8709379099656599,
+    "mean_qc_minus_local": 0.001842138949881198,
+    "mean_absolute_difference": 0.021461161233257028,
+    "root_mean_squared_difference": 0.028669746087640467,
+    "quantconnect_metrics": {
+      "months": 183,
+      "CAGR": 0.2375284853183226,
+      "Sharpe_monthly": 0.934565954797986,
+      "maxDD_monthly_endpoints": -0.3930426037696564
+    },
+    "local_metrics": {
+      "months": 183,
+      "CAGR": 0.20858769007120204,
+      "Sharpe_monthly": 0.8293787143609519,
+      "maxDD_monthly_endpoints": -0.3714828350653935
+    }
+  },
+  "frequency_reconciliation": {
+    "qc_reported_sharpe": 0.6899,
+    "qc_naive_daily_sharpe": 0.7080099353110975,
+    "qc_monthly_sharpe": 0.9504379357806493,
+    "local_monthly_sharpe": 0.852294822184385,
+    "qc_reported_daily_maxDD": -0.4813619396945997,
+    "qc_monthly_endpoint_maxDD": -0.3930426037696563,
+    "local_monthly_endpoint_maxDD": -0.3714828350653935,
+    "qc_daily_peak": "2021-02-09",
+    "qc_daily_trough": "2023-10-28",
+    "local_monthly_peak_decision": "2020-12-31",
+    "local_monthly_trough_decision": "2023-09-29"
+  },
+  "monthly_metrics": {
+    "quantconnect_all_calendar_months": {
+      "months": 185,
+      "CAGR": 0.24157265570404451,
+      "Sharpe_monthly": 0.9504379357806493,
+      "maxDD_monthly_endpoints": -0.3930426037696557
+    },
+    "local_all_21_session_legs": {
+      "months": 184,
+      "CAGR": 0.21646515197289107,
+      "Sharpe_monthly": 0.852294822184385,
+      "maxDD_monthly_endpoints": -0.3714828350653935
+    }
+  },
+  "pick_reconciliation": {
+    "start": "2011-03",
+    "end": "2022-12",
+    "months": 142,
+    "log_limit_note": "QuantConnect free-tier export truncated at 10 KB.",
+    "mean_jaccard": 0.8664819726439446,
+    "median_jaccard": 0.875,
+    "mean_intersection_names": 6.76056338028169,
+    "exact_match_months": 61,
+    "return_MAE_exact_pick_months": 0.018260064857041153,
+    "return_MAE_nonexact_pick_months": 0.02593666587291883,
+    "abs_return_difference_vs_pick_mismatch_correlation": 0.23457875461212324
+  }
+}

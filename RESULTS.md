@@ -18,7 +18,7 @@ the full history, including failed tests and superseded numbers.
 | Multi-asset trend | **SURVIVED — defensive** | Trails SPY on raw return, with smoother drawdowns and better measured Sharpe. |
 | Graham value, mega caps | **FAILED FOR THIS UNIVERSE** | Few or no qualifying trades; paid point-in-time small-cap fundamentals would be a different test. |
 | Paper portfolios | **LOCKED / AWAITING FIRST RUN** | The provenance-locked `prospective-v2` series starts at the next month end. Existing rows remain historical and separate. |
-| QuantConnect replication | **SURVIVED — DYNAMIC AND FIXED UNIVERSES** | Dynamic-universe run: +3,455.56% total return, 25.97% CAGR, 53.70% max DD, 0.695 Sharpe. Fixed 99-name matched-universe run: +2,557.48%, 23.62% CAGR, 48.10% max DD, 0.690 Sharpe versus local 21.65%/37.15%/0.85. |
+| QuantConnect replication | **SURVIVED — DYNAMIC AND FIXED UNIVERSES** | Dynamic-universe run: +3,455.56% total return, 25.97% CAGR, 53.70% daily max DD, 0.695 daily Sharpe. Fixed run: 183 complete monthly returns correlate 0.933 with local; common-month risk is 0.93 Sharpe/-39.30% DD versus 0.83/-37.15% locally. |
 
 ## Current numbers
 
@@ -143,21 +143,25 @@ The dynamic cloud magnitude is not a like-for-like estimate of the Yahoo
 result: it uses the top 200 liquid US equities at each selection date. A second
 cloud run fixes the universe to the same 99 current-constituent survivors and
 the same broad 2011-2026 window as the local small-cap comparison. Its 23.62%
-CAGR is close to the local 21.65%, while Sharpe is lower (0.69 vs 0.85) and
-drawdown is worse (-48.10% vs -37.15%). The cloud engine converted daily market
-orders to market-on-close/open fills, charged its IB fee model instead of the
+official CAGR is close to the local 21.65%. The earlier risk comparison mixed
+QuantConnect's daily curve with local monthly endpoints. On the same month-end
+scale, QuantConnect is 0.93 Sharpe/-39.30% drawdown versus 0.83/-37.15% locally;
+183 complete monthly returns correlate 0.933. The cloud engine converted daily
+market orders to market-on-close/open fills, charged its IB fee model instead of the
 local fixed 25 bps, adjusted several symbols to their mapping/data start dates,
-and included an incomplete final June holding interval. Treat the CAGR
-agreement as encouraging data/execution convergence, not exact replication.
+and included an incomplete final June holding interval. The capped logs show
+mean pick-set Jaccard overlap of 0.866 across 142 months, including 61 exact
+matches. Residual differences remain from fills, price histories, symbol
+availability, and fees.
 
 ## Promotion gate
 
 Momentum can move from **provisional** to **validated for deployment** only after:
 
-1. the remaining monthly-return differences between the completed fixed-
-   universe cloud run and Yahoo implementation are reconciled, including fill
-   timing, final-period truncation, and fees; and
-2. prospective paper observations accumulate under the frozen model version.
+1. prospective paper observations accumulate under the frozen model version;
+   and
+2. the evidence survives a genuinely new market window without changing the
+   frozen rule.
 
 Until those pass, this repository is a research product and audit trail,
 not investment advice or a deployable trading system.
@@ -195,5 +199,6 @@ seed fixed, from nearly unchanged AUC to 0.392 selected-name overlap and changed
 portfolio conclusions. `PAPER.md` includes a closest-prior-work table and does
 not claim discovery of momentum, predictive multiplicity, or allocation
 instability in general.
-Remaining work is monthly return reconciliation, selection-stability figures,
-artifact provenance, and prospective evidence.
+Remaining work is selection-stability figures, full table-level artifact
+provenance, and prospective evidence. The fixed-universe monthly return and
+pick reconciliation is complete.
