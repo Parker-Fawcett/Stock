@@ -1,5 +1,5 @@
 {
- "spent": 12,
+ "spent": 16,
  "proposals": {
   "P1-vol-only": {
    "status": "dead-artifact",
@@ -148,6 +148,54 @@
     "sharpe": 0.135,
     "months": 81
    }
+  },
+  "P13-ml-rank": {
+   "status": "exploratory-tune",
+   "pred": "Removing the absolute probability gate improves stability, but weak ML ranking keeps Sharpe below momentum.",
+   "cache": "data/cache/sc_full_v2",
+   "mode": "exploratory",
+   "tune": {
+    "CAGR": 0.1352,
+    "maxDD": -0.231,
+    "sharpe": 0.786,
+    "months": 89
+   }
+  },
+  "P14-mom75-ml25": {
+   "status": "exploratory-tune",
+   "pred": "A momentum-dominant blend preserves most baseline strength; ML adds little, expected Sharpe near but below momentum.",
+   "cache": "data/cache/sc_full_v2",
+   "mode": "exploratory",
+   "tune": {
+    "CAGR": 0.1205,
+    "maxDD": -0.215,
+    "sharpe": 0.788,
+    "months": 89
+   }
+  },
+  "P15-consensus40": {
+   "status": "exploratory-tune",
+   "pred": "Requiring both ranks in the top 40% raises signal agreement but concentrates the book; Sharpe may improve while DD worsens.",
+   "cache": "data/cache/sc_full_v2",
+   "mode": "exploratory",
+   "tune": {
+    "CAGR": 0.1532,
+    "maxDD": -0.222,
+    "sharpe": 0.903,
+    "months": 89
+   }
+  },
+  "P16-mom75-ml25-volw": {
+   "status": "exploratory-tune",
+   "pred": "Momentum-heavy ranks plus inverse-volatility weights should reduce DD; expected best risk-adjusted candidate of this round.",
+   "cache": "data/cache/sc_full_v2",
+   "mode": "exploratory",
+   "tune": {
+    "CAGR": 0.108,
+    "maxDD": -0.22,
+    "sharpe": 0.749,
+    "months": 89
+   }
   }
  },
  "archive": [
@@ -293,6 +341,69 @@
     "maxDD": -0.408,
     "sharpe": 0.135,
     "months": 81
+   }
+  },
+  {
+   "id": "P13-ml-rank",
+   "cache": "data/cache/sc_full_v2",
+   "mode": "exploratory",
+   "tune": {
+    "CAGR": 0.1352,
+    "maxDD": -0.231,
+    "sharpe": 0.786,
+    "months": 89
+   }
+  },
+  {
+   "id": "P14-mom75-ml25",
+   "cache": "data/cache/sc_full_v2",
+   "mode": "exploratory",
+   "tune": {
+    "CAGR": 0.1205,
+    "maxDD": -0.215,
+    "sharpe": 0.788,
+    "months": 89
+   }
+  },
+  {
+   "id": "P15-consensus40",
+   "cache": "data/cache/sc_full_v2",
+   "mode": "exploratory",
+   "tune": {
+    "CAGR": 0.1532,
+    "maxDD": -0.222,
+    "sharpe": 0.903,
+    "months": 89
+   }
+  },
+  {
+   "id": "P16-mom75-ml25-volw",
+   "cache": "data/cache/sc_full_v2",
+   "mode": "exploratory",
+   "tune": {
+    "CAGR": 0.108,
+    "maxDD": -0.22,
+    "sharpe": 0.749,
+    "months": 89
+   }
+  }
+ ],
+ "rounds": [
+  {
+   "cache": "data/cache/sc_full_v2",
+   "mode": "exploratory",
+   "proposals": [
+    "P13-ml-rank",
+    "P14-mom75-ml25",
+    "P15-consensus40",
+    "P16-mom75-ml25-volw"
+   ],
+   "window": "2013-09-30..2020-02-06",
+   "control": {
+    "CAGR": 0.1133,
+    "maxDD": -0.216,
+    "sharpe": 0.762,
+    "months": 89
    }
   }
  ]

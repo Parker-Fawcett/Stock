@@ -577,6 +577,17 @@ paper: nothing about the self-improvement loop's output survives being
 asked whether it is distinguishable from what N trials looks like under a
 null of no skill.
 
+After this retrospective DSR analysis was completed, four additional rules
+(P13-P16) were explored on the already inspected corrected-cache tune period.
+The best, P15, requires both the machine-learning and momentum ranks to be in
+the cross-sectional top 40%. It reports 15.32% CAGR, 0.903 Sharpe, and -22.2%
+maximum drawdown versus 11.33%, 0.762, and -21.6% for a same-run momentum
+control. These four searches are excluded from Table 8 because that table
+reconstructs the original 12-proposal promotion process on its legacy cache.
+They are also ineligible for promotion: their design follows inspection of the
+period and they have no untouched holdout. P15 is a hypothesis for future data,
+not evidence supporting the paper's historical conclusions.
+
 ## 7. Discussion
 
 The main result is a disconnect between global predictive stability and local
@@ -628,8 +639,9 @@ Five limitations constrain the current evidence.
    validates direction without current-constituent selection; the fixed run
    compares magnitude without removing survivorship bias.
 3. **Research-path dependence.** Many ideas were evaluated during the wider
-   project. A 20-proposal lifetime budget records the formal improvement loop,
-   but informal design choices also consume researcher degrees of freedom.
+   project. The 20-proposal lifetime budget has spent 16 trials: 12 in the
+   historical promotion loop and four later exploratory trials that cannot be
+   promoted. Informal design choices also consume researcher degrees of freedom.
 4. **Incomplete robustness analysis.** Bootstrap intervals, factor regressions,
    and a Deflated Sharpe Ratio are complete. A probability-of-backtest-
    overfitting analysis and decision-cutoff stability plots remain open.
@@ -665,8 +677,9 @@ or machine-learning decision rules.
 7. Update the prospective section after at least 12 monthly cohorts while
    preserving the initial empty-series manuscript and all run manifests.
 
-No remaining improvement-loop trials will be spent on the already inspected
-historical sample before these analyses are complete.
+The four remaining improvement-loop trials are banked for a genuinely new data
+window or independent universe. No exploratory result from already inspected
+history is eligible for promotion.
 
 ## 10. Prospective protocol
 

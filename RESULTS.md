@@ -13,7 +13,7 @@ the full history, including failed tests and superseded numbers.
 | Textbook 12-1 momentum | **SURVIVED — provisional** | Positive in every tested half, resampling-robust (bootstrap CI stays positive). Beats matched-window SPY on point estimate in both halves (small-cap) / holdout (mid-cap), but that margin's 95% CI crosses zero — directional, not statistically confident. Yahoo survivor bias remains. |
 | Price-based tree ML | **WEAK / NOT USEFUL** | Ranking survives at mean AUC 0.554, but the portfolio is unstable and weaker than momentum. |
 | ML + momentum | **FAILED** | Adding ML reduces CAGR and Sharpe in both halves. |
-| Self-improvement overlays | **MIXED / PIPELINE-SENSITIVE / NOT DISTINGUISHABLE FROM LUCK** | On original dates with the fixed ledger, only P5 stays positive. With leak-fixed probabilities and shifted folds, all four are strongly positive later—but none passes that cache's tune gate. Deflated Sharpe Ratio: the loop's best result is a coin flip against 12-trial luck (DSR 0.57–0.59) and below even chance against the project's full 34-configuration search (DSR 0.38). |
+| Self-improvement overlays | **MIXED / PIPELINE-SENSITIVE / NOT DISTINGUISHABLE FROM LUCK** | On original dates with the fixed ledger, only P5 stays positive. With leak-fixed probabilities and shifted folds, all four are strongly positive later—but none passes that cache's tune gate. Deflated Sharpe Ratio: the historical loop's best result is a coin flip against 12-trial luck (DSR 0.57–0.59) and below even chance against the project's historical 34-configuration search (DSR 0.38). A later four-trial exploratory round found P15 consensus, but it has no untouched holdout. |
 | Insider signals | **FAILED** | Raw and conviction-filtered Form 4 features do not improve the model. |
 | Multi-asset trend | **SURVIVED — defensive** | Trails SPY on raw return, with smoother drawdowns and better measured Sharpe. |
 | Graham value, mega caps | **FAILED FOR THIS UNIVERSE** | Few or no qualifying trades; paid point-in-time small-cap fundamentals would be a different test. |
@@ -86,6 +86,29 @@ about 39%. Tune Sharpes stay clearly under the original gate in five of six
 cells; the corrected-purge P12 cell (0.41) lands almost exactly on it. Still
 diagnostics rather than promotions. The original legacy cache cannot be fully
 reconstructed because it has no data/code manifest; new caches now record one.
+
+### Exploratory rank and consensus round
+
+Four additional proposals were preregistered in code and evaluated on the
+already inspected tune half of `sc_full_v2` (September 30, 2013 through
+February 6, 2020). The tool marks them `exploratory-tune` and prevents their
+promotion. The same runner recomputed a pure-momentum control using identical
+stops, costs, dates, and portfolio accounting.
+
+| Rule | CAGR | Sharpe | Maximum drawdown |
+|---|---:|---:|---:|
+| Momentum control | 11.33% | 0.762 | -21.6% |
+| P13 ML rank, no probability gate | 13.52% | 0.786 | -23.1% |
+| P14 75% momentum / 25% ML rank | 12.05% | 0.788 | -21.5% |
+| P15 top-40%-in-both consensus | **15.32%** | **0.903** | -22.2% |
+| P16 P14 with inverse-volatility weights | 10.80% | 0.749 | -22.0% |
+
+P15 is the candidate worth freezing: it improves CAGR by 3.99 percentage
+points and Sharpe by 0.141 relative to the same-run momentum control, with a
+0.6-point worse maximum drawdown. This is search output, not new evidence.
+The period, universe, and model probabilities were already known when these
+rules were designed, four alternatives were tried, and no untouched holdout
+was opened. The lifetime budget is now 16/20 spent; four trials remain banked.
 
 ## What the evidence supports
 

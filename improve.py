@@ -12,9 +12,10 @@ Bar (pre-committed, round one): tune Sharpe > 0.41 AND maxDD > -0.35
 
 Usage:
   python3 improve.py status          # budget + registry
-  python3 improve.py propose         # list pending (proposals are code)
-  python3 improve.py round           # evaluate pending on tune-half
-  python3 improve.py promote         # holdout once for the winner (if bar)
+  python3 improve.py round --cache data/cache/sc_full_v2 --mode exploratory
+                                      # evaluate pending on tune-half
+  python3 improve.py promote --cache data/cache/sc_full_v2
+                                      # holdout once for that cache's winner
   python3 improve.py replay-promoted --cache data/cache/sc_full
   python3 improve.py replay-promoted --cache data/cache/sc_full_v2
 """
@@ -382,6 +383,83 @@ def p_top40(test, proba, px):
     return _risk_book(t, proba, tpx, weight_fn=trailing_vol, top_n=40)
 
 
+def _rank_book(test, proba, px, ml_weight: float,
+               consensus: bool = False, inverse_vol: bool = False):
+    """Monthly top-20 book using cross-sectional ranks, not proba levels.
+
+    This removes sensitivity to probability calibration while retaining a
+    fixed, auditable selection boundary. ``ml_weight=0`` is the unspent
+    momentum control recomputed alongside every new round.
+    """
+    from predictor.backtest import RISK_STOP
+
+    t = test.copy().reset_index(drop=True)
+    t["proba"] = np.asarray(proba, dtype=float)
+    months = pd.to_datetime(t["Date"]).dt.to_period("M").drop_duplicates().sort_values()
+    rows, prev_w = [], {}
+    for m in months:
+        block = t[pd.to_datetime(t["Date"]).dt.to_period("M") == m]
+        d0 = block["Date"].max()
+        c = block[block["Date"] == d0].copy()
+        hist = px.loc[px.index <= d0]
+        if len(hist) < 252:
+            continue
+        mom = hist.iloc[-21] / hist.iloc[-252] - 1
+        c["mom_rank"] = c["ticker"].map(mom.rank(pct=True))
+        c["ml_rank"] = c["proba"].rank(pct=True)
+        c = c.dropna(subset=["mom_rank", "ml_rank"])
+        c["score"] = ml_weight * c["ml_rank"] + (1 - ml_weight) * c["mom_rank"]
+        if consensus:
+            c = c[(c["ml_rank"] >= 0.60) & (c["mom_rank"] >= 0.60)]
+        picks = c.sort_values("score", ascending=False).head(TOP_N)["ticker"].tolist()
+
+        if inverse_vol and picks:
+            inv = {}
+            for tk in picks:
+                v = trailing_vol(tk, d0)
+                inv[tk] = 1 / v if np.isfinite(v) and v > 0 else 0.0
+            total = sum(inv.values())
+            weights = ({tk: value / total for tk, value in inv.items()}
+                       if total else {tk: 1 / len(picks) for tk in picks})
+        else:
+            weights = {tk: 1 / len(picks) for tk in picks} if picks else {}
+
+        turnover = bt.weight_turnover(prev_w, weights)
+        gross = 0.0
+        realized = []
+        for tk in picks:
+            try:
+                realized.append((tk, bt.leg_simple(
+                    px[tk], d0, bt.HORIZON, short=False, stop_frac=RISK_STOP)))
+            except Exception:  # noqa: BLE001
+                continue
+        if realized:
+            gross = sum(weights.get(tk, 0.0) * ret for tk, ret in realized)
+        rows.append({"date": d0, "net": gross - turnover * COST / 1e4})
+        prev_w = weights
+    return pd.DataFrame(rows).set_index("date")["net"]
+
+
+def p_ml_rank(test, proba, px):
+    return _rank_book(test, proba, px, ml_weight=1.0)
+
+
+def p_mom75_ml25(test, proba, px):
+    return _rank_book(test, proba, px, ml_weight=0.25)
+
+
+def p_consensus40(test, proba, px):
+    return _rank_book(test, proba, px, ml_weight=0.50, consensus=True)
+
+
+def p_mom75_ml25_volw(test, proba, px):
+    return _rank_book(test, proba, px, ml_weight=0.25, inverse_vol=True)
+
+
+def momentum_control(test, proba, px):
+    return _rank_book(test, proba, px, ml_weight=0.0)
+
+
 PROPOSALS = {
     # id: (fn, predicted effect, pre-registered before any evaluation)
     "P1-vol-only": (p_vol_only, "Cuts turnover drag; DD unchanged. Sharpe ~0.1."),
@@ -396,6 +474,14 @@ PROPOSALS = {
     "P10-gate35": (p_gate35, "Tighter selection, fewer names; punchier, worse DD. Sharpe ~0.4."),
     "P11-hold10": (p_hold10, "Fresher signal, half exposure, double turnover rate. Sharpe ~0.3."),
     "P12-top40": (p_top40, "Max breadth; dilutes further. Sharpe ~0.3, DD best yet."),
+    "P13-ml-rank": (p_ml_rank,
+        "Removing the absolute probability gate improves stability, but weak ML ranking keeps Sharpe below momentum."),
+    "P14-mom75-ml25": (p_mom75_ml25,
+        "A momentum-dominant blend preserves most baseline strength; ML adds little, expected Sharpe near but below momentum."),
+    "P15-consensus40": (p_consensus40,
+        "Requiring both ranks in the top 40% raises signal agreement but concentrates the book; Sharpe may improve while DD worsens."),
+    "P16-mom75-ml25-volw": (p_mom75_ml25_volw,
+        "Momentum-heavy ranks plus inverse-volatility weights should reduce DD; expected best risk-adjusted candidate of this round."),
 }
 
 
@@ -407,15 +493,22 @@ def read_log():
 
 def write_log(d):
     LOG.parent.mkdir(parents=True, exist_ok=True)
-    LOG.write_text(json.dumps(d, indent=1))
+    LOG.write_text(json.dumps(d, indent=1) + "\n")
 
 
 def main() -> None:
     ap = argparse.ArgumentParser()
     sub = ap.add_subparsers(dest="cmd", required=True)
     sub.add_parser("status")
-    sub.add_parser("round")
-    sub.add_parser("promote")
+    round_cmd = sub.add_parser("round")
+    round_cmd.add_argument("--cache", required=True,
+                           help="fold cache to test; required to lock data vintage")
+    round_cmd.add_argument("--mode", required=True,
+                           choices=("exploratory", "preregistered"),
+                           help="evidence status; explored history cannot be promoted")
+    promote_cmd = sub.add_parser("promote")
+    promote_cmd.add_argument("--cache", required=True,
+                             help="same fold cache used for the tune round")
     replay = sub.add_parser("replay-promoted")
     replay.add_argument("--cache", required=True,
                         help="fold cache to replay; required so cache vintage is explicit")
@@ -466,15 +559,23 @@ def main() -> None:
         return
 
     if args.cmd == "round":
-        folds = load_folds()
+        folds = load_folds(args.cache)
+        if not folds:
+            raise ValueError(f"no folds found in {args.cache}")
         tune = folds[:len(folds) // 2]
         tickers = sorted({tk for t, _ in tune for tk in t["ticker"].unique()})
         px = load_px(tickers)
         pending = [pid for pid in PROPOSALS if log["proposals"].get(
             pid, {}).get("status") in (None, "pending")]
+        if not pending:
+            print("no pending proposals")
+            return
         if log["spent"] + len(pending) > BUDGET_TOTAL:
             print("BUDGET EXCEEDED — loop halts. No more proposals, ever.")
             return
+        control_nets = stitch([momentum_control(t, p, px) for t, p in tune])
+        control = score(control_nets)
+        print(f"momentum-control: {control} (does not spend budget)")
         for pid in pending:
             fn, pred = PROPOSALS[pid]
             nets = []
@@ -488,23 +589,41 @@ def main() -> None:
                 log["proposals"][pid] = {"status": "error", "pred": pred}
                 continue
             s = score(stitch(nets))
-            log["proposals"][pid] = {"status": "tested-tune", "pred": pred,
+            status = ("exploratory-tune" if args.mode == "exploratory"
+                      else "tested-tune")
+            log["proposals"][pid] = {"status": status, "pred": pred,
+                                     "cache": args.cache, "mode": args.mode,
                                      "tune": s}
-            log["archive"].append({"id": pid, "tune": s})
+            log["archive"].append({"id": pid, "cache": args.cache,
+                                   "mode": args.mode, "tune": s})
             print(f"{pid}: {s}  pred was: {pred}")
             log["spent"] += 1
+        log.setdefault("rounds", []).append({
+            "cache": args.cache,
+            "mode": args.mode,
+            "proposals": pending,
+            "window": (f"{pd.Timestamp(control_nets.index.min()).date()}.."
+                       f"{pd.Timestamp(control_nets.index.max()).date()}"),
+            "control": control,
+        })
         write_log(log)
-        print("round done. Promote only the best IF bar passes "
-              "(Sharpe > 0.41 AND maxDD > -0.35).")
+        if args.mode == "exploratory":
+            print("round done. Exploratory history is ineligible for promotion.")
+        else:
+            print("round done. Promote only the best IF bar passes "
+                  "(Sharpe > 0.41 AND maxDD > -0.35).")
         return
 
     if args.cmd == "promote":
-        folds = load_folds()
+        folds = load_folds(args.cache)
+        if not folds:
+            raise ValueError(f"no folds found in {args.cache}")
         hold = folds[len(folds) // 2:]
         tickers = sorted({tk for t, _ in hold for tk in t["ticker"].unique()})
         px = load_px(tickers)
         cands = {pid: st for pid, st in log["proposals"].items()
-                 if st.get("status") == "tested-tune"}
+                 if st.get("status") == "tested-tune"
+                 and st.get("cache") == args.cache}
         if not cands:
             print("nothing to promote")
             return

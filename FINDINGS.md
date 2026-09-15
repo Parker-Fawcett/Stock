@@ -1055,3 +1055,37 @@ cutoff, and portfolio accounting in one reproducible audit.
 `PAPER.md` now states this limit in the introduction, related-literature table,
 discussion, and conclusion. The paper claims neither a new momentum anomaly nor
 the first observation of predictive multiplicity or allocation instability.
+
+## Self-improvement exploratory rank round (P13-P16, Sep 14, 2026)
+
+The loop resumed with four safeguards added before evaluation. `round` and
+`promote` now require an explicit cache; promotion considers only proposals
+tested on that same cache; each round records its cache, evidence mode, window,
+and same-run control; and an exploratory round cannot be promoted. This closes
+the old risk that the commands silently defaulted to the leak-affected cache or
+reconsidered stale `tested-tune` entries.
+
+Four predictions were registered in `improve.py` before running the corrected
+`sc_full_v2` tune period, September 30, 2013 through February 6, 2020:
+
+| Proposal | Construction | CAGR | Sharpe | Max DD |
+|---|---|---:|---:|---:|
+| Control | Pure 252/21 momentum rank | 11.33% | 0.762 | -21.6% |
+| P13 | ML rank only; no absolute probability gate | 13.52% | 0.786 | -23.1% |
+| P14 | 75% momentum rank / 25% ML rank | 12.05% | 0.788 | -21.5% |
+| P15 | Both ranks top 40%, then 50/50 consensus score | **15.32%** | **0.903** | -22.2% |
+| P16 | P14 plus inverse-volatility weights | 10.80% | 0.749 | -22.0% |
+
+P15 is the clear exploratory winner. Relative to the same-run momentum control,
+it adds 3.99 percentage points of CAGR and 0.141 Sharpe while worsening maximum
+drawdown by 0.6 point. It also supports a useful design change: rank agreement
+looks more promising than averaging portfolio returns or relying on an absolute
+probability gate. P16 falsifies the prediction that inverse-volatility weights
+would be the best risk-adjusted candidate in this round.
+
+This does not revive the historical ML claim. The corrected cache and both
+calendar halves were already inspected before P13-P16 were designed, and four
+alternatives were searched. The tool records all four as `exploratory-tune`,
+blocks promotion, and leaves their holdout fields empty. P15 should be frozen
+for a new point-in-time universe or prospective window. The lifetime counter is
+16/20 spent, leaving four trials banked.
