@@ -470,8 +470,9 @@ portfolio value.
 
 The corrected QuantConnect strategy applies the same 252/21 momentum formation
 rule to a dynamic top-200 liquid U.S. equity universe. The cloud result reports
-3,455.56% total return, 25.97% annualized return, 53.70% maximum drawdown, and
-a 0.695 Sharpe ratio. It completes without the missing-price order errors seen
+3,455.56% total return, 25.97% annualized return, 53.70% daily-path maximum
+drawdown, and a 0.695 daily-path Sharpe ratio. It completes without the
+missing-price order errors seen
 in an earlier implementation. H4 is supported: the direction remains positive
 when the current-constituent list is removed.
 
@@ -500,8 +501,9 @@ equity is $2,657,483.15 from $100,000, with $18,335.09 in reported fees across
 
 The official full-span 1.97-percentage-point CAGR difference is small relative
 to the return magnitude, which is encouraging evidence that the local result
-is not solely a Yahoo pricing artifact. The apparent 10.95-point drawdown gap in the original
-comparison was mostly a frequency mismatch. At month-end, the gap is 2.15
+is not solely a Yahoo pricing artifact. The apparent 10.95-point drawdown gap
+in the original comparison was mostly a frequency mismatch. At month-end, the
+gap is 2.15
 points and QuantConnect's Sharpe is higher by 0.11. Across 183 complete months
 from March 2011 through May 2026, the two return paths correlate 0.933
 (R-squared 0.871), with 2.15 percentage points mean absolute monthly difference.
@@ -537,7 +539,8 @@ factor itself, at conventional (uncorrected) significance. Mid-cap alpha is
 statistically indistinguishable from zero once those factors are priced in:
 most of its apparent edge loads on known factors, principally momentum and
 size, rather than on something beyond them. Neither figure carries a
-multiple-testing correction; that adjustment is Section 9 item 3.
+multiple-testing correction. Table 8 adjusts the self-improvement loop's
+selected Sharpe ratio; it does not correct these regression coefficients.
 
 We next construct a moving-block bootstrap (block length six months, 5,000
 resamples, circular resampling to preserve series length) over the holdout
@@ -551,6 +554,9 @@ monthly excess return over SPY measured on the same decision dates.
 |---|---|---|---|---|
 | Small cap | +2.06% [+0.58%, +3.68%] | +21.7% [+1.9%, +47.6%] | 0.78 [0.22, 1.46] | +0.59% [-0.66%, +1.85%] |
 | Mid cap | +2.30% [+0.70%, +4.27%] | +24.7% [+3.7%, +54.5%] | 0.81 [0.27, 1.35] | +0.79% [-0.53%, +2.36%] |
+
+*The first three columns use all 94 holdout months. The SPY-excess column uses
+the 92 months with a complete matched 21-session SPY return.*
 
 Mean return, CAGR, and Sharpe intervals stay entirely positive in both
 universes; the result that momentum makes money in the holdout period is
@@ -585,7 +591,7 @@ P3's 82-month tune return series has skewness +0.417 and kurtosis 3.94
 |---|---|---:|---:|---:|
 | \(N=12\), formal loop as run | all 12 tune Sharpes | +0.72 | 0.982 | 0.566 |
 | \(N=12\), formal loop | 11 tune Sharpes, P1 artifact excluded | +0.70 | 0.982 | 0.587 |
-| \(N=34\), broad (all reported configurations) | same 11, held fixed | +0.89 | 0.982 | 0.383 |
+| \(N=38\), broad (all reported configurations) | same 11, held fixed | +0.91 | 0.982 | 0.364 |
 
 The naive probabilistic Sharpe ratio, which ignores the selection process
 entirely, reports 98% confidence that the true Sharpe of the best trial is
@@ -593,10 +599,10 @@ positive. That figure is not the relevant one. Correcting for the 12 trials
 actually conducted lowers this to 0.57-0.59: statistically indistinguishable
 from a coin flip on whether the loop's best result is genuine skill rather
 than the expected maximum of 12 noisy draws. Extending the trial count to
-every distinct configuration this project has reported (\(N=34\), formal and
-informal) lowers it further to 0.38 -- below even chance, meaning the
-observed best Sharpe is now smaller than the expected maximum of 34
-pure-noise trials. The \(N=34\) row holds \(\sigma(SR)\) at the formal
+every distinct configuration this project has reported (\(N=38\), including
+the four later exploratory rules) lowers it further to 0.36 -- below even
+chance, meaning the observed best Sharpe is now smaller than the expected
+maximum of 38 pure-noise trials. The \(N=38\) row holds \(\sigma(SR)\) at the formal
 estimate rather than re-measuring it from the informal set, so it is a
 sensitivity bound rather than an independently estimated figure; the
 direction is unambiguous regardless of that simplification.
@@ -611,11 +617,12 @@ After this retrospective DSR analysis was completed, four additional rules
 The best, P15, requires both the machine-learning and momentum ranks to be in
 the cross-sectional top 40%. It reports 15.32% CAGR, 0.903 Sharpe, and -22.2%
 maximum drawdown versus 11.33%, 0.762, and -21.6% for a same-run momentum
-control. These four searches are excluded from Table 8 because that table
-reconstructs the original 12-proposal promotion process on its legacy cache.
-They are also ineligible for promotion: their design follows inspection of the
-period and they have no untouched holdout. P15 is a hypothesis for future data,
-not evidence supporting the paper's historical conclusions.
+control. These four return series are excluded from Table 8's historical
+12-proposal reconstruction because they were designed later. They are counted
+in the broader \(N=38\) trial-count sensitivity row. They remain ineligible for
+promotion: their design follows inspection of the period and they have no
+untouched holdout. P15 is a hypothesis for future data, not evidence supporting
+the paper's historical conclusions.
 
 P15 was subsequently subjected to one external validation on the frozen
 mid-cap `mc_price` cache. The validation rule and gate were committed before
@@ -714,8 +721,9 @@ or machine-learning decision rules.
    and 142 logged monthly pick sets have mean Jaccard overlap of 0.866.
 5. **Done (Section 6.1).** `selection_stability.py` reports monthly portfolio
    overlap and membership disagreement by probability distance from the cutoff.
-6. Publish environment-lock information and immutable hashes for every table's
-   source artifact.
+6. **Done (Appendix C).** `paper_provenance.py` locks every numbered table and
+   figure to its displayed block, source artifacts, generating code, parameters,
+   reproduction commands, and software environment.
 7. Update the prospective section after at least 12 monthly cohorts while
    preserving the initial empty-series manuscript and all run manifests.
 
@@ -853,6 +861,7 @@ https://www.preprints.org/manuscript/202608.2127
 | Deflated Sharpe Ratio | `deflated_sharpe.py` | `data/cache/sc_full/` (legacy, pre-registered dates), console summary recorded in `FINDINGS.md` |
 | Fixed-universe QuantConnect comparison | `qc_momentum_matched.py` | Cloud backtest `Determined Black Cow`; result recorded in `FINDINGS.md` and `RESULTS.md` |
 | QuantConnect path and pick reconciliation | `qc_reconcile.py` | `data/qc_reconciliation/summary.json` plus derived daily, monthly-return, and monthly-pick CSVs |
+| Paper artifact and environment verification | `paper_provenance.py` | `data/paper_provenance/manifest.json` |
 
 ## Appendix B. Evidence-status vocabulary
 
@@ -867,3 +876,18 @@ https://www.preprints.org/manuscript/202608.2127
   before the outcome begins.
 - **Superseded:** a result produced by a known-invalid implementation and kept
   only as part of the audit trail.
+
+## Appendix C. Artifact and environment lock
+
+`data/paper_provenance/manifest.json` records every numbered table and figure,
+the SHA-256 hash of its displayed Markdown block, the hash of every source file
+and generating code file, its parameters, and exact reproduction commands. It
+also records the Python, operating-system, package, and `requirements.txt`
+versions used to create the lock. Large local price and fold caches are not
+stored in Git; their individual and aggregate hashes identify the exact
+external artifacts required for reproduction.
+
+Run `python3 paper_provenance.py verify` from the repository root. The command
+fails if a displayed table or figure, source input, code dependency, or locked
+environment differs. Rebuild the manifest only after intentionally rerunning
+the affected analysis and reviewing the changed result.

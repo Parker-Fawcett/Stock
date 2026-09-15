@@ -36,6 +36,10 @@ from improve import PROPOSALS, load_folds, load_px, stitch
 
 EULER_MASCHERONI = 0.5772156649015329
 
+# The historical DSR target is the original promotion loop, before the later
+# exploratory P13-P16 round. Do not inherit newly appended registry entries.
+FORMAL_PROPOSAL_IDS = tuple(f"P{number}" for number in range(1, 13))
+
 # Broad trial count: the 12 formal loop proposals plus every other distinct
 # configuration reported in FINDINGS.md's "Experiment log" as of Sep 2026,
 # counting sub-variants an item names explicitly (e.g. item 7's risk-overlay
@@ -47,9 +51,9 @@ EULER_MASCHERONI = 0.5772156649015329
 # configs (3), long-short (1), mid-cap ML (1), momentum small+mid as one
 # frozen rule (1), ensemble (1), vol-scaled monkeys (1), quality sleeve (1),
 # multi-asset monthly+quarterly (2), intl sleeve (1), value d0.5+d0.0 (2) =
-# 22 informal + 12 formal = 34. Documented here so it can be checked and
-# disputed rather than asserted.
-BROAD_TRIAL_COUNT = 34
+# 22 earlier informal + 12 formal + 4 later exploratory (P13-P16) = 38.
+# Documented here so it can be checked and disputed rather than asserted.
+BROAD_TRIAL_COUNT = 38
 
 
 def expected_max_sharpe(variance_of_trial_sharpes: float, n_trials: int) -> float:
@@ -89,7 +93,13 @@ def main() -> None:
     px = load_px(tickers)
 
     trials = {}
-    for pid, (fn, _pred) in PROPOSALS.items():
+    formal = {
+        pid: value for pid, value in PROPOSALS.items()
+        if pid.split("-", 1)[0] in FORMAL_PROPOSAL_IDS
+    }
+    if len(formal) != 12:
+        raise ValueError(f"expected 12 original proposals, found {sorted(formal)}")
+    for pid, (fn, _pred) in formal.items():
         nets = stitch([fn(t, p, px) for t, p in tune_folds])
         trials[pid] = nets.to_numpy()
         print(f"{pid:<14} n={len(nets):>3} monthly_sharpe={monthly_sharpe(trials[pid]):+.3f} "

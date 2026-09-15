@@ -940,19 +940,19 @@ Skew and kurtosis of P3's 82-month tune return series: +0.417 and 3.94
 |---|---|---:|---:|---:|
 | N=12, formal loop as run | all 12 tune Sharpes | +0.72 | 0.982 | **0.566** |
 | N=12, formal loop | 11 tune Sharpes, P1 artifact excluded | +0.70 | 0.982 | **0.587** |
-| N=34, broad (all reported configs) | same 11, held fixed | +0.89 | 0.982 | **0.383** |
+| N=38, broad (all reported configs) | same 11, held fixed | +0.91 | 0.982 | **0.364** |
 
 The naive PSR(0) -- "is the true Sharpe positive, ignoring that this was
 picked as the best of many" -- says 98% confidence. That number is the wrong
 one to trust. Once corrected for actually having searched 12 trials, DSR
 drops to 0.57-0.59: barely better than a coin flip on whether the loop's best
 result reflects real skill rather than the expected maximum of 12 lucky
-draws. Widening the search to N=34 (every distinct configuration this
-project has reported, formal and informal, not just the loop's own 12) drops
-DSR to 0.38 -- *below* even chance, meaning the observed best Sharpe is now
-*less* than what you'd expect the best of 34 pure-noise trials to produce.
+draws. Widening the search to N=38 (every distinct configuration this
+project has reported, including the later P13-P16 exploratory round) drops
+DSR to 0.36 -- *below* even chance, meaning the observed best Sharpe is now
+*less* than what you'd expect the best of 38 pure-noise trials to produce.
 
-N=34's sigma(SR) is held at the formal-12 estimate rather than re-measured
+N=38's sigma(SR) is held at the formal-12 estimate rather than re-measured
 from the broader set (gathering monthly return series for every informal
 experiment in the file was out of scope here), so that row is a sensitivity
 bound, not an independently estimated number -- flagged as such rather than
@@ -1204,3 +1204,34 @@ measures where the observed changes concentrate.
 Reproducible outputs are committed in `data/selection_stability/`. The summary
 locks both 26-fold input caches and the generating script by SHA-256. The
 publication figure is committed as `figures/selection_stability.png` and PDF.
+
+## Paper artifact lock and hostile rerun (Sep 15, 2026)
+
+`paper_provenance.py` now covers all eight numbered tables and Figure 1. Its
+manifest stores each displayed Markdown block, every source and code file hash,
+aggregate bundle hashes, parameters, exact reproduction commands, the source
+Git commit, Python/platform versions, required package versions, and the
+`requirements.txt` hash. The lock includes 52 controlled-ablation fold files,
+24 legacy-loop folds, 26 corrected-model folds, 201 universe price files across
+the small- and mid-cap bundles, factor archives, QuantConnect-derived evidence,
+and the selection-stability outputs. `python3 paper_provenance.py verify` fails
+on any changed block, input, dependency, code bundle, or environment.
+
+The pre-lock hostile rerun reproduced Tables 1-7 to the displayed precision.
+It found one real failure in Table 8's generator: `deflated_sharpe.py` iterated
+the live `PROPOSALS` registry, so adding exploratory P13-P16 after the original
+DSR analysis silently expanded the supposedly historical 12-trial calculation
+to 16 proposals. The script now freezes P1-P12 explicitly and has a regression
+test. The 12-trial rows reproduce their recorded values (DSR 0.566 and 0.587).
+The honest broad count increases from 34 to 38 because P13-P16 still consume
+researcher degrees of freedom; its expected maximum Sharpe becomes 0.912 and
+DSR becomes 0.364. The paper and product summary are updated.
+
+The audit also corrected three presentation risks: QuantConnect's dynamic-run
+risk statistics are labeled as daily-path measures; Table 7 now states that
+its return/CAGR/Sharpe intervals use 94 months while the SPY-excess interval
+has 92 matched months; and the factor-alpha paragraph no longer implies that
+the loop's Deflated Sharpe Ratio corrects the separate regression coefficients.
+No headline direction changed. The principal historical tables are now locked;
+the remaining evidence gap is prospective data rather than another historical
+recalculation.

@@ -13,7 +13,7 @@ the full history, including failed tests and superseded numbers.
 | Textbook 12-1 momentum | **SURVIVED — provisional** | Positive in every tested half, resampling-robust (bootstrap CI stays positive). Beats matched-window SPY on point estimate in both halves (small-cap) / holdout (mid-cap), but that margin's 95% CI crosses zero — directional, not statistically confident. Yahoo survivor bias remains. |
 | Price-based tree ML | **WEAK / NOT USEFUL** | Ranking survives at mean AUC 0.554, but the portfolio is unstable and weaker than momentum. |
 | ML + momentum | **FAILED** | Adding ML reduces CAGR and Sharpe in both halves. |
-| Self-improvement overlays | **MIXED / PIPELINE-SENSITIVE / NOT DISTINGUISHABLE FROM LUCK** | On original dates with the fixed ledger, only P5 stays positive. With leak-fixed probabilities and shifted folds, all four are strongly positive later—but none passes that cache's tune gate. Deflated Sharpe Ratio: the historical loop's best result is a coin flip against 12-trial luck (DSR 0.57–0.59) and below even chance against the project's historical 34-configuration search (DSR 0.38). A later four-trial exploratory round found P15 consensus, but it has no untouched holdout. |
+| Self-improvement overlays | **MIXED / PIPELINE-SENSITIVE / NOT DISTINGUISHABLE FROM LUCK** | On original dates with the fixed ledger, only P5 stays positive. With leak-fixed probabilities and shifted folds, all four are strongly positive later—but none passes that cache's tune gate. Deflated Sharpe Ratio: the historical loop's best result is a coin flip against 12-trial luck (DSR 0.57–0.59) and below even chance against the project's 38-configuration search (DSR 0.36). A later four-trial exploratory round found P15 consensus, but it has no untouched holdout. |
 | Insider signals | **FAILED** | Raw and conviction-filtered Form 4 features do not improve the model. |
 | Multi-asset trend | **SURVIVED — defensive** | Trails SPY on raw return, with smoother drawdowns and better measured Sharpe. |
 | Graham value, mega caps | **FAILED FOR THIS UNIVERSE** | Few or no qualifying trades; paid point-in-time small-cap fundamentals would be a different test. |
@@ -200,6 +200,6 @@ seed fixed, from nearly unchanged AUC to 0.389 selected-name overlap and changed
 portfolio conclusions. `PAPER.md` includes a closest-prior-work table and does
 not claim discovery of momentum, predictive multiplicity, or allocation
 instability in general.
-Remaining work is full table-level artifact provenance and prospective
-evidence. The selection-stability figures and fixed-universe QuantConnect
-reconciliation are complete.
+The historical tables, selection-stability figure, and QuantConnect
+reconciliation now have immutable source and environment locks. The principal
+remaining evidence gap is prospective performance under the frozen protocol.

@@ -66,9 +66,13 @@ python3 run.py --tickers AAPL,MSFT,JNJ,PG,XOM,CVX,KO,MRK,WMT,IBM --start 2015010
 - `run.py` — backtests; new probability caches include an input/code manifest
 - `cache_compare.py` — row-level probability, rank, and selected-name comparison
 - `selection_stability.py` — monthly overlap and distance-to-cutoff figure
+- `paper_provenance.py` — verify every paper table, figure, input, and environment lock
 - `purge_ablation.py` — controlled legacy-vs-corrected purge refit
 - `sweep.py` — cost sweeps with tune/holdout splits
 - `paper.py` — provenance-locked prospective ML and momentum ledger
+
+Verify the paper's displayed results and their locked inputs with
+`python3 paper_provenance.py verify`.
 
 ## Prospective paper trading (the only test that matters now)
 
