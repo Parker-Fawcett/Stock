@@ -817,13 +817,14 @@ built our loop; 4chan sentiment dead both directions (his newest video).
 
 Live: wide-seed0-v1 30 picks -2.7% excess; mom12-1-v1 logging from Sep 30
 month-end. QC cloud 252/21 replication completed at +3,455.564% total return,
-53.700% max drawdown, and 0.695 Sharpe on its dynamic liquid universe. Compare
-a matched period/universe next. LEAN local bulk costs thousands; Docker ready
-if ever needed.
+53.700% max drawdown, and 0.695 Sharpe on its dynamic liquid universe. The
+fixed-99-name comparison also completed at +2,557.483% total return, 23.617%
+CAGR, 48.100% max drawdown, and 0.690 Sharpe versus 21.65%/37.15%/0.85 locally.
+LEAN local bulk costs thousands; Docker ready if ever needed.
 
 Open: paper accumulation, value on paid small-cap data, quality expansion,
-matched-universe QC comparison, 8 loop trials banked. File stays open, loop
-frozen, index fund winning.
+monthly QC/Yahoo return-path reconciliation, 8 loop trials banked. File stays
+open, loop frozen, index fund winning.
 
 ## Prospective paper protocol locked (Sep 14, 2026)
 
@@ -962,7 +963,7 @@ as everything else this session has found under corrected accounting: the
 ML side of this project has produced nothing that survives being asked "or
 is this just what N trials looks like."
 
-## Matched-universe QuantConnect comparison, prepared but not yet run (Sep 14, 2026)
+## Fixed-universe QuantConnect comparison completed (Sep 14, 2026)
 
 PAPER.md Section 9 item 4. `qc_momentum.py`'s two completed cloud runs
 (Sleepy Orange Bison, Creative Yellow Antelope) validated *direction* on a
@@ -980,20 +981,41 @@ to the window QC's data can actually cover): 2011-02-28 to 2026-05-29 (184
 months) -- **CAGR +21.65%, Sharpe 0.85, maxDD -37.15%**. Matched-window
 buy-hold over the same 184 months: SPY +14.0%, IWM +10.1%.
 
-**`qc_momentum_matched.py`** (new file, not yet run in the cloud): same
+**`qc_momentum_matched.py`:** same
 252/21 rule, monthly rebalance, IB fee model as the existing `qc_momentum.py`,
 but replaces the dynamic coarse-filtered universe with a fixed `AddEquity`
 list of the exact same 99 tickers, and sets the backtest window to
 2011-01-01 through 2026-06-17 (QC's last confirmed data end date, not
 assumed to have caught up to Sep 2026 yet -- adjust if it has).
 
-This step needs manual execution: this session has no QuantConnect API
-token or LEAN CLI configured, and the two prior cloud runs were both
-executed by pasting code into the QuantConnect web IDE by hand. To close
-this out: paste `qc_momentum_matched.py` into the cloud project, run it, and
-report back total return, CAGR, Sharpe, max drawdown, and any handled-order
-or data-availability warnings (the guard from the last run -- rejecting
-orders for symbols without a price bar yet -- is unchanged and should still
-apply here). Once that result exists, the honest three-way comparison
-(local Yahoo / QC matched-universe / QC dynamic-universe) can be written up
-in one place instead of guessed at.
+Cloud project **Calculating Fluorescent Yellow Owl**, backtest **Determined
+Black Cow**, completed on a Community B-MICRO node in 76.39 seconds over
+3,826,932 data points. QuantConnect reported:
+
+- total return **+2,557.483%**;
+- CAGR **+23.617%**;
+- Sharpe **0.690**;
+- maximum drawdown **48.100%**;
+- end equity **$2,657,483.15** from $100,000;
+- fees **$18,335.09** across 1,733 orders.
+
+Against the local reference, cloud CAGR is only 1.97 percentage points higher
+(23.62% vs 21.65%). Risk does not match: cloud Sharpe is 0.16 lower and maximum
+drawdown is 10.95 points worse. This is useful convergence on return magnitude,
+but not numerical equivalence.
+
+The engine warnings identify remaining differences that must be reconciled
+before calling the implementations exactly matched. Daily-resolution market
+orders submitted during market hours were converted to market-on-close orders;
+closed-market orders became market-on-open orders; minimum-order checks ignored
+some single-share recommendations; and QuantConnect adjusted several securities
+to later factor-file or map-file start dates. The run also ends June 17 with an
+open, partial June holding interval and $602,392.65 of unrealized profit, whereas
+the local reference evaluates fixed 21-session legs from month-end decisions.
+QuantConnect applies its IB fee model while local returns charge a fixed 25 bps.
+
+The honest three-way reading is now available. The dynamic-universe run removes
+the current-survivor restriction and confirms direction at 25.97% CAGR. The
+fixed-universe run retains survivor bias on both sides and broadly reproduces
+the local Yahoo magnitude at 23.62% versus 21.65%. Neither establishes exact
+monthly equality; return-path reconciliation is the next step.

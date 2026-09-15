@@ -27,9 +27,11 @@ ledger, it produces positive results in both halves of two current-constituent
 universes and outperforms matched-window SPY buy-and-hold in three of four
 universe-period comparisons, though a moving-block bootstrap on the holdout
 half shows this outperformance is directional rather than statistically
-distinguishable from zero. A separate point-in-time, dynamic-universe
-QuantConnect implementation remains strongly positive, although it is not a
-matched estimate of the local backtest. The evidence supports a methodological
+distinguishable from zero. A point-in-time dynamic-universe QuantConnect
+implementation remains strongly positive. A second cloud run fixes the
+universe and broad period to the local comparison and reports 23.62% CAGR
+versus 21.65% locally, although its Sharpe and drawdown are worse and execution
+details remain unmatched. The evidence supports a methodological
 conclusion rather than a claim of newly discovered alpha: portfolio selection
 near a model cutoff can be unstable even when aggregate AUC appears robust,
 and implementation audits can dominate model choice in small quantitative
@@ -81,10 +83,10 @@ The comparison shows why a known simple signal can be a more demanding baseline
 than a weakly informative machine-learning model.
 
 The paper does not establish a deployable trading strategy. The local equity
-universes use current constituents, the cloud comparison uses a different
-liquidity-screened universe, formal factor-adjusted inference remains to be
-completed, and the provenance-locked prospective series has not produced its
-first observation. Those limits define the remaining research program.
+universes use current constituents, the fixed-universe cloud comparison retains
+that same bias, cloud and local fills and costs are not identical, and the
+provenance-locked prospective series has not produced its first observation.
+Those limits define the remaining research program.
 
 ## 2. Related literature
 
@@ -191,6 +193,24 @@ brokerage model.
 The cloud universe, dates, order timing, and fee model differ from the local
 test. It is a directional external check rather than a matched replication.
 
+### 4.3 Fixed-universe cloud comparison
+
+A second QuantConnect experiment fixes the security list to the same 99
+September 2026 small-cap constituents used by the local run after excluding
+`LEG`, and covers January 2011 through June 17, 2026. This comparison retains
+survivorship bias by design. Its purpose is narrower: test whether independent
+QuantConnect data and execution produce a similar magnitude when universe and
+broad calendar period are held constant.
+
+The implementations are still not observation-for-observation identical.
+QuantConnect converts market orders submitted with daily data to market-on-
+close or market-on-open orders, applies its Interactive Brokers fee model,
+adjusts symbols to their available mapping and factor-file start dates, and
+ends with a partial June holding interval. The local implementation charges a
+fixed 25 basis points and measures 21-session returns from its month-end
+decision dates. These differences are recorded rather than silently treated as
+matched.
+
 ## 5. Methods
 
 ### 5.1 Prediction target and features
@@ -296,8 +316,9 @@ relative to momentum alone on identical dates.
 
 The paper reports compound annual growth rate, monthly-return Sharpe ratio
 annualized by \(\sqrt{12}\), maximum drawdown, turnover, and exposure. The
-historical tables do not yet report confidence intervals or factor alpha. Those
-analyses are required before journal submission and are listed in Section 9.
+historical tables also report moving-block-bootstrap confidence intervals,
+CAPM and Fama-French-five-plus-momentum factor alpha, and a Deflated Sharpe
+Ratio for the searched self-improvement loop.
 
 ## 6. Results
 
@@ -400,8 +421,30 @@ This result is intentionally not placed beside the local CAGRs as a direct
 replication. Its dynamic universe contains larger and more liquid companies,
 the backtest spans January 2011 through the cloud data available in 2026, and
 QuantConnect applies a different execution and fee model. The magnitude could
-reflect those differences. A common-period, comparable-universe experiment is
-still required.
+reflect those differences.
+
+#### 6.4.1 Fixed-universe comparison
+
+The fixed 99-name QuantConnect run reports 2,557.48% total return, 23.617%
+compound annual return, 48.10% maximum drawdown, and a 0.690 Sharpe ratio. End
+equity is $2,657,483.15 from $100,000, with $18,335.09 in reported fees across
+1,733 orders. The local reference on the comparable survivor list and window is
+21.65% CAGR, 37.15% maximum drawdown, and 0.85 Sharpe.
+
+**Table 5. Fixed-survivor implementation comparison**
+
+| Implementation | CAGR | Sharpe | Maximum drawdown |
+|---|---:|---:|---:|
+| Local Yahoo ledger | 21.65% | 0.85 | -37.15% |
+| QuantConnect fixed 99-name universe | 23.62% | 0.69 | -48.10% |
+
+The 1.97-percentage-point CAGR difference is small relative to the return
+magnitude, which is encouraging evidence that the local result is not solely a
+Yahoo pricing artifact. Risk does not match: the cloud drawdown is 10.95 points
+worse and Sharpe is 0.16 lower. Because fill timing, fees, symbol start dates,
+and the final interval remain different, Table 5 establishes broad convergence,
+not numerical equivalence. It also says nothing new about survivorship because
+both rows use the same current-constituent list.
 
 ### 6.5 Factor exposure and resampling uncertainty
 
@@ -412,7 +455,7 @@ to account for autocorrelation from the 21-trading-day holding period [6].
 Each decision-date
 return is assigned to the calendar month in which it is realized.
 
-**Table 5. CAPM and Fama-French-5-plus-momentum regressions, full sample
+**Table 6. CAPM and Fama-French-5-plus-momentum regressions, full sample
 (185 months, March 2011-July 2026)**
 
 | Universe | CAPM alpha (annualized) | \(t\) | FF5+Mom alpha (annualized) | \(t\) | \(R^2\) | Momentum beta | Size beta |
@@ -433,7 +476,7 @@ resamples, circular resampling to preserve series length) over the holdout
 half only, for mean monthly return, CAGR, annualized Sharpe ratio, and mean
 monthly excess return over SPY measured on the same decision dates.
 
-**Table 6. Moving-block bootstrap 95% confidence intervals, holdout half
+**Table 7. Moving-block bootstrap 95% confidence intervals, holdout half
 (94 months)**
 
 | Universe | Mean monthly return | CAGR | Sharpe | Mean monthly excess vs. SPY |
@@ -468,7 +511,7 @@ regardless, since that is what a Sharpe-maximizing search surfaces today.
 P3's 82-month tune return series has skewness +0.417 and kurtosis 3.94
 (Pearson; normal is 3).
 
-**Table 7. Deflated Sharpe Ratio under three trial-count assumptions**
+**Table 8. Deflated Sharpe Ratio under three trial-count assumptions**
 
 | Trial count | \(\sigma(SR)\) source | \(E[\max SR \mid N]\) (annualized) | PSR(0), naive | DSR |
 |---|---|---:|---:|---:|
@@ -532,15 +575,17 @@ Five limitations constrain the current evidence.
 1. **Current-constituent local universes.** The local small- and mid-cap lists
    are sampled from September 2026 membership. Delisted and removed securities
    are absent from earlier years.
-2. **Unmatched external validation.** The QuantConnect result uses a dynamic
-   liquidity universe and different execution assumptions. It validates
-   direction, not the local return estimate.
+2. **Imperfect external matching.** The fixed-universe QuantConnect result
+   controls the names and broad period, but fill timing, fees, mapping start
+   dates, and the final partial holding interval still differ. The dynamic run
+   validates direction without current-constituent selection; the fixed run
+   compares magnitude without removing survivorship bias.
 3. **Research-path dependence.** Many ideas were evaluated during the wider
    project. A 20-proposal lifetime budget records the formal improvement loop,
    but informal design choices also consume researcher degrees of freedom.
-4. **Incomplete inference.** Historical results currently lack block-bootstrap
-   confidence intervals, factor regressions, a Deflated Sharpe Ratio, and a
-   probability-of-backtest-overfitting analysis.
+4. **Incomplete robustness analysis.** Bootstrap intervals, factor regressions,
+   and a Deflated Sharpe Ratio are complete. A probability-of-backtest-
+   overfitting analysis and decision-cutoff stability plots remain open.
 5. **No clean prospective outcomes yet.** The immutable `prospective-v2`
    series begins at the next completed month end. Historical paper rows were
    generated under a superseded dating and grading implementation and are
@@ -562,10 +607,10 @@ or machine-learning decision rules.
 3. **Done (Section 6.6).** Deflated Sharpe Ratio using the documented
    research-trial count and return skewness and kurtosis, with a sensitivity
    range extending to informal trials.
-4. **Prepared, not yet executed.** `qc_momentum_matched.py` fixes the cloud
-   universe to the exact local 99-ticker list and a common 2011-2026 window
-   (FINDINGS.md); requires manual execution in the QuantConnect web IDE,
-   which this session cannot do (no API token or LEAN CLI configured).
+4. **Executed; reconciliation remains.** `qc_momentum_matched.py` fixes the
+   cloud universe to the local 99-ticker list and broad 2011-2026 window. The
+   23.62% cloud CAGR is close to the 21.65% local reference. Reconcile monthly
+   returns after aligning fill timing, fees, and the final holding interval.
 5. Add selection-stability plots by month and by probability distance from the
    cutoff.
 6. Publish environment-lock information and immutable hashes for every table's
@@ -609,8 +654,9 @@ simple-return aggregation, weight-based turnover, exposure scaling, gap-aware
 stops, and initial-equity drawdown are enforced, a frozen 12-minus-1-month
 momentum baseline dominates the tested machine-learning portfolio and its
 ensemble. A dynamic-universe cloud implementation preserves the positive
-direction, but a matched external comparison and prospective outcomes remain
-necessary. Momentum's advantage over matched-window SPY buy-and-hold,
+direction, and a fixed-universe cloud run produces a similar CAGR with worse
+risk statistics. Monthly execution reconciliation and prospective outcomes
+remain necessary. Momentum's advantage over matched-window SPY buy-and-hold,
 however, is directional rather than statistically distinguishable from zero
 under a moving-block bootstrap, and the self-improvement loop's best observed
 Sharpe ratio is not distinguishable from the expected maximum of a 12-trial
@@ -673,7 +719,7 @@ https://doi.org/10.1111/j.1540-6261.1997.tb03808.x
 | Immutable prospective series | `paper.py` | `data/paper/runs/`, `data/paper/log_v2.csv`, `data/paper/grades_v2.csv` |
 | Factor regressions and bootstrap CIs | `factor_analysis.py` | Ken French factor cache (`predictor/factors.py`), console summary recorded in `FINDINGS.md` |
 | Deflated Sharpe Ratio | `deflated_sharpe.py` | `data/cache/sc_full/` (legacy, pre-registered dates), console summary recorded in `FINDINGS.md` |
-| Matched-universe QuantConnect comparison | `qc_momentum_matched.py` (requires manual cloud execution) | Local reference recomputed in `FINDINGS.md`; cloud result pending |
+| Fixed-universe QuantConnect comparison | `qc_momentum_matched.py` | Cloud backtest `Determined Black Cow`; result recorded in `FINDINGS.md` and `RESULTS.md` |
 
 ## Appendix B. Evidence-status vocabulary
 

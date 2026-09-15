@@ -18,7 +18,7 @@ the full history, including failed tests and superseded numbers.
 | Multi-asset trend | **SURVIVED — defensive** | Trails SPY on raw return, with smoother drawdowns and better measured Sharpe. |
 | Graham value, mega caps | **FAILED FOR THIS UNIVERSE** | Few or no qualifying trades; paid point-in-time small-cap fundamentals would be a different test. |
 | Paper portfolios | **LOCKED / AWAITING FIRST RUN** | The provenance-locked `prospective-v2` series starts at the next month end. Existing rows remain historical and separate. |
-| QuantConnect replication | **SURVIVED — different universe** | The guarded 252/21 cloud run completed without the prior missing-price order errors: +3,455.56% total return, 25.97% CAGR, 53.70% max drawdown, and 0.695 Sharpe. |
+| QuantConnect replication | **SURVIVED — DYNAMIC AND FIXED UNIVERSES** | Dynamic-universe run: +3,455.56% total return, 25.97% CAGR, 53.70% max DD, 0.695 Sharpe. Fixed 99-name matched-universe run: +2,557.48%, 23.62% CAGR, 48.10% max DD, 0.690 Sharpe versus local 21.65%/37.15%/0.85. |
 
 ## Current numbers
 
@@ -107,19 +107,24 @@ independent check: the corrected 252/21 run remained strongly positive and no
 longer produced the prior missing-price order errors. That makes a catastrophic
 survivorship explanation unlikely.
 
-The cloud magnitude is not a like-for-like estimate of the Yahoo result. It
-uses the top 200 liquid US equities at each selection date, while the local
-runs use today's small- and mid-cap constituent lists. Its January 2011 through
-June 17, 2026 period and QuantConnect execution model differ too. Treat the
-cloud result as confirmation of direction and fragility, not as a direct
-replacement CAGR.
+The dynamic cloud magnitude is not a like-for-like estimate of the Yahoo
+result: it uses the top 200 liquid US equities at each selection date. A second
+cloud run fixes the universe to the same 99 current-constituent survivors and
+the same broad 2011-2026 window as the local small-cap comparison. Its 23.62%
+CAGR is close to the local 21.65%, while Sharpe is lower (0.69 vs 0.85) and
+drawdown is worse (-48.10% vs -37.15%). The cloud engine converted daily market
+orders to market-on-close/open fills, charged its IB fee model instead of the
+local fixed 25 bps, adjusted several symbols to their mapping/data start dates,
+and included an incomplete final June holding interval. Treat the CAGR
+agreement as encouraging data/execution convergence, not exact replication.
 
 ## Promotion gate
 
 Momentum can move from **provisional** to **validated for deployment** only after:
 
-1. the cloud and Yahoo implementations are compared over a common period and
-   comparable universe; and
+1. the remaining monthly-return differences between the completed fixed-
+   universe cloud run and Yahoo implementation are reconciled, including fill
+   timing, final-period truncation, and fees; and
 2. prospective paper observations accumulate under the frozen model version.
 
 Until those pass, this repository is a research product and audit trail,
@@ -145,6 +150,7 @@ while testing this change.
 `PAPER.md` is the first complete working-paper draft. Its central claim is the
 controlled result, not a claim of new alpha: correcting the purge changes AUC
 from 0.553 to 0.551 while mean selected-name overlap is only 0.392. The draft
-labels the local momentum magnitudes as provisional, treats QuantConnect as a
-directional replication, and prespecifies the remaining inference, matched
-cloud comparison, and prospective evidence needed before journal submission.
+labels the local momentum magnitudes as provisional and separates the dynamic
+survivorship check from the completed fixed-universe magnitude comparison.
+Remaining work is monthly return reconciliation, selection-stability figures,
+artifact provenance, and prospective evidence.
