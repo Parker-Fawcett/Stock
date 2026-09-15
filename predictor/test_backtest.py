@@ -1,3 +1,4 @@
+import numpy as np
 import pandas as pd
 import pytest
 
@@ -20,3 +21,18 @@ def test_gap_stop_uses_observed_close_and_rejects_invalid_fraction():
 
 def test_drawdown_includes_starting_equity():
     assert max_drawdown(pd.Series([0.8, 0.9])) == pytest.approx(-0.20)
+
+
+def test_leg_simple_raises_on_non_finite_price():
+    """A ticker missing a row for one date in a fold's panel (normal --
+    not every name has a row on every date) must not silently become a NaN
+    return that corrupts the whole month's weighted average. It must raise,
+    so _run_book's per-leg try/except drops only that name."""
+    dates = pd.bdate_range("2026-01-02", periods=5)
+    entry_missing = pd.Series([np.nan, 101.0, 102.0, 103.0, 104.0], index=dates)
+    with pytest.raises(ValueError):
+        leg_simple(entry_missing, dates[0], 3, False, None)
+
+    exit_missing = pd.Series([100.0, 101.0, 102.0, np.nan, np.nan], index=dates)
+    with pytest.raises(ValueError):
+        leg_simple(exit_missing, dates[0], 3, False, None)

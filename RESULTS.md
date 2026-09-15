@@ -13,7 +13,7 @@ the full history, including failed tests and superseded numbers.
 | Textbook 12-1 momentum | **SURVIVED — provisional** | Positive in every tested half, resampling-robust (bootstrap CI stays positive). Beats matched-window SPY on point estimate in both halves (small-cap) / holdout (mid-cap), but that margin's 95% CI crosses zero — directional, not statistically confident. Yahoo survivor bias remains. |
 | Price-based tree ML | **WEAK / NOT USEFUL** | Ranking survives at mean AUC 0.554, but the portfolio is unstable and weaker than momentum. |
 | ML + momentum | **FAILED** | Adding ML reduces CAGR and Sharpe in both halves. |
-| Self-improvement overlays | **MIXED / PIPELINE-SENSITIVE** | On original dates with the fixed ledger, only P5 stays positive. With leak-fixed probabilities and shifted folds, all four are strongly positive later—but none passes that cache's tune gate. |
+| Self-improvement overlays | **MIXED / PIPELINE-SENSITIVE / NOT DISTINGUISHABLE FROM LUCK** | On original dates with the fixed ledger, only P5 stays positive. With leak-fixed probabilities and shifted folds, all four are strongly positive later—but none passes that cache's tune gate. Deflated Sharpe Ratio: the loop's best result is a coin flip against 12-trial luck (DSR 0.57–0.59) and below even chance against the project's full 34-configuration search (DSR 0.38). |
 | Insider signals | **FAILED** | Raw and conviction-filtered Form 4 features do not improve the model. |
 | Multi-asset trend | **SURVIVED — defensive** | Trails SPY on raw return, with smoother drawdowns and better measured Sharpe. |
 | Graham value, mega caps | **FAILED FOR THIS UNIVERSE** | Few or no qualifying trades; paid point-in-time small-cap fundamentals would be a different test. |
@@ -82,7 +82,8 @@ folds, test rows, model, and seed constant and changed only purge logic:
 
 The purge repair itself causes a large positive shift, even though aggregate
 AUC barely changes (0.553 to 0.551). Monthly selected-name overlap is only
-about 39%. Neither ablation passes the original tune gate, so these are
+about 39%. Tune Sharpes stay clearly under the original gate in five of six
+cells; the corrected-purge P12 cell (0.41) lands almost exactly on it. Still
 diagnostics rather than promotions. The original legacy cache cannot be fully
 reconstructed because it has no data/code manifest; new caches now record one.
 
@@ -95,7 +96,10 @@ but it has not established a stable portfolio improvement. The promoted
 overlays reverse sign between the legacy and corrected probability caches even
 on common dates. That is evidence of pipeline sensitivity, while the strong v2
 period is a real positive observation that warrants continued prospective
-tracking.
+tracking. A Deflated Sharpe Ratio check adds a harder ceiling on the loop
+specifically: its best historical result is statistically indistinguishable
+from what 12 trials of pure noise would be expected to produce, and falls
+below chance once every configuration this project has tried is counted.
 
 The local stock lists contain companies that survive today. QuantConnect's
 point-in-time fundamental universe and delisting-aware data provide a useful

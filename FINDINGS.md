@@ -415,12 +415,14 @@ probabilities generated before the validation-leak fix.
 
 | Proposal | Tune CAGR | Tune Sharpe | Tune DD | Holdout CAGR | Holdout Sharpe | Holdout DD |
 |---|---:|---:|---:|---:|---:|---:|
-| P5 lower gate | 13.0% | 0.70 | -31.3% | **6.3%** | 0.35 | -36.9% |
-| P8 inverse-vol weights | 11.8% | 0.67 | -32.4% | **-2.0%** | 0.02 | -42.0% |
-| P9 top 30 | 12.1% | 0.68 | -32.1% | **-2.1%** | 0.01 | -41.8% |
-| P12 top 40 | 11.9% | 0.68 | -32.1% | **-2.0%** | 0.02 | -41.3% |
+| P5 lower gate | 13.1% | 0.70 | -30.1% | **6.3%** | 0.35 | -36.9% |
+| P8 inverse-vol weights | 11.8% | 0.65 | -34.1% | **-2.0%** | 0.02 | -42.0% |
+| P9 top 30 | 12.1% | 0.67 | -34.1% | **-2.1%** | 0.01 | -41.8% |
+| P12 top 40 | 11.9% | 0.66 | -34.1% | **-2.0%** | 0.02 | -41.3% |
 
-All four pass the original tune bar of Sharpe > 0.41 and drawdown above -0.35.
+(Tune column revised Sep 14, 2026 -- see "leg_simple NaN guard" below. Holdout
+untouched: re-verified identical.) All four pass the original tune bar of
+Sharpe > 0.41 and drawdown above -0.35.
 The promotions were procedurally faithful under that vintage. P5 remains
 positive and trails matched-window SPY; the other three fail this replay.
 
@@ -432,15 +434,20 @@ would have happened at the original promotion decision.
 
 | Proposal | Tune CAGR | Tune Sharpe | Tune DD | Holdout CAGR | Holdout Sharpe | Holdout DD |
 |---|---:|---:|---:|---:|---:|---:|
-| P5 lower gate | 3.8% | 0.30 | -37.5% | **25.9%** | 0.83 | -41.6% |
-| P8 inverse-vol weights | 4.6% | 0.36 | -35.6% | **17.7%** | 0.65 | -40.8% |
-| P9 top 30 | 4.6% | 0.35 | -34.9% | **17.7%** | 0.65 | -40.8% |
-| P12 top 40 | 4.7% | 0.36 | -34.5% | **17.9%** | 0.66 | -40.8% |
+| P5 lower gate | 4.8% | 0.35 | -33.0% | **25.9%** | 0.83 | -41.6% |
+| P8 inverse-vol weights | 5.6% | 0.40 | -31.1% | **17.7%** | 0.65 | -40.8% |
+| P9 top 30 | 5.5% | 0.40 | -30.4% | **17.7%** | 0.65 | -40.8% |
+| P12 top 40 | 5.7% | 0.41 | -29.9% | **17.9%** | 0.66 | -40.8% |
 
-Every configuration fails the original tune Sharpe gate of 0.41 in v2, so none
-would be promoted if the protocol were restarted on this cache. The holdout
-results are nevertheless real supporting evidence for the frozen configurations.
-They are post-selection evidence, not a new sealed-holdout claim.
+(Tune column revised Sep 14, 2026, same fix as above. Holdout unchanged.)
+P8 and P9 still fall just short of the original tune Sharpe gate of 0.41; P12
+now lands at 0.410, essentially on the bar rather than clearly under it. None
+of the three is comfortably over the line, so the practical conclusion is
+unchanged -- none would be promoted with confidence if the protocol were
+restarted on this cache -- but P12 is a genuine coin flip, not a clear miss.
+The holdout results are nevertheless real supporting evidence for the frozen
+configurations. They are post-selection evidence, not a new sealed-holdout
+claim.
 
 **Common-date sensitivity check (February 28, 2020–July 9, 2025).** Restricting
 both holdout replays to identical dates does not remove the reversal:
@@ -477,16 +484,20 @@ reproduced `sc_full_v2` (probability correlation 1.000). Only purge logic varied
 
 | Proposal | Legacy-purge tune | Legacy-purge hold | Fixed-purge tune | Fixed-purge hold |
 |---|---:|---:|---:|---:|
-| P5 | -1.5% / 0.03 / -52.2% | +11.9% / 0.57 / -35.6% | +3.8% / 0.30 / -37.5% | +25.9% / 0.83 / -41.6% |
-| P8 | +1.1% / 0.16 / -50.6% | +6.7% / 0.40 / -39.4% | +4.6% / 0.36 / -35.6% | +17.7% / 0.65 / -40.8% |
-| P9 | +1.2% / 0.16 / -50.4% | +6.6% / 0.40 / -39.7% | +4.6% / 0.35 / -34.9% | +17.7% / 0.65 / -40.8% |
-| P12 | +1.2% / 0.16 / -50.4% | +6.4% / 0.39 / -39.7% | +4.7% / 0.36 / -34.5% | +17.9% / 0.66 / -40.8% |
+| P5 | +0.8% / 0.14 / -43.2% | +11.9% / 0.57 / -35.6% | +4.8% / 0.35 / -33.0% | +25.9% / 0.83 / -41.6% |
+| P8 | +4.2% / 0.32 / -40.4% | +6.7% / 0.40 / -39.4% | +5.6% / 0.40 / -31.1% | +17.7% / 0.65 / -40.8% |
+| P9 | +4.3% / 0.32 / -40.2% | +6.6% / 0.40 / -39.7% | +5.5% / 0.40 / -30.4% | +17.7% / 0.65 / -40.8% |
+| P12 | +4.3% / 0.32 / -40.2% | +6.4% / 0.39 / -39.7% | +5.7% / 0.41 / -29.9% | +17.9% / 0.66 / -40.8% |
 
-Format is CAGR / Sharpe / maximum drawdown. The purge repair alone produces a
-large positive holdout shift while slightly lowering aggregate common-row AUC
-(0.553 to 0.551). Probability rank correlation is 0.762, but selected-name
-Jaccard is only 0.392. Neither side passes the original tune gate, so this is a
-mechanism diagnostic, not a retroactive promotion.
+Format is CAGR / Sharpe / maximum drawdown. Tune columns revised Sep 14, 2026
+(see "leg_simple NaN guard" below); hold columns re-verified identical. The
+purge repair alone produces a large positive holdout shift while slightly
+lowering aggregate common-row AUC (0.553 to 0.551). Probability rank
+correlation is 0.762, but selected-name Jaccard is only 0.392. Fixed-purge
+P12's tune Sharpe (0.41) now lands almost exactly on the original gate rather
+than clearly under it; the other five tune cells stay clearly below it. Still
+a mechanism diagnostic, not a retroactive promotion -- P12 sitting on the line
+is a reason for caution about that boundary, not a reason to wave it through.
 
 The old `sc_full` cache still cannot be fully reconstructed: refitting its
 legacy purge against today's inputs reaches only 0.855 rank correlation and
@@ -496,6 +507,47 @@ attributing the remaining difference. `run.py --save-proba` now refuses to
 overwrite a cache and writes `manifest.json` with arguments, git state,
 pipeline settings, model backend, versions, fold dates, panel coverage, and a
 SHA-256 hash for every price input.
+
+### leg_simple NaN guard (found and fixed Sep 14, 2026)
+
+Found while building the Deflated Sharpe Ratio package (below), because that
+script computed Sharpe with `numpy.mean`/`numpy.std` directly instead of
+pandas' default `skipna=True` reductions that every other summary in this
+project goes through. `predictor/backtest.py`'s `leg_simple` returned `NaN`
+(rather than raising) when a held name's entry or exit close was missing --
+not a bad raw price (`data/raw/*.csv` has zero NaN closes, checked directly)
+but a normal, expected gap in the per-ticker feature panel: a name can lack a
+row for a specific date in a fold's cached CSV without that being any kind of
+data corruption. `_run_book` wraps each name's `leg_simple` call in
+`try/except` specifically to drop one bad leg and keep the rest of that
+month's names -- but a silently-returned NaN doesn't raise, so it was never
+caught, and it corrupted that entire month's weighted return instead of just
+that one name's contribution. Every downstream summary (`score()`,
+`ev.summarize()`) uses pandas' default `skipna=True` mean/std/cumprod, so
+this was invisible in every previously reported number: the bad months were
+quietly excluded from the statistics rather than explicitly handled, so CAGR
+and Sharpe looked plausible while resting on fewer clean months than reported.
+
+Fixed: `leg_simple` now raises `ValueError` on a non-finite entry or exit
+price, so `_run_book`'s existing exception handling does what it was already
+meant to do -- exclude that one name's leg and let the rest of the month's
+book still contribute a real, correctly-computed return, instead of losing
+the whole month. Added
+`predictor/test_backtest.py::test_leg_simple_raises_on_non_finite_price` as a
+regression test.
+
+**Verified impact, don't take on faith:** reran every affected artifact.
+Every previously reported **holdout** figure across `sc_full`, `sc_full_v2`,
+and both purge-ablation caches is unchanged (re-verified bit-for-bit against
+the tables above and below). **Tune-half** figures for P5/P8/P9/P12 shift --
+sometimes materially, as in the purge-ablation legacy-purge column (P5 tune
+Sharpe 0.03 to 0.14, drawdown -52.2% to -43.2%) -- because the specific
+data-panel gaps that triggered this all happened to fall on tune-period
+dates for these folds. All corrected tables above already reflect the fix.
+mom_run.py/multi_run.py (momentum, multi-asset) never call `leg_simple` and
+build their price panel straight from `data/raw`, so they were never
+affected; none of the momentum, SPY-comparison, bootstrap, or factor-
+regression results change.
 
 ## Rerun under corrected ledger: momentum, multi-asset, ensemble (Sep 13, 2026)
 
@@ -854,3 +906,58 @@ section's title overstates what a single-path comparison can close out. The
 honest read: small- and mid-cap momentum's outperformance over SPY in this
 window is directionally consistent but not distinguishable from zero once
 monthly-return sampling noise is accounted for.
+
+## Deflated Sharpe Ratio (Sep 14, 2026)
+
+PAPER.md Section 9 item 3, Bailey & Lopez de Prado (2014). Applies to the
+self-improvement loop specifically, not momentum -- momentum was "frozen
+before first run... not fitted" (`mom_run.py`'s own docstring), so its
+Sharpe isn't the max of a search the way a promoted loop proposal's is.
+`deflated_sharpe.py` reran all 12 formal proposals on the tune half of the
+legacy (`sc_full`) fold cache -- the pre-registered dates the real promotion
+decisions used -- under the current, fully corrected code (this is also what
+surfaced and got the `leg_simple` NaN bug fixed above: it computes Sharpe
+with `numpy.mean`/`numpy.std`, which don't silently skip NaN the way pandas'
+defaults do everywhere else, so a corrupted month showed up as an outright
+NaN instead of a quietly-wrong number).
+
+**Under corrected code, the tune-half maximum is now P3-blend** (monthly
+Sharpe +0.226, annualized +0.78), not the historically-promoted P5 (+0.697
+annualized) -- P3 was never promoted historically despite clearing both the
+Sharpe and drawdown bars on record (CAGR 7.2%, DD -22.2%, Sharpe 0.43 in the
+original registry), which is a loose end this analysis doesn't resolve: either
+an undocumented additional criterion filtered it out, or it was a selection
+oversight. DSR is computed on the actual current best (P3) either way, since
+that's what a Sharpe-maximizing search would surface today.
+
+Skew and kurtosis of P3's 82-month tune return series: +0.417 and 3.94
+(Pearson; normal is 3) -- mildly right-skewed, close to normal tails.
+
+| Trial count | sigma(SR) source | E[max SR \| N] (annualized) | PSR(0), naive | **DSR** |
+|---|---|---:|---:|---:|
+| N=12, formal loop as run | all 12 tune Sharpes | +0.72 | 0.982 | **0.566** |
+| N=12, formal loop | 11 tune Sharpes, P1 artifact excluded | +0.70 | 0.982 | **0.587** |
+| N=34, broad (all reported configs) | same 11, held fixed | +0.89 | 0.982 | **0.383** |
+
+The naive PSR(0) -- "is the true Sharpe positive, ignoring that this was
+picked as the best of many" -- says 98% confidence. That number is the wrong
+one to trust. Once corrected for actually having searched 12 trials, DSR
+drops to 0.57-0.59: barely better than a coin flip on whether the loop's best
+result reflects real skill rather than the expected maximum of 12 lucky
+draws. Widening the search to N=34 (every distinct configuration this
+project has reported, formal and informal, not just the loop's own 12) drops
+DSR to 0.38 -- *below* even chance, meaning the observed best Sharpe is now
+*less* than what you'd expect the best of 34 pure-noise trials to produce.
+
+N=34's sigma(SR) is held at the formal-12 estimate rather than re-measured
+from the broader set (gathering monthly return series for every informal
+experiment in the file was out of scope here), so that row is a sensitivity
+bound, not an independently estimated number -- flagged as such rather than
+presented with false precision. The direction is unambiguous either way: the
+wider the honestly-accountable search, the less this loop's best result
+looks like evidence of skill.
+
+This closes out PAPER.md Section 9 item 3 and lands on the same conclusion
+as everything else this session has found under corrected accounting: the
+ML side of this project has produced nothing that survives being asked "or
+is this just what N trials looks like."

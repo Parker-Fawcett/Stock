@@ -321,22 +321,26 @@ result supports H1 and H2. Aggregate classification quality is insufficient to
 establish decision stability.
 
 Previously promoted portfolio overlays also change materially, as shown in
-Table 2. None of the two ablation arms passes the original tuning gate, so these
-results are diagnostics and must not be interpreted as retroactive strategy
-promotions.
+Table 2. Neither ablation arm clears the original tuning gate with confidence
+(one cell lands almost exactly on it), so these results are diagnostics and
+must not be interpreted as retroactive strategy promotions.
 
 **Table 2. Previously selected overlays under the controlled purge ablation**
 
 | Overlay | Legacy tune | Legacy holdout | Corrected tune | Corrected holdout |
 |---|---:|---:|---:|---:|
-| P5: lower probability gate | -1.5% / 0.03 / -52.2% | +11.9% / 0.57 / -35.6% | +3.8% / 0.30 / -37.5% | +25.9% / 0.83 / -41.6% |
-| P8: inverse-volatility weights | +1.1% / 0.16 / -50.6% | +6.7% / 0.40 / -39.4% | +4.6% / 0.36 / -35.6% | +17.7% / 0.65 / -40.8% |
-| P9: top 30 | +1.2% / 0.16 / -50.4% | +6.6% / 0.40 / -39.7% | +4.6% / 0.35 / -34.9% | +17.7% / 0.65 / -40.8% |
-| P12: top 40 | +1.2% / 0.16 / -50.4% | +6.4% / 0.39 / -39.7% | +4.7% / 0.36 / -34.5% | +17.9% / 0.66 / -40.8% |
+| P5: lower probability gate | +0.8% / 0.14 / -43.2% | +11.9% / 0.57 / -35.6% | +4.8% / 0.35 / -33.0% | +25.9% / 0.83 / -41.6% |
+| P8: inverse-volatility weights | +4.2% / 0.32 / -40.4% | +6.7% / 0.40 / -39.4% | +5.6% / 0.40 / -31.1% | +17.7% / 0.65 / -40.8% |
+| P9: top 30 | +4.3% / 0.32 / -40.2% | +6.6% / 0.40 / -39.7% | +5.5% / 0.40 / -30.4% | +17.7% / 0.65 / -40.8% |
+| P12: top 40 | +4.3% / 0.32 / -40.2% | +6.4% / 0.39 / -39.7% | +5.7% / 0.41 / -29.9% | +17.9% / 0.66 / -40.8% |
 
 *Cells report CAGR / annualized monthly Sharpe / maximum drawdown. “Tune” and
-“holdout” describe the project's recorded split; neither ablation clears the
-original tune Sharpe requirement.*
+“holdout” describe the project's recorded split. Corrected-tune P12 (0.41)
+lands almost exactly on the original tune Sharpe requirement rather than
+clearly under it; the other five tune cells stay clearly below it. (Tune
+cells revised Sep 14, 2026 after fixing a NaN-propagation bug in
+`leg_simple`, documented in `FINDINGS.md`; holdout cells were re-verified
+and are unchanged.)*
 
 The direction of the holdout difference is unexpectedly favorable to the
 corrected purge. That observation does not mean leakage was conservative in
@@ -446,6 +450,51 @@ comparison should be read with that distinction: the point estimate and the
 window-matching methodology are correct, but the outperformance itself is
 directional, not confidently established, at this sample size.
 
+### 6.6 Deflated Sharpe Ratio for the self-improvement loop
+
+Section 9 item 3 is complete. The Deflated Sharpe Ratio [4] targets the
+self-improvement loop specifically, not momentum: momentum is a frozen,
+unfitted rule (Section 5.5), so its Sharpe is not the maximum of a search the
+way a promoted loop proposal's is. We rerun all 12 formal loop proposals on
+the tune half of the legacy (pre-registered) fold cache under the fully
+corrected code and take the empirical maximum monthly Sharpe as \(\widehat{SR}\).
+
+Under the corrected code the tune-half maximum is P3 (a signal blend never
+promoted historically despite clearing the original Sharpe and drawdown
+thresholds on record), not the historically promoted P5. We do not resolve
+why; either an undocumented criterion filtered P3 out at the time, or it was
+a selection oversight. DSR is computed on the actual current maximum (P3)
+regardless, since that is what a Sharpe-maximizing search surfaces today.
+P3's 82-month tune return series has skewness +0.417 and kurtosis 3.94
+(Pearson; normal is 3).
+
+**Table 7. Deflated Sharpe Ratio under three trial-count assumptions**
+
+| Trial count | \(\sigma(SR)\) source | \(E[\max SR \mid N]\) (annualized) | PSR(0), naive | DSR |
+|---|---|---:|---:|---:|
+| \(N=12\), formal loop as run | all 12 tune Sharpes | +0.72 | 0.982 | 0.566 |
+| \(N=12\), formal loop | 11 tune Sharpes, P1 artifact excluded | +0.70 | 0.982 | 0.587 |
+| \(N=34\), broad (all reported configurations) | same 11, held fixed | +0.89 | 0.982 | 0.383 |
+
+The naive probabilistic Sharpe ratio, which ignores the selection process
+entirely, reports 98% confidence that the true Sharpe of the best trial is
+positive. That figure is not the relevant one. Correcting for the 12 trials
+actually conducted lowers this to 0.57-0.59: statistically indistinguishable
+from a coin flip on whether the loop's best result is genuine skill rather
+than the expected maximum of 12 noisy draws. Extending the trial count to
+every distinct configuration this project has reported (\(N=34\), formal and
+informal) lowers it further to 0.38 -- below even chance, meaning the
+observed best Sharpe is now smaller than the expected maximum of 34
+pure-noise trials. The \(N=34\) row holds \(\sigma(SR)\) at the formal
+estimate rather than re-measuring it from the informal set, so it is a
+sensitivity bound rather than an independently estimated figure; the
+direction is unambiguous regardless of that simplification.
+
+This result is consistent with every other machine-learning finding in this
+paper: nothing about the self-improvement loop's output survives being
+asked whether it is distinguishable from what N trials looks like under a
+null of no skill.
+
 ## 7. Discussion
 
 The main result is a disconnect between global predictive stability and local
@@ -510,9 +559,9 @@ or machine-learning decision rules.
    monthly return, CAGR, Sharpe, and momentum-minus-SPY return.
 2. **Done (Section 6.5).** CAPM and Fama-French five-factor-plus-momentum
    regressions on monthly portfolio returns, with Newey-West standard errors.
-3. Report the Deflated Sharpe Ratio using the documented research-trial count
-   and return skewness and kurtosis; add a conservative sensitivity range that
-   includes informal trials.
+3. **Done (Section 6.6).** Deflated Sharpe Ratio using the documented
+   research-trial count and return skewness and kurtosis, with a sensitivity
+   range extending to informal trials.
 4. Run a QuantConnect comparison on a common period and a universe construction
    made as comparable as platform data allow. Record every remaining mismatch.
 5. Add selection-stability plots by month and by probability distance from the
@@ -559,7 +608,14 @@ stops, and initial-equity drawdown are enforced, a frozen 12-minus-1-month
 momentum baseline dominates the tested machine-learning portfolio and its
 ensemble. A dynamic-universe cloud implementation preserves the positive
 direction, but a matched external comparison and prospective outcomes remain
-necessary.
+necessary. Momentum's advantage over matched-window SPY buy-and-hold,
+however, is directional rather than statistically distinguishable from zero
+under a moving-block bootstrap, and the self-improvement loop's best observed
+Sharpe ratio is not distinguishable from the expected maximum of a 12-trial
+search under a null of no skill -- and falls below it once the search is
+widened to every configuration this project tested. The machine-learning side
+of this study has produced no result that survives being asked whether it is
+better than what the number of trials conducted would produce by chance.
 
 The publishable finding is therefore methodological. In small financial
 machine-learning studies, the integrity of label boundaries, portfolio
@@ -614,6 +670,7 @@ https://doi.org/10.1111/j.1540-6261.1997.tb03808.x
 | Dynamic-universe momentum check | `qc_momentum.py` | QuantConnect result recorded in `FINDINGS.md` and `RESULTS.md` |
 | Immutable prospective series | `paper.py` | `data/paper/runs/`, `data/paper/log_v2.csv`, `data/paper/grades_v2.csv` |
 | Factor regressions and bootstrap CIs | `factor_analysis.py` | Ken French factor cache (`predictor/factors.py`), console summary recorded in `FINDINGS.md` |
+| Deflated Sharpe Ratio | `deflated_sharpe.py` | `data/cache/sc_full/` (legacy, pre-registered dates), console summary recorded in `FINDINGS.md` |
 
 ## Appendix B. Evidence-status vocabulary
 

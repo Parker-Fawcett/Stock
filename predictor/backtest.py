@@ -74,9 +74,17 @@ def leg_simple(px_col, d0, horizon: int, short: bool,
                stop_frac: float | None) -> float:
     """Simple return of one position held up to `horizon` trading days.
     Gap-aware stops: exit at the first close beyond the stop, realized
-    at that actual close."""
+    at that actual close.
+
+    Raises on a non-finite entry or exit price instead of silently
+    returning NaN -- a NaN return added into a month's weighted gross
+    (_run_book) corrupts that whole month for every held name, not just
+    this one. Callers already wrap this in try/except to skip one bad
+    leg and keep the rest; a raise here is what makes that work."""
     _check_stop(stop_frac)
     p0 = float(px_col.loc[d0])
+    if not np.isfinite(p0):
+        raise ValueError(f"non-finite entry price at {d0}")
     fut = px_col.loc[px_col.index > d0].iloc[:horizon]
     if len(fut) == 0:
         return 0.0
@@ -85,14 +93,17 @@ def leg_simple(px_col, d0, horizon: int, short: bool,
             hit = fut[fut / p0 >= 1 / stop_frac]
             if len(hit):
                 return float(p0 / hit.iloc[0] - 1)  # stopped: a loss
-            return float(p0 / fut.iloc[-1] - 1)
-        hit = fut[fut / p0 <= stop_frac]
-        if len(hit):
-            return float(hit.iloc[0] / p0 - 1)  # actual close, gaps included
-        return float(fut.iloc[-1] / p0 - 1)
-    if short:
-        return float(p0 / fut.iloc[-1] - 1)
-    return float(fut.iloc[-1] / p0 - 1)
+            exit_price = float(fut.iloc[-1])
+        else:
+            hit = fut[fut / p0 <= stop_frac]
+            if len(hit):
+                return float(hit.iloc[0] / p0 - 1)  # actual close, gaps included
+            exit_price = float(fut.iloc[-1])
+    else:
+        exit_price = float(fut.iloc[-1])
+    if not np.isfinite(exit_price):
+        raise ValueError(f"non-finite exit price after {d0}")
+    return p0 / exit_price - 1 if short else exit_price / p0 - 1
 
 
 def _run_book(test: pd.DataFrame, schedule, cost_bps: float = COST_BPS,
