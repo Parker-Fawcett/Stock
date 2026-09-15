@@ -1019,3 +1019,39 @@ the current-survivor restriction and confirms direction at 25.97% CAGR. The
 fixed-universe run retains survivor bias on both sides and broadly reproduces
 the local Yahoo magnitude at 23.62% versus 21.65%. Neither establishes exact
 monthly equality; return-path reconciliation is the next step.
+
+## Novelty audit and closest prior work (Sep 14, 2026)
+
+The broad headline cannot honestly be “equally accurate models can choose
+different portfolios.” Predictive multiplicity and underspecification already
+establish that similar held-out performance can conceal conflicting individual
+predictions or deployment behavior. Recent finance work also documents unstable
+portfolio weights and Sharpe ratios across stochastic deep-RL fits. A separate
+2026 equity benchmark already emphasizes leakage-controlled, fold-isolated
+preprocessing. An August 2026 preprint, PC-Audit, is closer still in purpose: it
+treats validation-selected models as decision objects and audits rank transfer,
+cost, execution, multiplicity, and temporal stress in index ETFs. It does not
+run a before-and-after leakage repair or measure constituent overlap at a
+cross-sectional stock-selection cutoff.
+
+The defensible contribution is narrower and stronger because it is controlled:
+one real label-purge repair is changed while the price snapshot, 26 fold
+boundaries, test rows and labels, model implementation, backend, and random seed
+remain fixed. The audit then measures the full propagation path:
+
+- pooled AUC changes only 0.002, from 0.553 to 0.551;
+- full probability-rank correlation remains 0.762;
+- mean selected-name Jaccard falls to 0.392; and
+- previously promoted portfolio outcomes change materially under the corrected
+  ledger.
+
+That differs from prior classifier studies, which establish the general
+multiplicity problem, and from the closest financial paper, which perturbs
+random seeds and stochastic optimization in deep reinforcement learning. This
+study perturbs a single causal validation-code defect in supervised
+cross-sectional equity selection and connects global accuracy, the investable
+cutoff, and portfolio accounting in one reproducible audit.
+
+`PAPER.md` now states this limit in the introduction, related-literature table,
+discussion, and conclusion. The paper claims neither a new momentum anomaly nor
+the first observation of predictive multiplicity or allocation instability.

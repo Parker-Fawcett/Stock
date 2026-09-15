@@ -152,5 +152,16 @@ controlled result, not a claim of new alpha: correcting the purge changes AUC
 from 0.553 to 0.551 while mean selected-name overlap is only 0.392. The draft
 labels the local momentum magnitudes as provisional and separates the dynamic
 survivorship check from the completed fixed-universe magnitude comparison.
+The novelty review now also separates the broad known phenomenon from this
+paper's narrower contribution. Predictive multiplicity, underspecification,
+leakage-controlled financial ML, and seed-driven allocation instability all
+have prior literature. A closely related August 2026 preprint also audits
+validation-selected decisions, rank transfer, costs, and execution in index
+ETFs. The potentially original result is the controlled
+propagation of one label-purge repair, with data, folds, test rows, model, and
+seed fixed, from nearly unchanged AUC to 0.392 selected-name overlap and changed
+portfolio conclusions. `PAPER.md` includes a closest-prior-work table and does
+not claim discovery of momentum, predictive multiplicity, or allocation
+instability in general.
 Remaining work is monthly return reconciliation, selection-stability figures,
 artifact provenance, and prospective evidence.

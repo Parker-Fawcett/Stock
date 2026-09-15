@@ -37,8 +37,9 @@ near a model cutoff can be unstable even when aggregate AUC appears robust,
 and implementation audits can dominate model choice in small quantitative
 research programs.
 
-**Keywords:** machine learning, equity selection, backtest overfitting,
-look-ahead bias, momentum, reproducibility, portfolio accounting
+**Keywords:** machine learning, equity selection, predictive multiplicity,
+backtest overfitting, look-ahead bias, momentum, reproducibility, portfolio
+accounting
 
 ## 1. Introduction
 
@@ -74,8 +75,13 @@ investment boundary. In this experiment, mean selected-name overlap is about
 39%, despite similar AUC.
 
 The study makes three contributions. First, it gives a concrete, reproducible
-example in which a valid correction leaves headline predictive accuracy nearly
-unchanged while materially changing portfolio membership and economic results.
+decision-level case study in which a valid correction leaves headline
+predictive accuracy nearly unchanged while materially changing portfolio
+membership and economic results. This is not a claim that predictive
+multiplicity itself is new. The narrower contribution is to identify the
+effect of one validation-code repair while holding the data snapshot, folds,
+test observations, model, and seed fixed, then follow that effect from AUC to
+cutoff selections and portfolio results.
 Second, it separates model error from accounting error through controlled
 replays. Third, it compares the machine-learning pipeline with a frozen,
 textbook momentum rule and with a dynamic point-in-time cloud implementation.
@@ -115,11 +121,44 @@ selection bias, non-normal returns, and the number of trials [4]. This project
 keeps a lifetime proposal budget and an archive of failures, but the final
 submission will also report a formal multiple-testing adjustment.
 
+The broad stability problem has substantial precedent outside and inside
+finance. Marx, Calmon, and Ustun define *predictive multiplicity*: models with
+nearly equal accuracy can give conflicting predictions for the same cases [9].
+D'Amour et al. describe the related problem of underspecification, in which
+pipelines with similar held-out performance can behave differently in
+deployment [10]. Masum et al. provide a recent leakage-controlled,
+fold-isolated equity-prediction benchmark, but do not study transaction costs,
+turnover, or a controlled before-and-after portfolio cutoff [11]. Grądzki is
+one close financial precedent: repeated deep-reinforcement-learning fits can
+have unstable Sharpe ratios and portfolio weights, motivating allocation-level
+evaluation and deflated performance statistics [12]. That experiment varies
+random seeds and stochastic optimization. The present experiment varies one
+causal validation repair in a supervised cross-sectional classifier while
+holding the seed and evaluation sample fixed. Li et al.'s August 2026 PC-Audit
+preprint is also close in purpose: it treats validation-based model selection
+as a decision-reliability problem and audits transfer, costs, execution, and
+multiplicity in index ETFs [13]. It compares candidate-model selection across
+time; it does not measure a before-and-after leakage repair or the stability of
+stocks selected at a cross-sectional probability cutoff.
+
+**Positioning against the closest prior work**
+
+| Study | Source of disagreement | Domain | Decision-level measure | Downstream portfolio accounting |
+|---|---|---|---|---|
+| Marx et al. (2020) [9] | Near-optimal classifiers | General classification | Conflicting individual predictions | No |
+| D'Amour et al. (2022) [10] | Underspecified pipelines | Multiple applied domains | Deployment stress tests | No |
+| Masum et al. (2026) [11] | Leakage-controlled model benchmark | Short-horizon equities | Predictive metrics | No |
+| Grądzki (2026) [12] | Random seeds and stochastic training | Financial deep reinforcement learning | Allocation distance and Sharpe dispersion | Yes |
+| Li et al. (2026), preprint [13] | Validation-selected candidate models | Index-ETF forecasting | Rank transfer, regret, and confidence sets | Cost and execution stress tests |
+| This study | One label-purge repair, all named controls fixed | Cross-sectional equities | Rank correlation and selected-name Jaccard | Yes; corrected ledger, turnover, costs, and drawdown |
+
 The present contribution differs from a factor-discovery paper. It asks how
 model-validation details propagate through a selection threshold into realized
 portfolio decisions. That focus also motivates the public audit trail: incorrect
 results remain visible with explicit supersession labels instead of disappearing
-from the record.
+from the record. Its novelty claim is therefore the controlled propagation path,
+not the general existence of predictive multiplicity, momentum, or unstable
+financial models.
 
 ## 3. Research questions and hypotheses
 
@@ -551,6 +590,14 @@ reassurance. The corrected classifier may retain weak information in aggregate,
 yet a particular portfolio derived from it can remain fragile. Reporting the
 overlap of actual selections, turnover, and return sensitivity alongside AUC
 would make this fragility visible in other financial classification studies.
+This result should be read as a finance-specific, controlled instance of
+predictive multiplicity and underspecification [9,10]. Grądzki's seed-driven
+allocation instability provides the nearest portfolio-level comparison [12],
+while Li et al. provide the nearest validation-decision audit [13]. The
+additional evidence is the causal structure of the ablation: a single
+validation repair, identical test observations and seed, and a measured chain
+from nearly invariant AUC to low selected-name overlap and changed economic
+results.
 
 The accounting corrections carry a separate lesson. Averaging security-level
 log returns and exponentiating creates the geometric mean of constituent gross
@@ -665,11 +712,13 @@ widened to every configuration this project tested. The machine-learning side
 of this study has produced no result that survives being asked whether it is
 better than what the number of trials conducted would produce by chance.
 
-The publishable finding is therefore methodological. In small financial
-machine-learning studies, the integrity of label boundaries, portfolio
-selection, and the accounting ledger can matter more than the choice of model.
-Researchers should report decision-level stability and preserve corrected
-failures alongside headline accuracy.
+The publishable finding is therefore methodological and deliberately narrow.
+Predictive multiplicity, financial allocation instability, and validation-
+decision audits are already known [9,10,12,13]. This study adds a controlled
+case showing that one leakage repair can leave AUC nearly invariant while
+replacing most cutoff-selected stocks and changing economic conclusions. In
+small financial machine-learning studies, researchers should report decision-
+level stability and preserve corrected failures alongside headline accuracy.
 
 ## References
 
@@ -706,6 +755,32 @@ https://doi.org/10.1016/j.jfineco.2014.10.010
 [8] Carhart, M. M. (1997). “On Persistence in Mutual Fund Performance.”
 *The Journal of Finance*, 52(1), 57–82.
 https://doi.org/10.1111/j.1540-6261.1997.tb03808.x
+
+[9] Marx, C., Calmon, F. P., and Ustun, B. (2020). “Predictive Multiplicity
+in Classification.” *Proceedings of the 37th International Conference on
+Machine Learning*, PMLR 119, 6765–6774.
+https://proceedings.mlr.press/v119/marx20a.html
+
+[10] D'Amour, A., Heller, K., Moldovan, D., et al. (2022).
+“Underspecification Presents Challenges for Credibility in Modern Machine
+Learning.” *Journal of Machine Learning Research*, 23(226), 1–61.
+https://jmlr.org/papers/v23/20-1335.html
+
+[11] Masum, M., et al. (2026). “Audit-Ready Machine Learning for Short-Horizon
+Equity Prediction: A Dual-Target Benchmark With Fold-Isolated Preprocessing.”
+*Engineering Reports*, 8(6), e70893.
+https://doi.org/10.1002/eng2.70893
+
+[12] Grądzki, P. (2026). “Unstable Gains: Multiplicity-Aware Evaluation of
+Financial Deep Reinforcement Learning.” *The Journal of Finance and Data
+Science*, 12, 100205.
+https://doi.org/10.1016/j.jfds.2026.100205
+
+[13] Li, S., Zhang, W., Wang, Y., and Lei, Q. (2026). “PC-Audit: A
+Decision-Reliability Framework for Auditing Validation-Based Machine-Learning
+Model Selection in Weak-Signal Financial Time Series.” Preprints.org,
+202608.2127, version 1. Preprint; not peer reviewed.
+https://www.preprints.org/manuscript/202608.2127
 
 ## Appendix A. Reproduction map
 
