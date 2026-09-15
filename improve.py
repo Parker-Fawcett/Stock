@@ -25,6 +25,7 @@ from __future__ import annotations
 
 import argparse
 import glob
+import hashlib
 import json
 import sys
 from pathlib import Path
@@ -44,9 +45,24 @@ TOP_N = 20
 THRESH = 0.30
 
 
+def fold_files(cache: str) -> list[str]:
+    return sorted(glob.glob(str(Path(cache) / "fold*.csv")),
+                  key=lambda f: int("".join(
+                      c for c in Path(f).stem if c.isdigit())))
+
+
+def fold_cache_digest(cache: str) -> str:
+    """Hash ordered fold names and bytes for cache-vintage verification."""
+    digest = hashlib.sha256()
+    for fp in fold_files(cache):
+        path = Path(fp)
+        digest.update(path.name.encode())
+        digest.update(path.read_bytes())
+    return digest.hexdigest()
+
+
 def load_folds(cache: str = "data/cache/sc_full"):
-    files = sorted(glob.glob(str(Path(cache) / "fold*.csv")),
-                   key=lambda f: int("".join(c for c in Path(f).stem if c.isdigit())))
+    files = fold_files(cache)
     out = []
     for fp in files:
         t = pd.read_csv(fp, parse_dates=["Date"])
@@ -595,6 +611,7 @@ def main() -> None:
         )
         plan.update({
             "status": "passed-external" if passed else "failed-external",
+            "cache_sha256": fold_cache_digest(cache),
             "window": (f"{pd.Timestamp(candidate.index.min()).date()}.."
                        f"{pd.Timestamp(candidate.index.max()).date()}"),
             "candidate": candidate_score,

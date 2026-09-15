@@ -1089,3 +1089,27 @@ alternatives were searched. The tool records all four as `exploratory-tune`,
 blocks promotion, and leaves their holdout fields empty. P15 should be frozen
 for a new point-in-time universe or prospective window. The lifetime counter is
 16/20 spent, leaving four trials banked.
+
+## P15 mid-cap external validation: failed (Sep 14, 2026)
+
+Commit `52229b2` registered the test before its result was opened. P15 was to be
+run once across all 26 frozen folds of `data/cache/mc_price`, covering September
+30, 2013 through July 2, 2026. The gate required it to beat an identically
+accounted pure-momentum control on CAGR and Sharpe while adding no more than five
+percentage points of maximum drawdown. This validation did not spend another
+proposal trial; it tested the already selected P15 rule on a different universe.
+The older cache has no generation manifest and is not tracked by Git; the result
+record now locks its ordered fold contents with SHA-256 digest
+`c612415f7316fff1c404bef5d73a5ff2abd9c1f89e95bcc5c03e7a6b1bb35f22`.
+
+| Mid-cap external test, 177 months | CAGR | Sharpe | Max DD |
+|---|---:|---:|---:|
+| P15 ML/momentum rank consensus | 13.53% | 0.698 | -35.9% |
+| Same-run momentum control | **15.40%** | 0.692 | **-30.7%** |
+
+**Gate: failed.** P15 improves Sharpe by only 0.006, loses 1.87 percentage
+points of CAGR, and worsens maximum drawdown by 5.2 points, just beyond the
+precommitted five-point tolerance. The attractive small-cap tune result does
+not generalize. Rank agreement remains a reasonable idea for future prospective
+observation, but the independent evidence continues to favor pure momentum over
+adding this machine-learning rank.

@@ -588,6 +588,18 @@ They are also ineligible for promotion: their design follows inspection of the
 period and they have no untouched holdout. P15 is a hypothesis for future data,
 not evidence supporting the paper's historical conclusions.
 
+P15 was subsequently subjected to one external validation on the frozen
+mid-cap `mc_price` cache. The validation rule and gate were committed before
+execution: P15 had to beat a same-run momentum control on both CAGR and Sharpe,
+with no more than five percentage points of additional maximum drawdown. Across
+177 months, P15 returned 13.53% CAGR, 0.698 Sharpe, and -35.9% drawdown versus
+15.40%, 0.692, and -30.7% for momentum. It failed on CAGR and exceeded the
+drawdown tolerance by 0.2 point. The small-cap exploratory improvement therefore
+does not generalize to this independent current-constituent universe. The
+mid-cap cache predates the manifest system; its ordered fold contents are locked
+in the result registry by a SHA-256 digest, but its original generation
+environment cannot be reconstructed as completely as newer caches.
+
 ## 7. Discussion
 
 The main result is a disconnect between global predictive stability and local

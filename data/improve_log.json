@@ -390,16 +390,31 @@
  ],
  "external_validations": {
   "P15-mc-price-v1": {
-   "status": "pending",
+   "status": "failed-external",
    "proposal": "P15-consensus40",
    "cache": "data/cache/mc_price",
+   "cache_sha256": "c612415f7316fff1c404bef5d73a5ff2abd9c1f89e95bcc5c03e7a6b1bb35f22",
    "evidence": "cross-universe mid-cap validation; full 26 frozen folds",
    "prediction": "P15 beats the same-run momentum control on CAGR and Sharpe without worsening maximum drawdown by more than 5 percentage points.",
    "gate": {
     "candidate_cagr_gt_control": true,
     "candidate_sharpe_gt_control": true,
     "max_dd_tolerance": 0.05
-   }
+   },
+   "window": "2013-09-30..2026-07-02",
+   "candidate": {
+    "CAGR": 0.1353,
+    "maxDD": -0.359,
+    "sharpe": 0.698,
+    "months": 177
+   },
+   "control": {
+    "CAGR": 0.154,
+    "maxDD": -0.307,
+    "sharpe": 0.692,
+    "months": 177
+   },
+   "passed": false
   }
  },
  "rounds": [

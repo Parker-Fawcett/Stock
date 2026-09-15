@@ -110,6 +110,15 @@ The period, universe, and model probabilities were already known when these
 rules were designed, four alternatives were tried, and no untouched holdout
 was opened. The lifetime budget is now 16/20 spent; four trials remain banked.
 
+P15 then received one preregistered external test on all 26 frozen folds of the
+mid-cap `mc_price` cache. The plan was committed before execution: P15 had to
+beat the same-run momentum control on CAGR and Sharpe without worsening maximum
+drawdown by more than five percentage points. It failed. P15 returned 13.53%
+CAGR, 0.698 Sharpe, and -35.9% drawdown versus 15.40%, 0.692, and -30.7% for
+momentum. The 0.006 Sharpe increase is negligible; CAGR fell 1.87 points and
+drawdown worsened 5.2 points. The exploratory small-cap improvement therefore
+did not generalize to the independent universe.
+
 ## What the evidence supports
 
 The defensible research claim is narrow: cross-sectional momentum appears

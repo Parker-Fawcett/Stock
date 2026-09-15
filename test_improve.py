@@ -20,3 +20,16 @@ def test_rank_book_flat_prices_cannot_create_returns():
     assert list(nets.index) == decisions
     assert np.isclose(nets.iloc[0], -0.5 * improve.COST / 1e4)
     assert np.isclose(nets.iloc[1], 0.0)
+
+
+def test_fold_cache_digest_tracks_ordered_fold_contents(tmp_path):
+    (tmp_path / "fold10.csv").write_text("ten\n")
+    (tmp_path / "fold2.csv").write_text("two\n")
+    (tmp_path / "notes.txt").write_text("ignored\n")
+
+    before = improve.fold_cache_digest(str(tmp_path))
+    (tmp_path / "notes.txt").write_text("still ignored\n")
+    assert improve.fold_cache_digest(str(tmp_path)) == before
+
+    (tmp_path / "fold2.csv").write_text("changed\n")
+    assert improve.fold_cache_digest(str(tmp_path)) != before
