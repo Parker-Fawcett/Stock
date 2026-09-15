@@ -16,6 +16,8 @@ Usage:
                                       # evaluate pending on tune-half
   python3 improve.py promote --cache data/cache/sc_full_v2
                                       # holdout once for that cache's winner
+  python3 improve.py validate --id P15-mc-price-v1
+                                      # execute one registered external check
   python3 improve.py replay-promoted --cache data/cache/sc_full
   python3 improve.py replay-promoted --cache data/cache/sc_full_v2
 """
@@ -509,6 +511,9 @@ def main() -> None:
     promote_cmd = sub.add_parser("promote")
     promote_cmd.add_argument("--cache", required=True,
                              help="same fold cache used for the tune round")
+    validate_cmd = sub.add_parser("validate")
+    validate_cmd.add_argument("--id", required=True,
+                              help="pending id in external_validations registry")
     replay = sub.add_parser("replay-promoted")
     replay.add_argument("--cache", required=True,
                         help="fold cache to replay; required so cache vintage is explicit")
@@ -556,6 +561,50 @@ def main() -> None:
                 window = (f"{pd.Timestamp(nets.index.min()).date()}.."
                           f"{pd.Timestamp(nets.index.max()).date()}")
                 print(f"{pid} {half} [{window}]: {result}")
+        return
+
+    if args.cmd == "validate":
+        plans = log.get("external_validations", {})
+        if args.id not in plans:
+            raise ValueError(f"unregistered external validation: {args.id}")
+        plan = plans[args.id]
+        if plan.get("status") != "pending":
+            raise ValueError(f"external validation {args.id} already executed")
+        pid = plan["proposal"]
+        if pid not in PROPOSALS:
+            raise ValueError(f"unknown proposal in validation plan: {pid}")
+        cache = plan["cache"]
+        folds = load_folds(cache)
+        if not folds:
+            raise ValueError(f"no folds found in {cache}")
+        tickers = sorted({tk for t, _ in folds for tk in t["ticker"].unique()})
+        px = load_px(tickers)
+        candidate = stitch([PROPOSALS[pid][0](t, p, px) for t, p in folds])
+        control = stitch([momentum_control(t, p, px) for t, p in folds])
+        candidate, control = candidate.align(control, join="inner")
+        if candidate.empty:
+            raise ValueError("candidate and control have no common results")
+        candidate_score = score(candidate)
+        control_score = score(control)
+        gate = plan["gate"]
+        passed = (
+            candidate_score["CAGR"] > control_score["CAGR"]
+            and candidate_score["sharpe"] > control_score["sharpe"]
+            and candidate_score["maxDD"]
+            >= control_score["maxDD"] - float(gate["max_dd_tolerance"])
+        )
+        plan.update({
+            "status": "passed-external" if passed else "failed-external",
+            "window": (f"{pd.Timestamp(candidate.index.min()).date()}.."
+                       f"{pd.Timestamp(candidate.index.max()).date()}"),
+            "candidate": candidate_score,
+            "control": control_score,
+            "passed": passed,
+        })
+        write_log(log)
+        print(f"{args.id} candidate: {candidate_score}")
+        print(f"{args.id} momentum-control: {control_score}")
+        print(f"{args.id}: {'PASS' if passed else 'FAIL'} under registered gate")
         return
 
     if args.cmd == "round":

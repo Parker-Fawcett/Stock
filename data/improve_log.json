@@ -388,6 +388,20 @@
    }
   }
  ],
+ "external_validations": {
+  "P15-mc-price-v1": {
+   "status": "pending",
+   "proposal": "P15-consensus40",
+   "cache": "data/cache/mc_price",
+   "evidence": "cross-universe mid-cap validation; full 26 frozen folds",
+   "prediction": "P15 beats the same-run momentum control on CAGR and Sharpe without worsening maximum drawdown by more than 5 percentage points.",
+   "gate": {
+    "candidate_cagr_gt_control": true,
+    "candidate_sharpe_gt_control": true,
+    "max_dd_tolerance": 0.05
+   }
+  }
+ },
  "rounds": [
   {
    "cache": "data/cache/sc_full_v2",
