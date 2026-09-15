@@ -961,3 +961,39 @@ This closes out PAPER.md Section 9 item 3 and lands on the same conclusion
 as everything else this session has found under corrected accounting: the
 ML side of this project has produced nothing that survives being asked "or
 is this just what N trials looks like."
+
+## Matched-universe QuantConnect comparison, prepared but not yet run (Sep 14, 2026)
+
+PAPER.md Section 9 item 4. `qc_momentum.py`'s two completed cloud runs
+(Sleepy Orange Bison, Creative Yellow Antelope) validated *direction* on a
+dynamic top-200 liquid-equity universe over Jan 2011-Jun 2026 -- survivor-free,
+but a different universe and period than the local small-cap backtest, so
+never a magnitude estimate. This does not attempt to fix survivorship (both
+sides still use today's 99 known survivors); it isolates a narrower question:
+does QC's independent data and execution reproduce the local Yahoo-based
+number for the *same* tickers and dates? A mismatch under a matched universe
+is attributable to data/execution differences, not universe or period choice.
+
+**Local reference, recomputed for this exact comparison** (`mom_run.py`,
+same 99-ticker small-cap list minus `LEG`, IWM-relative, 25bps, restricted
+to the window QC's data can actually cover): 2011-02-28 to 2026-05-29 (184
+months) -- **CAGR +21.65%, Sharpe 0.85, maxDD -37.15%**. Matched-window
+buy-hold over the same 184 months: SPY +14.0%, IWM +10.1%.
+
+**`qc_momentum_matched.py`** (new file, not yet run in the cloud): same
+252/21 rule, monthly rebalance, IB fee model as the existing `qc_momentum.py`,
+but replaces the dynamic coarse-filtered universe with a fixed `AddEquity`
+list of the exact same 99 tickers, and sets the backtest window to
+2011-01-01 through 2026-06-17 (QC's last confirmed data end date, not
+assumed to have caught up to Sep 2026 yet -- adjust if it has).
+
+This step needs manual execution: this session has no QuantConnect API
+token or LEAN CLI configured, and the two prior cloud runs were both
+executed by pasting code into the QuantConnect web IDE by hand. To close
+this out: paste `qc_momentum_matched.py` into the cloud project, run it, and
+report back total return, CAGR, Sharpe, max drawdown, and any handled-order
+or data-availability warnings (the guard from the last run -- rejecting
+orders for symbols without a price bar yet -- is unchanged and should still
+apply here). Once that result exists, the honest three-way comparison
+(local Yahoo / QC matched-universe / QC dynamic-universe) can be written up
+in one place instead of guessed at.

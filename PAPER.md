@@ -562,8 +562,10 @@ or machine-learning decision rules.
 3. **Done (Section 6.6).** Deflated Sharpe Ratio using the documented
    research-trial count and return skewness and kurtosis, with a sensitivity
    range extending to informal trials.
-4. Run a QuantConnect comparison on a common period and a universe construction
-   made as comparable as platform data allow. Record every remaining mismatch.
+4. **Prepared, not yet executed.** `qc_momentum_matched.py` fixes the cloud
+   universe to the exact local 99-ticker list and a common 2011-2026 window
+   (FINDINGS.md); requires manual execution in the QuantConnect web IDE,
+   which this session cannot do (no API token or LEAN CLI configured).
 5. Add selection-stability plots by month and by probability distance from the
    cutoff.
 6. Publish environment-lock information and immutable hashes for every table's
@@ -671,6 +673,7 @@ https://doi.org/10.1111/j.1540-6261.1997.tb03808.x
 | Immutable prospective series | `paper.py` | `data/paper/runs/`, `data/paper/log_v2.csv`, `data/paper/grades_v2.csv` |
 | Factor regressions and bootstrap CIs | `factor_analysis.py` | Ken French factor cache (`predictor/factors.py`), console summary recorded in `FINDINGS.md` |
 | Deflated Sharpe Ratio | `deflated_sharpe.py` | `data/cache/sc_full/` (legacy, pre-registered dates), console summary recorded in `FINDINGS.md` |
+| Matched-universe QuantConnect comparison | `qc_momentum_matched.py` (requires manual cloud execution) | Local reference recomputed in `FINDINGS.md`; cloud result pending |
 
 ## Appendix B. Evidence-status vocabulary
 
