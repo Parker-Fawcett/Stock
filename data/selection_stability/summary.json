@@ -1,0 +1,62 @@
+{
+  "source": {
+    "legacy_cache": "data/cache/purge_legacy_ablation",
+    "legacy_cache_sha256": "77a357d5835d811d99531ae51e0fc85e2c88e0557cdcbb069fbdc4ee0b1a9e36",
+    "corrected_cache": "data/cache/purge_fixed_ablation",
+    "corrected_cache_sha256": "eed2dcce295d41ea41ccaa238eb482e6895cecef492c7b5d601051607229af9b",
+    "script_sha256": "426a42068a5938a892792dbe82f4473200958cfb74ed88d2daec0b22a8ededd0"
+  },
+  "specification": {
+    "decision_frequency": "last cached observation in each calendar month",
+    "probability_threshold": 0.25,
+    "maximum_names": 20,
+    "distance_definition": "mean absolute probability distance from each arm's effective threshold/top-count boundary"
+  },
+  "monthly_stability": {
+    "start": "2013-09-30",
+    "end": "2026-07-02",
+    "decision_months": 155,
+    "months_with_nonempty_union": 154,
+    "mean_jaccard": 0.3894231310324592,
+    "median_jaccard": 0.41885964912280704,
+    "jaccard_p10": 0.0,
+    "jaccard_p90": 0.625,
+    "exact_match_months_with_nonempty_union": 2,
+    "mean_rank_spearman": 0.7565503450304396,
+    "median_rank_spearman": 0.7635901275926235,
+    "mean_legacy_names": 10.825806451612904,
+    "mean_corrected_names": 10.35483870967742
+  },
+  "distance_to_boundary": [
+    {
+      "bin": "0-1 pp",
+      "names": 789,
+      "changed": 327,
+      "disagreement_rate": 0.4144486692015209
+    },
+    {
+      "bin": "1-2 pp",
+      "names": 1035,
+      "changed": 397,
+      "disagreement_rate": 0.38357487922705313
+    },
+    {
+      "bin": "2-5 pp",
+      "names": 4191,
+      "changed": 528,
+      "disagreement_rate": 0.12598425196850394
+    },
+    {
+      "bin": "5-10 pp",
+      "names": 6254,
+      "changed": 57,
+      "disagreement_rate": 0.009114166933162776
+    },
+    {
+      "bin": ">10 pp",
+      "names": 776,
+      "changed": 2,
+      "disagreement_rate": 0.002577319587628866
+    }
+  ]
+}

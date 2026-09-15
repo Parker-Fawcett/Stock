@@ -493,7 +493,9 @@ Format is CAGR / Sharpe / maximum drawdown. Tune columns revised Sep 14, 2026
 (see "leg_simple NaN guard" below); hold columns re-verified identical. The
 purge repair alone produces a large positive holdout shift while slightly
 lowering aggregate common-row AUC (0.553 to 0.551). Probability rank
-correlation is 0.762, but selected-name Jaccard is only 0.392. Fixed-purge
+correlation is 0.762. The original all-cached-date diagnostic gives selected-
+name Jaccard 0.392; the later portfolio-frequency analysis gives 0.389 across
+nonempty monthly decisions. Fixed-purge
 P12's tune Sharpe (0.41) now lands almost exactly on the original gate rather
 than clearly under it; the other five tune cells stay clearly below it. Still
 a mechanism diagnostic, not a retroactive promotion -- P12 sitting on the line
@@ -854,10 +856,10 @@ series still has zero observations.
 `PAPER.md` turns the audit trail into a manuscript with one narrow central
 claim: aggregate predictive accuracy can survive a pipeline correction while
 the investable decisions do not. The controlled purge ablation is the primary
-result (AUC 0.553 vs 0.551; probability Spearman 0.762; mean selected-name
-Jaccard 0.392). Corrected momentum and the QuantConnect run are comparisons and
-robustness evidence, not claims of a newly discovered anomaly or matched return
-estimates.
+result (AUC 0.553 vs 0.551; probability Spearman 0.762; mean monthly selected-
+name Jaccard 0.389). Corrected momentum and the QuantConnect run provide
+comparison and robustness evidence rather than claims of a newly discovered
+anomaly or perfectly matched return estimates.
 
 The draft declares the work still required before journal submission:
 block-bootstrap uncertainty, factor regressions, multiple-testing adjustment,
@@ -1088,7 +1090,7 @@ remain fixed. The audit then measures the full propagation path:
 
 - pooled AUC changes only 0.002, from 0.553 to 0.551;
 - full probability-rank correlation remains 0.762;
-- mean selected-name Jaccard falls to 0.392; and
+- mean monthly selected-name Jaccard falls to 0.389; and
 - previously promoted portfolio outcomes change materially under the corrected
   ledger.
 
@@ -1160,3 +1162,45 @@ precommitted five-point tolerance. The attractive small-cap tune result does
 not generalize. Rank agreement remains a reasonable idea for future prospective
 observation, but the independent evidence continues to favor pure momentum over
 adding this machine-learning rank.
+
+## Monthly selection stability and cutoff mechanism (Sep 15, 2026)
+
+`selection_stability.py` closes PAPER.md Section 9 item 5 using the controlled
+purge-ablation caches. Unlike the earlier `cache_compare.py` diagnostic across
+every cached trading date, this analysis uses the last available observation
+in each calendar month, matching the portfolio's rebalance frequency. It
+applies the replayed overlay rule: probability at least 0.25, then at most the
+top 20 names. One month in which both arms select nothing is excluded from
+Jaccard because an empty union contains no investment decision.
+
+Across 155 monthly decisions from September 2013 through the final cached July
+2026 observation, 154 have a nonempty portfolio union. **Mean Jaccard is 0.389,
+median Jaccard is 0.419, and only two nonempty months match exactly.** Mean
+cross-sectional rank correlation remains 0.757. The original all-date Jaccard
+of 0.392 was therefore not driven by daily oversampling; the economically
+relevant monthly estimate is slightly lower.
+
+The distance analysis identifies the mechanism rather than merely showing an
+unstable time series. For each arm and month, the effective boundary is the
+0.25 probability gate unless at least 20 names qualify, in which case it is the
+20th selected probability. Each common name is grouped by its mean absolute
+distance from the two arm-specific boundaries:
+
+| Mean distance from boundary | Security-months | Membership changed |
+|---|---:|---:|
+| 0-1 probability point | 789 | **41.4%** |
+| 1-2 points | 1,035 | **38.4%** |
+| 2-5 points | 4,191 | 12.6% |
+| 5-10 points | 6,254 | 0.9% |
+| More than 10 points | 776 | 0.3% |
+
+Instability falls monotonically with distance and is effectively absent far
+from the boundary. This directly supports the paper's mechanism: a repair can
+leave full-sample AUC almost unchanged while replacing the investable tail
+because portfolio construction discretizes small probability changes near a
+gate. The analysis does not claim that every near-boundary name changes; it
+measures where the observed changes concentrate.
+
+Reproducible outputs are committed in `data/selection_stability/`. The summary
+locks both 26-fold input caches and the generating script by SHA-256. The
+publication figure is committed as `figures/selection_stability.png` and PDF.

@@ -20,7 +20,7 @@ that changed concentration rather than exposure. A controlled refit changes
 only the purge rule while holding the price snapshot, universe, folds, labels,
 test observations, model code, and random seed fixed. Aggregate test AUC barely
 changes, from 0.553 to 0.551, but the probability-rank correlation is 0.762 and
-the mean Jaccard overlap of selected portfolios is only 0.392. Portfolio
+the mean Jaccard overlap of selected portfolios is only 0.389. Portfolio
 conclusions move materially even though headline classifier accuracy does not.
 A simpler 12-minus-1-month momentum rule is more stable: after correcting the
 ledger, it produces positive results in both halves of two current-constituent
@@ -29,10 +29,10 @@ universe-period comparisons, though a moving-block bootstrap on the holdout
 half shows this outperformance is directional rather than statistically
 distinguishable from zero. A point-in-time dynamic-universe QuantConnect
 implementation remains strongly positive. A second cloud run fixes the
-universe and broad period to the local comparison and reports 23.62% CAGR
-versus 21.65% locally, although its Sharpe and drawdown are worse and execution
-details remain unmatched. The evidence supports a methodological
-conclusion rather than a claim of newly discovered alpha: portfolio selection
+universe and broad period to the local comparison. Across 183 common complete
+months, its return path correlates 0.933 with the local implementation; its
+month-end Sharpe and drawdown are also close. The evidence supports a
+methodological conclusion rather than a claim of newly discovered alpha: portfolio selection
 near a model cutoff can be unstable even when aggregate AUC appears robust,
 and implementation audits can dominate model choice in small quantitative
 research programs.
@@ -306,7 +306,9 @@ purge repair within this pipeline. It does not identify a general causal effect
 for other models or datasets.
 
 We report pooled out-of-fold AUC, Pearson and Spearman probability association,
-per-date rank association, and selected-name Jaccard overlap. For selected sets
+monthly rank association, and selected-name Jaccard overlap. The stability
+analysis uses the last cached observation in each calendar month, matching the
+portfolio rebalance rule. For selected sets
 \(A_t\) and \(B_t\), overlap is
 
 \[
@@ -315,7 +317,8 @@ J_t=\frac{|A_t\cap B_t|}{|A_t\cup B_t|}.
 
 The selection rule takes up to 20 names whose predicted probability is at
 least 0.25. This is the economically relevant tail used by the replayed
-overlays.
+overlays. A month in which both arms select no names has no portfolio union and
+is excluded from the mean Jaccard calculation.
 
 ### 5.4 Portfolio accounting
 
@@ -372,13 +375,29 @@ Table 1 presents the central controlled result.
 | Pooled out-of-fold AUC | 0.553 | 0.551 | — |
 | Probability Pearson correlation | — | — | 0.762 |
 | Probability rank correlation | — | — | 0.762 |
-| Mean selected-name Jaccard | — | — | 0.392 |
+| Mean selected-name Jaccard | — | — | 0.389 |
 
 The headline AUC declines by only 0.002 after the repair. The portfolios are
 far less stable: at the threshold and top-20 cutoff, only about 39% of the
 union of selected names appears in both arms on an average decision date. The
 result supports H1 and H2. Aggregate classification quality is insufficient to
 establish decision stability.
+
+Figure 1 separates time variation from proximity to the selection boundary.
+Across 155 monthly decisions, 154 have a nonempty union of selected names. Mean
+Jaccard is 0.389, median Jaccard is 0.419, and only two nonempty months select
+exactly the same portfolio. Membership changes for 41.4% of security-months
+within one probability point of the arm-specific boundary and 38.4% between
+one and two points away. The rate falls to 12.6% at two to five points, 0.9%
+at five to ten points, and 0.3% beyond ten points. This monotone concentration
+at the cutoff supplies direct mechanism evidence for H2.
+
+![Selection stability after repairing the label purge](figures/selection_stability.png)
+
+**Figure 1. Selection stability after repairing the label purge.** Panel A
+shows monthly selected-name overlap and its trailing 12-month mean. Panel B
+groups all common security-months by their mean probability distance from each
+arm's effective probability/top-count boundary. Counts are security-months.
 
 Previously promoted portfolio overlays also change materially, as shown in
 Table 2. Neither ablation arm clears the original tuning gate with confidence
@@ -667,7 +686,7 @@ Five limitations constrain the current evidence.
    promoted. Informal design choices also consume researcher degrees of freedom.
 4. **Incomplete robustness analysis.** Bootstrap intervals, factor regressions,
    and a Deflated Sharpe Ratio are complete. A probability-of-backtest-
-   overfitting analysis and decision-cutoff stability plots remain open.
+   overfitting analysis remains open.
 5. **No clean prospective outcomes yet.** The immutable `prospective-v2`
    series begins at the next completed month end. Historical paper rows were
    generated under a superseded dating and grading implementation and are
@@ -693,8 +712,8 @@ or machine-learning decision rules.
    to the local 99-ticker list and broad 2011-2026 window. `qc_reconcile.py`
    extracts and aligns the result: 183 complete monthly returns correlate 0.933,
    and 142 logged monthly pick sets have mean Jaccard overlap of 0.866.
-5. Add selection-stability plots by month and by probability distance from the
-   cutoff.
+5. **Done (Section 6.1).** `selection_stability.py` reports monthly portfolio
+   overlap and membership disagreement by probability distance from the cutoff.
 6. Publish environment-lock information and immutable hashes for every table's
    source artifact.
 7. Update the prospective section after at least 12 monthly cohorts while
@@ -729,7 +748,7 @@ no longer edit.
 This audit finds that a repair to financial-model validation can leave
 aggregate AUC almost unchanged while replacing most investable selections and
 moving portfolio outcomes. In the controlled ablation, AUC changes from 0.553
-to 0.551, while mean selected-name Jaccard overlap is 0.392. The result exposes
+to 0.551, while mean selected-name Jaccard overlap is 0.389. The result exposes
 a blind spot in workflows that stop at predictive discrimination.
 
 Correct portfolio accounting also changes the magnitude of the evidence. Once
@@ -825,6 +844,7 @@ https://www.preprints.org/manuscript/202608.2127
 |---|---|---|
 | Controlled legacy/fixed purge refit | `purge_ablation.py` | `data/cache/purge_legacy_ablation/`, `data/cache/purge_fixed_ablation/` |
 | Probability and selection agreement | `cache_compare.py` | Fold-level probability CSVs in the two ablation caches |
+| Monthly selection stability | `selection_stability.py` | `data/selection_stability/` and `figures/selection_stability.{png,pdf}` |
 | Corrected momentum results | `mom_run.py` | Cached OHLCV files plus console summary recorded in `FINDINGS.md` |
 | Corrected ML/momentum ensemble | `ens_test.py` | `data/cache/sc_full_v2/` plus console summary recorded in `FINDINGS.md` |
 | Dynamic-universe momentum check | `qc_momentum.py` | QuantConnect result recorded in `FINDINGS.md` and `RESULTS.md` |
